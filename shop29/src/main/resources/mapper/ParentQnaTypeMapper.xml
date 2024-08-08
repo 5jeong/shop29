@@ -11,6 +11,7 @@
             `parent_qna_type_id`, -- 부모 문의타입 ID
             `name`, -- 부모 문의타입 이름
             `description`, -- 부모 문의타입 설명
+            `is_active`, -- 사용여부
             `created_id`, -- 생성자 ID
             `updated_id` -- 수정자 ID
         )
@@ -18,6 +19,7 @@
             #{parentQnaTypeId},
             #{name},
             #{description},
+            #{isActive},
             #{createdId},
             #{updatedId}
         );
