@@ -9,12 +9,27 @@
         where user_id = #{userId};
     </select>
 
+    <!-- 이메일 조회-->
+    <select id="findByEmail" resultType="com.toy2.shop29.users.domain.UserDto">
+        select *
+        from user
+        where email = #{email};
+    </select>
+
+    <!-- 핸드폰번호 조회-->
+    <select id="findByPhoneNumber" resultType="com.toy2.shop29.users.domain.UserDto">
+        select *
+        from user
+        where phone_number = #{phoneNumber};
+    </select>
+
+
     <!-- 회원가입폼에서 회원가입 -->
     <insert id="insertUser" parameterType="com.toy2.shop29.users.domain.UserRegisterDto">
         INSERT INTO user (user_id, password, user_name, email, phone_number, postal_code, address_line1, address_line2,
                           address_reference, birth_date, gender)
         VALUES (#{userId}, #{password}, #{userName}, #{email}, #{phoneNumber}, #{postalCode}, #{addressLine1},
-                #{addressLine2}, #{addressReference}, #{birthDate},  #{gender})
+                #{addressLine2}, #{addressReference}, #{birthDate}, #{gender})
     </insert>
 
     <!-- 회원 삭제 -->
@@ -27,24 +42,23 @@
     <!-- 회원수정 폼에서 수정 -->
     <update id="updateUser" parameterType="map">
         UPDATE user
-        SET password = #{userUpdateDto.password},
-            user_name = #{userUpdateDto.userName},
-            birth_date = #{userUpdateDto.birthDate},
-            phone_number = #{userUpdateDto.phoneNumber},
-            gender = #{userUpdateDto.gender},
-            postal_code = #{userUpdateDto.postalCode},
-            address_line1 = #{userUpdateDto.addressLine1},
-            address_line2 = #{userUpdateDto.addressLine2},
+        SET password          = #{userUpdateDto.password},
+            user_name         = #{userUpdateDto.userName},
+            birth_date        = #{userUpdateDto.birthDate},
+            phone_number      = #{userUpdateDto.phoneNumber},
+            gender            = #{userUpdateDto.gender},
+            postal_code       = #{userUpdateDto.postalCode},
+            address_line1     = #{userUpdateDto.addressLine1},
+            address_line2     = #{userUpdateDto.addressLine2},
             address_reference = #{userUpdateDto.addressReference},
-            email = #{userUpdateDto.email}
+            email             = #{userUpdateDto.email}
         WHERE user_id = #{userId}
     </update>
-    
+
     <select id="userCount" resultType="int">
         select count(*)
         from user
     </select>
-    
 
 
 </mapper>
