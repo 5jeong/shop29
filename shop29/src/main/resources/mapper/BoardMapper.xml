@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.Board.Notice.dao.BoardMapper">
+
+    <select id="count" resultType="int">
+        select count(*) from board
+    </select>
+
+<select id="select" parameterType="int" resultType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+    select notice_number,
+    notice_title,
+    notice_content,
+    notice_creator_id,
+    notice_modifier_id,
+    notice_creation_time,
+    notice_modification_time,
+    top_fixed,
+    top_fixed_priority
+    from board
+    where notice_number= #{notice_number}
+</select>
+
+    <select id="selectAll" resultType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        select notice_number,
+               notice_title,
+               notice_content,
+               notice_creator_id,
+               notice_modifier_id,
+               notice_creation_time,
+               notice_modification_time,
+               top_fixed,
+               top_fixed_priority
+        from board
+        order by notice_creation_time desc, notice_number desc
+</select>
+
+    <select id="selectPage" parameterType="map" resultType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        select notice_number,
+               notice_title,
+               notice_content,
+               notice_creator_id,
+               notice_modifier_id,
+               notice_creation_time,
+               notice_modification_time,
+               top_fixed,
+               top_fixed_priority
+        from board
+        order by notice_creation_time desc, notice_number desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        insert into board (notice_title, notice_content, notice_creator_id)
+               values (#{notice_title}, #{notice_content}, #{notice_creator_id})
+
+    </insert>
+
+    <delete id="deleteAll">
+            deleter from board
+            </delete>
+
+    <delete id="delete" parameterType="map">
+        delete from board where notice_number=#{notice_number} and notice_creator_id=#{notice_creator_id}
+    </delete>
+
+    <update id="update" parameterType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        update board
+        set notice_title=#{notice_title},
+            notice_content=#{notice_content},
+            notice_modification_time=now()
+        where notice_number=#{notice_number}
+    </update>
+
+</mapper>
