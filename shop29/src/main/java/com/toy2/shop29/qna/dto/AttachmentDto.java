@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class AttachmentDto {
-    private Integer attachment_id;
-    private Integer qna_id;
-    private String file_name;
-    private String file_path;
+    private Integer attachmentId;
+    private Integer qnaId;
+    private String fileName;
+    private String filePath;
     private Integer width;
     private Integer height;
     private Integer size;
     private String extension;
-    private Integer is_active;
+    private Integer isActive;
 
     // 시스템 컬럼
-    private LocalDateTime created_time;
-    private String created_id;
-    private LocalDateTime updated_time;
-    private String updated_id;
+    private LocalDateTime createdTime;
+    private String createdId;
+    private LocalDateTime updatedTime;
+    private String updatedId;
 }
