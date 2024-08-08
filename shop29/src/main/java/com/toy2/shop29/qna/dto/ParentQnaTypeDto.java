@@ -1,6 +1,6 @@
 package com.toy2.shop29.qna.dto;
 
-
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,14 +11,24 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class ParentQnaTypeDto {
-    private String parent_qna_type_id;
-    private String name;
-    private String description;
-    private Boolean is_active;
+    @NotNull
+    private String parentQnaTypeId; // 부모 문의유형 ID
 
-    // 시스템 컬럼
-    private LocalDateTime created_time;
-    private String created_id;
-    private LocalDateTime updated_time;
-    private String updated_id;
+    @NotNull
+    private String name; // 부모 문의유형 이름
+
+    @NotNull
+    private String description; // 부모 문의유형 설명
+    private Boolean isActive; // 사용여부
+
+    // System columns
+    private LocalDateTime createdTime;
+
+    @NotNull
+    private String createdId;
+
+    private LocalDateTime updatedTime;
+
+    @NotNull
+    private String updatedId;
 }

@@ -5,7 +5,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -22,83 +21,46 @@ public class ParentQnaTypeDaoImpl implements ParentQnaTypeDao{
         CREATE
      */
     @Override
-    public int insert(ParentQnaTypeDto parentQnaTypeDto) {
-        int rowCnt;
-        try {
-            rowCnt = session.insert(namespace + "insert", parentQnaTypeDto);
-        }catch (DataAccessException e){
-            rowCnt = 0;
-            e.printStackTrace();
-        }
-        return rowCnt;
+    public int insert(ParentQnaTypeDto parentQnaTypeDto) throws DataAccessException {
+        return session.insert(namespace + "insert", parentQnaTypeDto);
     }
 
     /*
         READ
      */
     @Override
-    public ParentQnaTypeDto select(String parentQnaTypeId) {
-        ParentQnaTypeDto parentQnaTypeDto;
-        try {
-            parentQnaTypeDto = session.selectOne(namespace + "select", parentQnaTypeId);
-        }catch (DataAccessException e){
-            parentQnaTypeDto = null;
-            e.printStackTrace();
-        }
-        return parentQnaTypeDto;
+    public ParentQnaTypeDto select(String parentQnaTypeId) throws DataAccessException {
+        return session.selectOne(namespace + "select", parentQnaTypeId);
     }
 
     @Override
-    public List<ParentQnaTypeDto> selectAll() {
-        List<ParentQnaTypeDto> list;
-        try {
-            list = session.selectList(namespace + "selectAll");
-        }catch (DataAccessException e){
-            list = List.of();
-            e.printStackTrace();
-        }
-        return list;
+    public List<ParentQnaTypeDto> selectAll() throws DataAccessException{
+        return session.selectList(namespace + "selectAll");
+    }
+
+    @Override
+    public int count() throws DataAccessException{
+        return session.selectOne(namespace + "count");
     }
 
     /*
         UPDATE
      */
     @Override
-    public int update(ParentQnaTypeDto parentQnaTypeDto) {
-        int rowCnt;
-        try {
-            rowCnt = session.update(namespace + "update", parentQnaTypeDto);
-        }catch (DataAccessException e) {
-            rowCnt = 0;
-            e.printStackTrace();
-        }
-        return rowCnt;
+    public int update(ParentQnaTypeDto parentQnaTypeDto) throws DataAccessException{
+        return session.update(namespace + "update", parentQnaTypeDto);
     }
 
     /*
         DELETE
      */
     @Override
-    public int delete(String parentQnaTypeId) {
-        int rowCnt;
-        try {
-            rowCnt = session.delete(namespace + "delete", parentQnaTypeId);
-        }catch (DataAccessException e) {
-            rowCnt = 0;
-            e.printStackTrace();
-        }
-        return rowCnt;
+    public int delete(String parentQnaTypeId) throws DataAccessException{
+        return session.delete(namespace + "delete", parentQnaTypeId);
     }
 
     @Override
-    public int deleteAll() {
-        int rowCnt;
-        try {
-            rowCnt = session.delete(namespace + "deleteAll");
-        }catch (DataAccessException e){
-            rowCnt = 0;
-            e.printStackTrace();
-        }
-        return rowCnt;
+    public int deleteAll() throws DataAccessException{
+        return session.delete(namespace + "deleteAll");
     }
 }
