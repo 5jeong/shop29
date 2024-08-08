@@ -124,7 +124,7 @@ class ProductDaoImplTest {
         ProductDto product5 = new ProductDto(5, 1,"brand1", "name5", 10000,0,0,new Date(),"aaa",new Date(),"aaa");
 
 
-        //brand_id 여러개 섞어서 product를  insert해주고 총 몇개인지 센다
+        //brand_id 여러개 섞어서 product를  insert해주고 총 몇개인지 센다.
         productDao.insert(product1);
         productDao.insert(product2);
         productDao.insert(product3);
