@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toy2.shop29.cart.dao.CartDaoMapper">
+
+<!--    모든 장바구니 개수 조회-->
+    <select id="count" resultType="int">
+        SELECT count(*) FROM cart
+    </select>
+
+<!--    해당 유저의 장바구니 개수 조회-->
+    <select id="countUserCart" resultType="int">
+        SELECT count(*) FROM cart WHERE user_id = #{userId}
+    </select>
+
+<!--    유저 아이디와 상품 번호로 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
+    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.CartDto">
+        SELECT *
+        FROM cart
+        WHERE user_id = #{userId}
+          AND product_id = #{productId};
+    </select>
+
+<!--    유저 아이디로 해당 유저가 담은 장바구니 조회-->
+    <select id="findcartsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.CartDto">
+        SELECT
+            Cart.product_id,
+            Cart.quantity,
+            Product.product_name,
+            Product.price,
+            Product.sale_ratio,
+            Product.size_info
+        FROM
+            Cart
+                JOIN
+            Product ON Cart.product_id = Product.product_id
+        WHERE
+            Cart.user_id = #{userId}
+    </select>
+
+<!--    장바구니 해당 상품 삭제-->
+    <delete id="deleteCart" parameterType="map">
+        DELETE FROM cart
+        WHERE user_id = #{userId}
+          AND product_id = #{productId};
+    </delete>
+
+<!--    장바구니 해당 상품 수량 업데이트-->
+    <update id="updateCart" parameterType="map">
+        UPDATE Cart
+        SET quantity = #{quantity}
+        WHERE user_id = #{userId} AND product_id = #{productId}
+    </update>
+
+<!--    해당 상품 장바구니 담기-->
+    <insert id="insertCart" parameterType="com.toy2.shop29.cart.domain.CartDto">
+        INSERT INTO Cart (user_id, product_id)
+        VALUES (#{userId}, #{productId})
+    </insert>
+
+</mapper>

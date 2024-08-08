@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>* {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        width: 90%;
+        max-width: 1200px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f8f8f8;
+    }
+
+    img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .item-details {
+        margin-left: 5px;
+        text-align: left;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+
+    .quantity-controls button {
+        cursor: pointer;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        min-height: 25px;
+        width: 36px;
+        min-width: initial;
+        height: 36px;
+        font-size: 20px;
+        font-weight: 400;
+        color: rgb(160, 160, 160);
+        background: rgb(255, 255, 255);
+        border: 1px solid silver;
+    }
+
+    .quantity-controls input {
+        display: block;
+        color: rgb(26, 26, 26);
+        outline: none;
+        width: 37px;
+        height: 36px;
+        margin: 0px;
+        padding: 0px;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        border: 1px solid rgb(228, 228, 228);
+    }
+
+    .price {
+        display: block;
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .buy-btn {
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .buy-btn:hover {
+        background-color: #444;
+    }
+
+    .summary, .checkout-actions {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    .actions {
+
+    }
+
+    .actions button, .checkout-actions button {
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+        margin: 0 5px;
+    }
+
+    .actions button:hover, .checkout-actions button:hover {
+        background-color: #444;
+    }
+
+    .summary {
+        font-size: 18px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .continue-shopping {
+        background-color: #fff;
+        color: #000;
+        border: 1px solid #000;
+    }
+
+    .continue-shopping:hover {
+        background-color: #f8f8f8;
+    }
+
+    .delete {
+        background-color: white !important;
+        border: 1px solid silver !important;
+        color: black !important;
+    }
+
+    .item-info {
+        display:flex;
+    }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Shopping Cart</h1>
+    <table class="cart">
+        <thead>
+        <tr>
+            <th><input type="checkbox" checked></th>
+            <th>상품 정보</th>
+            <th>수량</th>
+            <th>주문금액</th>
+            <th>배송비</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.product_id}">
+            <td><input type="checkbox" checked></td>
+            <td>
+                <div class="item-info">
+                    <img src="https://img.29cm.co.kr/item/202407/11ef4e151edaf399aad275bb5024f198.jpg?width=150"
+                         alt="Product Image">
+                    <div class="item-details">
+                        <h2 th:text="${cart.product_name}">Item Name</h2>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="quantity-controls">
+                    <button class="quantity" onclick="decreaseQuantity(this)">-</button>
+                    <input th:value="${cart.quantity}" min="1" class="quantity-input">
+                    <button class="quantity" onclick="increaseQuantity(this)">+</button>
+                </div>
+                <button class="buy-btn" onclick="updateOrderCount(this)">저장</button>
+            </td>
+            <td>
+                <span class="price" th:text="${cart.price * cart.quantity} + '원'">1,927,800원</span>
+                <button class="buy-btn">BUY NOW</button>
+            </td>
+            <td>조건무료 일반배송</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="actions">
+        <button class="delete">선택상품 삭제</button>
+        <button class="delete">품절상품 삭제</button>
+    </div>
+    <div class="summary">
+        <div class="summary-item">
+            <span>총 주문금액</span>
+            <span>2,922,900원</span>
+        </div>
+        <div class="summary-item">
+            <span>총 배송비</span>
+            <span>4,000원</span>
+        </div>
+        <div class="summary-item">
+            <span>총 결제금액</span>
+            <span>2,926,900원</span>
+        </div>
+    </div>
+    <div class="checkout-actions">
+        <button class="continue-shopping">CONTINUE SHOPPING</button>
+        <button class="checkout">CHECK OUT</button>
+    </div>
+</div>
+<script>
+    function increaseQuantity(button) {
+        const quantityInput = $(button).siblings('.quantity-input');
+        let currentValue = parseInt(quantityInput.val());
+        quantityInput.val(currentValue + 1);
+    }
+
+    function decreaseQuantity(button) {
+        const quantityInput = $(button).siblings('.quantity-input');
+        let currentValue = parseInt(quantityInput.val());
+        if (currentValue > 1) {
+            quantityInput.val(currentValue - 1);
+        }
+    }
+
+    function updateOrderCount(button) {
+        const row = $(button).closest('tr');
+        const id = row.data('id');
+        const quantityInput = row.find('.quantity-input');
+        const orderCount = quantityInput.val();
+
+        $.ajax({
+            url: '/cart/order-count',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: id, orderCount: orderCount }),
+        });
+    }
+</script>
+</body>
+</html>
