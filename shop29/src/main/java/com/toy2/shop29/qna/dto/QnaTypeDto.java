@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class QnaTypeDto {
-    private String qna_type_id;
-    private String parent_qna_type_id;
+    private String qnaTypeId;
+    private String parentQnaTypeId;
     private String name;
     private String description;
-    private Boolean is_order_id_active;
-    private Boolean is_product_id_active;
-    private Boolean is_active;
+    private Boolean isOrderIdActive;
+    private Boolean isProductIdActive;
+    private Boolean isActive;
 
-    // 시스템 컬럼
-    private LocalDateTime created_time;
-    private String created_id;
-    private LocalDateTime updated_time;
-    private String updated_id;
+    // System columns
+    private LocalDateTime createdTime;
+    private String createdId;
+    private LocalDateTime updatedTime;
+    private String updatedId;
 }
