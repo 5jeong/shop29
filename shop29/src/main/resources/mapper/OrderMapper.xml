@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toy2.shop29.order.dao.OrderDaoMapper">
+
+<!--    주문번호로 주문내역 조회 -->
+    <select id="findOrder" parameterType="Long" resultType="com.toy2.shop29.order.domain.OrderDto">
+        SELECT * FROM `order` WHERE order_id = #{id}
+    </select>
+
+<!--    해당 유저의 전체 주문내역 조회-->
+    <select id="findAllOrders" parameterType="String" resultType="com.toy2.shop29.order.domain.OrderDto">
+        SELECT * FROM `order` WHERE user_id = #{id}
+    </select>
