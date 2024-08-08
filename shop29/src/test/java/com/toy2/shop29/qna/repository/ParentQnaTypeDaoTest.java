@@ -29,10 +29,12 @@ public class ParentQnaTypeDaoTest {
         - READ
             1. select
                 시나리오 1) 부모 문의유형 레코드 단건 조회 - 성공 - ParentQnaTypeDto 객체 반환
-                시나리오 2) 부모 문의유형 레코드 단건 조회 - 실패 - null 반환
+                시나리오 2) 부모 문의유형 레코드 단건 조회 - 성공 - 사용여부가 True인 레코드만 조회
+                시나리오 3) 부모 문의유형 레코드 단건 조회 - 실패 - null 반환
             2. selectAll
                 시나리오 1) 부모 문의유형 레코드 전체 조회 - 성공 - List<ParentQnaTypeDto> 객체 반환
-                시나리오 2) 부모 문의유형 레코드 전체 조회 - 실패 - 빈 List 반환
+                시나리오 2) 부모 문의유형 레코드 전체 조회 - 성공 - 사용여부가 True인 레코드들만 조회
+                시나리오 3) 부모 문의유형 레코드 전체 조회 - 실패 - 빈 List 반환
             3. count
                 시나리오 1) 부모 문의유형 레코드 수 조회 - 성공
         - UPDATE
@@ -144,9 +146,25 @@ public class ParentQnaTypeDaoTest {
         assertTrue(selectedDto.getParentQnaTypeId().equals(targetId));
     }
 
-    @DisplayName("부모 문의유형 레코드 단건 조회 - 실패 - null 반환")
+    @DisplayName("부모 문의유형 레코드 단건 조회 - 성공 - 사용여부가 True인 레코드만 조회")
     @Test
     void select_2(){
+        // 1단계 데이터 선택 -> 사용여부가 false 레코드 1건 삽입
+        String id = "TEST";
+        ParentQnaTypeDto dto = createSampleDto(id);
+        dto.setIsActive(false);
+        parentQnaTypeDao.insert(dto);
+
+        // 2단계 데이터 처리 -> 사용여부가 true인 레코드만 조회
+        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(id);
+
+        // 3단계 검증 -> 반환된 객체는 null
+        assertTrue(selectedDto == null);
+    }
+
+    @DisplayName("부모 문의유형 레코드 단건 조회 - 실패 - null 반환")
+    @Test
+    void select_3(){
         // 1단계 데이터 선택 -> (1) dto 객체 3건 생성, (2) 존재하지 않는 ID 지정
         for(int i = 0; i < 3; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
@@ -179,9 +197,35 @@ public class ParentQnaTypeDaoTest {
         assertTrue(list.size() == 3);
     }
 
-    @DisplayName("부모 문의유형 레코드 전체 조회 - 실패 - 빈 List 반환")
+    @DisplayName("부모 문의유형 레코드 전체 조회 - 성공 - 사용여부가 True인 레코드들만 조회")
     @Test
     void selectAll_2(){
+        // 1단계 데이터 선택 -> 사용여부가 true 레코드 3건, false 레코드 1건 삽입
+        for(int i = 0; i < 3; i++){
+            ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
+            parentQnaTypeDao.insert(dto);
+        }
+        ParentQnaTypeDto dto = createSampleDto("TEST_4");
+        dto.setIsActive(false);
+        parentQnaTypeDao.insert(dto);
+
+        // 2단계 데이터 처리 -> 사용여부가 true인 레코드들만 조회
+        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll();
+
+        // 3단계 검증
+        // (1) 반환된 List 객체는 null이 아님
+        assertTrue(list != null);
+        // (2) List 객체의 크기가 3
+        assertTrue(list.size() == 3);
+        // (3) List 객체의 모든 레코드들이 사용여부가 true
+        for(ParentQnaTypeDto selectedDto : list){
+            assertTrue(selectedDto.getIsActive());
+        }
+    }
+
+    @DisplayName("부모 문의유형 레코드 전체 조회 - 실패 - 빈 List 반환")
+    @Test
+    void selectAll_3(){
         // 1단계 데이터 선택 -> @BeforeEach 메소드로 테이블 레코드 전체 삭제
 
         // 2단계 데이터 처리 -> 테이블 전체 조회
@@ -311,6 +355,7 @@ public class ParentQnaTypeDaoTest {
                 .parentQnaTypeId(parentQnaTypeId)
                 .name("테스트")
                 .description("테스트")
+                .isActive(true)
                 .createdId(userId)
                 .updatedId(userId)
                 .build();
