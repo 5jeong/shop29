@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class QnaDto {
-    private Integer qna_id;
-    private String user_id;
-    private String qna_type_id;
+    private Integer qnaId;
+    private String userId;
+    private String qnaTypeId;
     private String title;
     private String content;
-    private Integer order_id;
-    private Integer product_id;
-    private Boolean is_deleted;
-    private LocalDateTime deleted_time;
+    private Integer orderId;
+    private Integer productId;
+    private Boolean isDeleted;
+    private LocalDateTime deletedTime;
 
-    // 시스템 컬럼
-    private LocalDateTime created_time;
-    private String created_id;
-    private LocalDateTime updated_time;
-    private String updated_id;
+    // System columns
+    private LocalDateTime createdTime;
+    private String createdId;
+    private LocalDateTime updatedTime;
+    private String updatedId;
 }
