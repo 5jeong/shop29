@@ -19,7 +19,7 @@ public class ParentQnaTypeDto {
 
     @NotNull
     private String description; // 부모 문의유형 설명
-    private Boolean isActive; // 사용여부
+    private boolean isActive; // 사용여부
 
     // System columns
     private LocalDateTime createdTime;
