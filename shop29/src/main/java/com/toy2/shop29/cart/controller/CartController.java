@@ -1,20 +1,19 @@
 package com.toy2.shop29.cart.controller;
 
+import com.toy2.shop29.cart.domain.CartDto;
+import com.toy2.shop29.cart.domain.request.AddCartProductDto;
+import com.toy2.shop29.cart.domain.request.OrderCountRequestDto;
 import com.toy2.shop29.cart.service.CartService;
-import com.toy2.shop29.cart.service.CartServiceImpl;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.List;
 
 @Controller
 @RequestMapping("/cart")
@@ -23,29 +22,59 @@ public class CartController {
     private CartService cartService;
 
     @GetMapping("/get-list")
-    public String getCartList(HttpServletRequest request, HttpServletResponse response, Model m, @SessionAttribute(name = "userId", required = false) String userId) {
+    public String getCartList(HttpServletRequest request, HttpServletResponse response, Model m, @SessionAttribute(name = "userId", required = false) String userId, @SessionAttribute(name = "guestId", required = false) String guestId) {
+        String userInfo = getUserInfo(userId, guestId);
+        Integer isUser = (userId != null) ? 1 : 0;
         try {
-            // 회원 확인 및 쿠키 남아있는지 확인
-            // 회원이면서 쿠키에 비회원 데이터가 남아있지않으면 패스
-            // 회원이면서 쿠키에 비회원 데이터가 남아있다면 비회원 때 추가한 회원 장바구니에 추가한다.
-
-            // if (userId == null) {
-            //     HttpSession session = request.getSession(true);
-            //     session.setAttribute("userId", "123");
-            //     // Session의 유효 시간 설정 (1800초 = 30분)
-            //     session.setMaxInactiveInterval(1800);
-            //     Cookie cartCookie = new Cookie("cartCookie", ckId);
-            //     cartCookie.setPath("/");
-            //     cartCookie.setMaxAge(60 * 60 * 24);
-            //     response.addCookie(cartCookie);
-            // }
-
-            HttpSession session = request.getSession(true);
-            m.addAttribute("cartList", cartService.getAllCart("user001"));
+            List<CartDto> getAllCart = cartService.getUserCartProducts(userInfo, isUser);
+            m.addAttribute("cartList", getAllCart);
             return "cart";
         } catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return "cart";
         }
+    }
+
+    @PostMapping("/cart-item")
+    public String addCartItem(@SessionAttribute(name = "userId", required = false) String userId, @SessionAttribute(name = "guestId", required = false) String guestId, @RequestBody AddCartProductDto AddCartProductDto) {
+        String userInfo = getUserInfo(userId, guestId);
+        Integer isUser = (userId != null) ? 1 : 0;
+        try {
+            cartService.addProductToCart(userInfo, AddCartProductDto.productId, AddCartProductDto.qauntity, isUser);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return "redirect:/cart/get-list";
+    }
+
+    @PostMapping("/order-count")
+    public @ResponseBody HashMap<String, String> orderCount(@RequestBody OrderCountRequestDto orderCountRequestDto, @SessionAttribute(name = "userId", required = false) String userId, @SessionAttribute(name = "guestId", required = false) String guestId) {
+        int product_id = orderCountRequestDto.getProduct_id();
+        int quantity = orderCountRequestDto.getQuantity();
+        String userInfo = getUserInfo(userId, guestId);
+
+        if (quantity > 100) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("status", "fail");
+            map.put("message", "");
+            return map;
+        }
+
+        try {
+            cartService.updateProductQuantity(userInfo, product_id, quantity);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("status", "success");
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("status", "fail");
+            map.put("message", e.getMessage());
+            return map;
+        }
+    }
+
+    public String getUserInfo(String userId, String guestId) {
+        return (userId != null) ? userId : guestId;
     }
 }

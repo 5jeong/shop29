@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -19,28 +17,35 @@ public class CartDaoTest {
     private CartDaoImpl cartDao;
 
     @Test
-    @DisplayName("사용자의 전체 주문내역 조회")
-    void testFindAllOrders() throws Exception {
+    @DisplayName("사용자 장바구니 추가")
+    void testCreateCart() throws Exception {
         String testUserId = "user001";
 
-        List<CartDto> result = cartDao.findcartsByUserId(testUserId);
+        int result = cartDao.countUserCart(testUserId);
 
-        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(1);
     }
 
     @Test
     @DisplayName("장바구니 상품 추가")
-    void testInsertcart() throws Exception {
+    void testInsertCart() throws Exception {
         String testUserId = "user001";
-        String productId = "5";
+        Integer productId = 5;
+        Integer quantity = 5;
 
         // 장바구니 해당 상품 조회
         CartDto cart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
         assertThat(cart).isNull();
 
+        try {
+            cartDao.createCart(testUserId, 1);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
         // 장바구니에 해당 상품이 있어야 됨
         if (cart == null) {
-            cartDao.insertCart(testUserId, productId);
+            cartDao.insertUserCartProduct(testUserId, productId, quantity);
             cart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
             assertThat(cart).isNotNull();
         }
@@ -48,9 +53,9 @@ public class CartDaoTest {
 
     @Test
     @DisplayName("장바구니 수량 더하기")
-    void testIncreasecartQuantity() throws Exception {
+    void testIncreaseUserCartProductQuantity() throws Exception {
         String testUserId = "user001";
-        String productId = "5";
+        Integer productId = 5;
         int quantity = (int) (Math.random() * 11 + 10);
 
         // 장바구니 해당 상품 조회
@@ -58,18 +63,18 @@ public class CartDaoTest {
 
         // 장바구니에 해당 상품이 있어야 됨
         if (cart != null) {
-            cartDao.updatecartQuantity(testUserId, productId, cart.getQuantity() + quantity);
-            CartDto updatedcart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
+            cartDao.updateUserCartProductQuantity(testUserId, productId, cart.getQuantity() + quantity);
+            CartDto updater = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
 
-            assertThat(updatedcart.getQuantity()).isGreaterThan(cart.getQuantity());
+            assertThat(updater.getQuantity()).isGreaterThan(cart.getQuantity());
         }
     }
 
     @Test
     @DisplayName("장바구니 수량 빼기")
-    void testDecreasecartQuantity() throws Exception {
+    void testDecreaseUserCartProductQuantity() throws Exception {
         String testUserId = "user001";
-        String productId = "5";
+        Integer productId = 5;
         int quantity = (int) (Math.random() * 11 + 10);
 
         // 장바구니 해당 상품 조회
@@ -78,7 +83,7 @@ public class CartDaoTest {
         // 장바구니에 해당 상품이 있어야 됨
 
         if (cart != null) {
-            cartDao.updatecartQuantity(testUserId, productId, cart.getQuantity() - quantity);
+            cartDao.updateUserCartProductQuantity(testUserId, productId, cart.getQuantity() - quantity);
             CartDto updatedcart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
 
             assertThat(updatedcart.getQuantity()).isLessThan(cart.getQuantity());
@@ -87,17 +92,27 @@ public class CartDaoTest {
 
     @Test
     @DisplayName("장바구니 해당 상품 삭제")
-    void testDeletecart() throws Exception {
+    void testDeleteUserCartProduct() throws Exception {
         String testUserId = "user001";
-        String productId = "5";
+        Integer productId = 5;
 
         CartDto cart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
 
         if (cart != null) {
-            cartDao.deleteCart(testUserId, productId);
+            cartDao.deleteUserCartProduct(testUserId, productId);
             cart = cartDao.searchProductIdByUserIdAndProductId(testUserId, productId);
             assertThat(cart).isNull();
         }
+    }
 
+    @Test
+    @DisplayName("유저의 장바구니 삭제")
+    void testDeleteCart() throws Exception {
+        String testUserId = "user001";
+
+        cartDao.deleteUserCart(testUserId);
+
+        assertThat(cartDao.countUserCart(testUserId)).isEqualTo(0);
+        assertThat(cartDao.countUserCartProducts(testUserId)).isEqualTo(0);
     }
 }

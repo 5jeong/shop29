@@ -4,58 +4,100 @@
 <mapper namespace="com.toy2.shop29.cart.dao.CartDaoMapper">
 
 <!--    모든 장바구니 개수 조회-->
-    <select id="count" resultType="int">
+    <select id="countAllUsersCart" resultType="int">
         SELECT count(*) FROM cart
     </select>
 
-<!--    해당 유저의 장바구니 개수 조회-->
+<!--    해당 유저의 장바구니 상품 개수 조회-->
+    <select id="countUserCartProducts" resultType="int">
+        SELECT COUNT(*)
+        FROM CartItem ci
+                 JOIN Cart c ON ci.cart_id = c.cart_id
+        WHERE c.user_id = #{userId};
+    </select>
+
+    <!--해당 유저 장바구니 존재 유무 조회-->
     <select id="countUserCart" resultType="int">
-        SELECT count(*) FROM cart WHERE user_id = #{userId}
+        SELECT COUNT(*)
+        FROM CART
+        WHERE user_id = #{userId};
     </select>
 
-<!--    유저 아이디와 상품 번호로 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
-    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.CartDto">
-        SELECT *
-        FROM cart
-        WHERE user_id = #{userId}
-          AND product_id = #{productId};
-    </select>
+    <!--장바구니 생성-->
+    <insert id="createCart" parameterType="map">
+        INSERT INTO Cart (user_id, is_user)
+        VALUES (#{userId}, #{isUser})
+    </insert>
 
-<!--    유저 아이디로 해당 유저가 담은 장바구니 조회-->
-    <select id="findcartsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.CartDto">
+    <!--    유저 아이디로 해당 유저의 장바구니 상품 전체 조회-->
+    <select id="findUserCartProductsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.CartDto">
         SELECT
-            Cart.product_id,
-            Cart.quantity,
-            Product.product_name,
-            Product.price,
-            Product.sale_ratio,
-            Product.size_info
+            ci.product_id,
+            ci.quantity,
+            p.product_name,
+            p.price,
+            p.sale_ratio
         FROM
-            Cart
+            CartItem ci
                 JOIN
-            Product ON Cart.product_id = Product.product_id
+            Product p ON ci.product_id = p.product_id
+                JOIN
+            Cart c ON ci.cart_id = c.cart_id
         WHERE
-            Cart.user_id = #{userId}
+            c.user_id = #{userId};
     </select>
 
-<!--    장바구니 해당 상품 삭제-->
-    <delete id="deleteCart" parameterType="map">
-        DELETE FROM cart
-        WHERE user_id = #{userId}
+<!--    (유저 아이디와 상품 번호로) 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
+    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.CartDto">
+        SELECT
+            ci.product_id,
+            ci.quantity,
+            p.product_name,
+            p.price,
+            p.sale_ratio
+        FROM
+            CartItem ci
+                JOIN
+            Product p ON ci.product_id = p.product_id
+                JOIN
+            Cart c ON ci.cart_id = c.cart_id
+        WHERE
+            c.user_id = #{userId}
+          AND ci.product_id = #{productId};
+    </select>
+
+    <!--    장바구니 해당 상품 담기-->
+    <insert id="insertUserCartProduct" parameterType="map">
+        INSERT INTO CartItem (cart_id, product_id, quantity)
+        VALUES ((SELECT cart_id FROM Cart WHERE user_id = #{userId}),#{productId},#{quantity});
+    </insert>
+
+    <!--    장바구니 해당 상품 수량 업데이트-->
+    <update id="modifyCartLastUpdate" parameterType="map">
+        UPDATE Cart
+        SET last_update = (now())
+        WHERE user_id = #{userId};
+    </update>
+
+<!--    장바구니 해당 상품 수량 업데이트-->
+    <update id="updateUserCartProductQuantity" parameterType="map">
+        UPDATE CartItem
+        SET quantity = #{quantity}
+        WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
+          AND product_id = #{productId};
+    </update>
+
+    <!--    장바구니 해당 상품 삭제-->
+    <delete id="deleteUserCartProduct" parameterType="map">
+        DELETE FROM CartItem
+        WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
           AND product_id = #{productId};
     </delete>
 
-<!--    장바구니 해당 상품 수량 업데이트-->
-    <update id="updateCart" parameterType="map">
-        UPDATE Cart
-        SET quantity = #{quantity}
-        WHERE user_id = #{userId} AND product_id = #{productId}
-    </update>
-
-<!--    해당 상품 장바구니 담기-->
-    <insert id="insertCart" parameterType="com.toy2.shop29.cart.domain.CartDto">
-        INSERT INTO Cart (user_id, product_id)
-        VALUES (#{userId}, #{productId})
-    </insert>
+    <!--    장바구니 해당 상품 삭제-->
+    <delete id="deleteUserCart" parameterType="String">
+        DELETE FROM CART
+        WHERE user_id = #{userId};
+    </delete>
 
 </mapper>

@@ -18,13 +18,36 @@ public class CartDaoImpl implements CartDao {
     private static String namespace = "com.toy2.shop29.cart.dao.CartDaoMapper.";
 
     @Override
-    public List<CartDto> findcartsByUserId(String userId) {
-        return session.selectList(namespace + "findcartsByUserId", userId);
+    public int countAllUsersCart() throws Exception {
+        return session.selectOne(namespace + "countAllUsersCart");
     }
 
     @Override
-    public CartDto searchProductIdByUserIdAndProductId(String userId, String productId) {
-        Map map = new HashMap();
+    public int countUserCartProducts(String userId) throws Exception {
+        return session.selectOne(namespace + "countUserCartProducts", userId);
+    }
+
+    @Override
+    public int countUserCart(String userId) {
+        return session.selectOne(namespace + "countUserCart", userId);
+    }
+
+    @Override
+    public int createCart(String userId, Integer is_user) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("isUser", is_user);
+        return session.insert(namespace + "createCart", params);
+    }
+    
+    @Override
+    public List<CartDto> findUserCartProductsByUserId(String userId) throws Exception {
+        return session.selectList(namespace + "findUserCartProductsByUserId", userId);
+    }
+
+    @Override
+    public CartDto searchProductIdByUserIdAndProductId(String userId, Integer productId) throws Exception {
+        Map<String, Object> map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
 
@@ -32,28 +55,40 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int insertCart(String userId, String productId) {
-        Map map = new HashMap();
-        map.put("userId", userId);
-        map.put("productId", productId);
-        return session.insert(namespace + "insertCart", map);
-    }
-
-    @Override
-    public int updatecartQuantity(String userId, String productId, Integer quantity) {
+    public int insertUserCartProduct(String userId, Integer productId, Integer quantity) throws Exception {
         Map map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
         map.put("quantity", quantity);
 
-        return session.update(namespace + "updateCart", map);
+        return session.insert(namespace + "insertUserCartProduct", map);
     }
 
     @Override
-    public int deleteCart(String userId, String productId) {
+    public int modifyCartLastUpdate(String userId) throws Exception {
+        return session.update(namespace + "modifyCartLastUpdate", userId);
+    }
+
+    @Override
+    public int updateUserCartProductQuantity(String userId, Integer productId, Integer quantity) throws Exception {
         Map map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
-        return session.delete(namespace + "deleteCart", map);
+        map.put("quantity", quantity);
+
+        return session.update(namespace + "updateUserCartProductQuantity", map);
+    }
+
+    @Override
+    public int deleteUserCartProduct(String userId, Integer productId) throws Exception {
+        Map map = new HashMap();
+        map.put("userId", userId);
+        map.put("productId", productId);
+        return session.delete(namespace + "deleteUserCartProduct", map);
+    }
+
+    @Override
+    public int deleteUserCart(String userId) {
+        return session.delete(namespace + "deleteUserCart", userId);
     }
 }

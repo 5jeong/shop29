@@ -12,3 +12,10 @@
     <select id="findAllOrders" parameterType="String" resultType="com.toy2.shop29.order.domain.OrderDto">
         SELECT * FROM `order` WHERE user_id = #{id}
     </select>
+
+<!--주문 내역 추가하기-->
+<!--    <insert id="insertOrder" parameterType="com.toy2.shop29.cart.domain.OrderDto">-->
+<!--        INSERT INTO Order (user_id, product_id)-->
+<!--        VALUES (#{userId}, #{productId})-->
+<!--    </insert>-->
+</mapper>

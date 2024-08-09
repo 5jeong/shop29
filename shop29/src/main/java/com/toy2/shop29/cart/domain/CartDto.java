@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class CartDto {
+
     private int product_id;
     private Integer quantity;
     private String product_name;
@@ -66,5 +67,17 @@ public class CartDto {
 
     public void setSize_info(String size_info) {
         this.size_info = size_info;
+    }
+
+    @Override
+    public String toString() {
+        return "CartDto{" +
+                "product_id=" + product_id +
+                ", quantity=" + quantity +
+                ", product_name='" + product_name + '\'' +
+                ", price=" + price +
+                ", sale_ratio=" + sale_ratio +
+                ", size_info='" + size_info + '\'' +
+                '}';
     }
 }
