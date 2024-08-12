@@ -28,9 +28,20 @@ public class QnaAnswerDaoImpl implements QnaAnswerDao{
     }
 
 
+
+
     /*
         READ
      */
+    @Override
+    public QnaAnswerDto selectBy(int qnaId, Boolean isDeleted) throws DataAccessException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("qnaId", qnaId);
+        map.put("isDeleted", isDeleted);
+
+        return session.selectOne(namespace + "selectBy", map);
+    }
+
     @Override
     public QnaAnswerDto select(int qnaAnswerId, Boolean isDeleted) throws DataAccessException {
         Map<String, Object> map = new HashMap<>();

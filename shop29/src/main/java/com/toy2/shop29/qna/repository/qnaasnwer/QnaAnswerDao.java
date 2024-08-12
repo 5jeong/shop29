@@ -10,6 +10,7 @@ public interface QnaAnswerDao {
     int insert(QnaAnswerDto qnaAnswerDto) throws DataAccessException;
 
     // Read
+    QnaAnswerDto selectBy(int qnaId, Boolean isDeleted) throws DataAccessException;
     // 테스트 목적
     QnaAnswerDto select(int qnaAnswerId, Boolean isDeleted) throws DataAccessException;
     // 테스트 목적
