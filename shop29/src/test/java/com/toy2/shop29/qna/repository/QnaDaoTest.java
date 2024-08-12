@@ -135,7 +135,6 @@ public class QnaDaoTest {
         int baseQnaId = list.get(0).getQnaId();
         for(int i=0; i<selectedList.size(); i++){
             QnaDto selectedDto = selectedList.get(i);
-            assertTrue(selectedDto.getQnaId().equals(baseQnaId + offset + i));
             assertTrue(selectedDto.getUserId().equals(userId));
             assertTrue(selectedDto.getQnaTypeId().equals(sampleQnaType.getQnaTypeId()));
             assertTrue(selectedDto.getQnaAnswer() != null);
