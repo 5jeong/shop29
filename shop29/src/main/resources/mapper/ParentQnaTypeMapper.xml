@@ -6,7 +6,7 @@
 
     <!--  CREATE-->
     <!-- 부모 문의타입 생성 -->
-    <insert id="insert" parameterType="com.toy2.shop29.qna.dto.ParentQnaTypeDto" useGeneratedKeys="true" keyProperty="parentQnaTypeId">
+    <insert id="insert" parameterType="com.toy2.shop29.qna.domain.ParentQnaTypeDto" useGeneratedKeys="true" keyProperty="parentQnaTypeId">
         INSERT INTO `ParentQnaType`(
             `parent_qna_type_id`, -- 부모 문의타입 ID
             `name`, -- 부모 문의타입 이름
@@ -27,18 +27,23 @@
 
     <!-- READ -->
     <!-- 부모 문의타입 단건 조회 -->
-    <select id="select" parameterType="String" resultType="com.toy2.shop29.qna.dto.ParentQnaTypeDto">
+    <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.ParentQnaTypeDto">
         SELECT *
         FROM `ParentQnaType`
         WHERE `parent_qna_type_id` = #{parentQnaTypeId} -- 부모 문의타입 ID
-            AND `is_active` = true -- 사용여부 확인
+        <if test="isActive != null">
+            AND `is_active` = #{isActive} -- 사용여부 확인
+        </if>
     </select>
 
     <!-- 부모 문의타입 전체 조회 -->
-    <select id="selectAll" resultType="com.toy2.shop29.qna.dto.ParentQnaTypeDto">
+    <select id="selectAll" parameterType="boolean" resultType="com.toy2.shop29.qna.domain.ParentQnaTypeDto">
         SELECT *
         FROM `ParentQnaType`
-        WHERE `is_active` = true -- 사용여부 확인
+        WHERE 1=1 -- 동적쿼리 오류 방지
+        <if test="isActive != null">
+            AND `is_active` = #{isActive} -- 사용여부 확인
+        </if>
         ORDER BY `parent_qna_type_id` -- 부모 문의타입 ID
     </select>
 
@@ -50,7 +55,7 @@
 
     <!-- UPDATE -->
     <!-- 부모 문의타입 단건 수정 -->
-    <update id="update" parameterType="com.toy2.shop29.qna.dto.ParentQnaTypeDto">
+    <update id="update" parameterType="com.toy2.shop29.qna.domain.ParentQnaTypeDto">
         UPDATE `ParentQnaType`
         SET
             `name` = #{name}, -- 부모 문의타입 이름

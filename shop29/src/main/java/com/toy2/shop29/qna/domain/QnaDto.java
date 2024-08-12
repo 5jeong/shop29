@@ -1,14 +1,15 @@
-package com.toy2.shop29.qna.dto;
+package com.toy2.shop29.qna.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class QnaDto {
     private Integer qnaId;
     private String userId;
@@ -17,7 +18,8 @@ public class QnaDto {
     private String content;
     private Integer orderId;
     private Integer productId;
-    private Boolean isDeleted;
+
+    private boolean isDeleted;
     private LocalDateTime deletedTime;
 
     // System columns
@@ -25,4 +27,10 @@ public class QnaDto {
     private String createdId;
     private LocalDateTime updatedTime;
     private String updatedId;
+
+    // JOIN
+    private QnaTypeDto qnaType;
+    private UserForQnaDto user;
+    private QnaAnswerDto qnaAnswer;
+    private List<AttachmentDto> attachments;
 }

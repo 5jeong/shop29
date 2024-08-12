@@ -1,14 +1,14 @@
-package com.toy2.shop29.qna.dto;
+package com.toy2.shop29.qna.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AttachmentDto {
     private Integer attachmentId;
     private Integer qnaId;
@@ -18,7 +18,7 @@ public class AttachmentDto {
     private Integer height;
     private Integer size;
     private String extension;
-    private Integer isActive;
+    private Boolean isActive;
 
     // 시스템 컬럼
     private LocalDateTime createdTime;

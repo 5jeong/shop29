@@ -1,15 +1,15 @@
-package com.toy2.shop29.qna.dto;
+package com.toy2.shop29.qna.domain;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ParentQnaTypeDto {
     @NotNull
     private String parentQnaTypeId; // 부모 문의유형 ID

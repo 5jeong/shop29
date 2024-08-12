@@ -1,6 +1,6 @@
-package com.toy2.shop29.qna.repository;
+package com.toy2.shop29.qna.repository.parentqnatype;
 
-import com.toy2.shop29.qna.dto.ParentQnaTypeDto;
+import com.toy2.shop29.qna.domain.ParentQnaTypeDto;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
@@ -11,8 +11,8 @@ public interface ParentQnaTypeDao {
     int insert(ParentQnaTypeDto parentQnaTypeDto) throws DataAccessException;
 
     // Read
-    ParentQnaTypeDto select(String parentQnaTypeId) throws DataAccessException;
-    List<ParentQnaTypeDto> selectAll() throws DataAccessException;
+    ParentQnaTypeDto select(String parentQnaTypeId, Boolean isActive) throws DataAccessException;
+    List<ParentQnaTypeDto> selectAll(Boolean isActive) throws DataAccessException;
     int count() throws DataAccessException;
 
     // Update
