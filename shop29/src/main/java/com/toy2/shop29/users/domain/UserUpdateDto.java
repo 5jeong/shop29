@@ -4,9 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,8 +13,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Setter
 @ToString
 public class UserUpdateDto {
-
-    private String userId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d).{8,20}$", message = "비밀번호는 8~20자, 대소문자 및 숫자로 이루어져야 합니다.")
