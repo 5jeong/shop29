@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
-//    private final JavaMailSenderImpl mailSender;
+    // SMTP를 통해 이메일 전송할 수 있도록 지원,
+    // 메일 객체 생성, 메일 전송 등의 기능을 제공
+    private final JavaMailSender mailSender;
 
     // 이메일을 발송할 발신자 주소
     @Value("${spring.mail.username")
     private String emailSender;
 
-    // SMTP를 통해 이메일 전송할 수 있도록 지원,
-    // 메일 객체 생성, 메일 전송 등의 기능을 제공
-    private final JavaMailSender mailSender;
+
 
     // 이메일 인증번호 전송
     public void sendVerificationEmail(EmailVerificationDto emailDto) {
