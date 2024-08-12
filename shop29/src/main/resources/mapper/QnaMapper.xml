@@ -313,7 +313,7 @@
         SELECT
             *
         FROM `Qna`
-        WHERE `qna_id` = #{qnaId};
+        WHERE `qna_id` = #{qnaId}
         <if test="isDeleted != null">
             AND `is_deleted` = #{isDeleted}
         </if>
