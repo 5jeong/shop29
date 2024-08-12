@@ -2,16 +2,12 @@ package com.toy2.shop29.users.domain;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
@@ -26,7 +22,6 @@ public class UserRegisterDto {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d).{8,20}$", message = "비밀번호는 8~20자, 대소문자 및 숫자로 이루어져야 합니다.")
     private String password;  // 비밀번호
-
 
     @NotBlank(message = "이름을 입력해주세요.")
     @Pattern(regexp = "^[^0-9]{2,15}$", message = "이름은 숫자를 포함할 수 없으며 2~15자 이내여야 합니다.")
