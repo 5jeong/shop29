@@ -1,6 +1,7 @@
 package com.toy2.shop29.qna.repository;
 
-import com.toy2.shop29.qna.dto.ParentQnaTypeDto;
+import com.toy2.shop29.qna.domain.ParentQnaTypeDto;
+import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -133,7 +134,7 @@ public class ParentQnaTypeDaoTest {
         String targetId = "TEST_2"; // (2) 조회할 parentQnaTypeId 지정
 
         // 2단계 데이터 처리 -> 삽입된 레코드들 중, 특정 레코드 조회
-        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(targetId);
+        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(targetId,true);
 
         // 3단계 검증 -> (1)반환된 객체는 null이 아님, (2) 반환된 객체의 ID가 targetId와 일치
         assertTrue(selectedDto != null);
@@ -150,7 +151,7 @@ public class ParentQnaTypeDaoTest {
         parentQnaTypeDao.insert(dto);
 
         // 2단계 데이터 처리 -> 사용여부가 true인 레코드만 조회
-        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(id);
+        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(id,true);
 
         // 3단계 검증 -> 반환된 객체는 null
         assertTrue(selectedDto == null);
@@ -168,7 +169,7 @@ public class ParentQnaTypeDaoTest {
         String targetId = "TEST_4";
 
         // 2단계 데이터 처리 -> 삽입된 레코드들 중, 존재하지 않는 ID로 조회
-        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(targetId);
+        ParentQnaTypeDto selectedDto = parentQnaTypeDao.select(targetId,true);
 
         // 3단계 검증 -> 반환된 객체는 null
         assertTrue(selectedDto == null);
@@ -178,24 +179,26 @@ public class ParentQnaTypeDaoTest {
     @Test
     void selectAll_1(){
         // 1단계 데이터 선택 -> dto 객체 3건 생성
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             parentQnaTypeDao.insert(dto);
         }
 
         // 2단계 데이터 처리 -> 테이블 전체 조회
-        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll();
+        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll(true);
 
         // 3단계 검증 -> (1)반환된 List 객체는 null이 아님, (2) List 객체의 크기가 3
         assertTrue(list != null);
-        assertTrue(list.size() == 3);
+        assertTrue(list.size() == insertCnt);
     }
 
     @DisplayName("부모 문의유형 레코드 전체 조회 - 성공 - 사용여부가 True인 레코드들만 조회")
     @Test
     void selectAll_2(){
         // 1단계 데이터 선택 -> 사용여부가 true 레코드 3건, false 레코드 1건 삽입
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             assertTrue(parentQnaTypeDao.insert(dto) == 1);
         }
@@ -204,13 +207,13 @@ public class ParentQnaTypeDaoTest {
         assertTrue(parentQnaTypeDao.insert(dto) == 1);
 
         // 2단계 데이터 처리 -> 사용여부가 true인 레코드들만 조회
-        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll();
+        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll(true);
 
         // 3단계 검증
         // (1) 반환된 List 객체는 null이 아님
         assertTrue(list != null);
         // (2) List 객체의 크기가 3
-        assertTrue(list.size() == 3);
+        assertTrue(list.size() == insertCnt);
         // (3) List 객체의 모든 레코드들이 사용여부가 true
         for(ParentQnaTypeDto selectedDto : list){
             assertTrue(selectedDto.isActive());
@@ -223,7 +226,7 @@ public class ParentQnaTypeDaoTest {
         // 1단계 데이터 선택 -> @BeforeEach 메소드로 테이블 레코드 전체 삭제
 
         // 2단계 데이터 처리 -> 테이블 전체 조회
-        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll();
+        List<ParentQnaTypeDto> list = parentQnaTypeDao.selectAll(true);
 
         // 3단계 검증 -> 반환된 List 객체는 null이 아님, List 객체의 크기가 0
         assertTrue(list != null);
@@ -234,7 +237,8 @@ public class ParentQnaTypeDaoTest {
     @Test
     void count_1(){
         // 1단계 데이터 선택 -> dto 객체 3건 생성
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             parentQnaTypeDao.insert(dto);
         }
@@ -243,7 +247,7 @@ public class ParentQnaTypeDaoTest {
         int count = parentQnaTypeDao.count();
 
         // 3단계 검증 -> 레코드 수 == 3
-        assertTrue(count == 3);
+        assertTrue(count == insertCnt);
     }
 
     @DisplayName("부모 문의유형 레코드 수정 - 성공 - 각 컬럼에 대해 수정여부 확인")
@@ -261,7 +265,7 @@ public class ParentQnaTypeDaoTest {
         ParentQnaTypeDto dto = createSampleDto(id);
         assertTrue(parentQnaTypeDao.insert(dto) == 1 );
         // (2) columnName에 해당하는 컬럼값 수정
-        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId());
+        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId(),true);
         assertTrue(insertedDto != null);
         switch (columnName){
             case "name": insertedDto.setName(insertedDto.getName() + "_MODIFIED"); break;
@@ -277,7 +281,7 @@ public class ParentQnaTypeDaoTest {
         // (1) 결과값 == 1
         assertTrue(rowCnt == 1);
         // (2) 수정된 레코드 조회 후, columnName에 해당하는 컬럼값 수정여부 확인
-        ParentQnaTypeDto updatedDto = parentQnaTypeDao.select(insertedDto.getParentQnaTypeId());
+        ParentQnaTypeDto updatedDto = parentQnaTypeDao.select(insertedDto.getParentQnaTypeId(),true);
         switch (columnName){
             case "name": assertTrue(!updatedDto.getName().equals(dto.getName())); break;
             case "isActive":
@@ -297,7 +301,7 @@ public class ParentQnaTypeDaoTest {
         int rowCnt = parentQnaTypeDao.insert(dto);
         assertTrue(rowCnt == 1);
 
-        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId());
+        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId(),true);
         assertTrue(insertedDto != null);
         assertTrue(insertedDto.getParentQnaTypeId().equals(dto.getParentQnaTypeId()));
 
@@ -309,7 +313,7 @@ public class ParentQnaTypeDaoTest {
         rowCnt = parentQnaTypeDao.update(insertedDto);
 
         // 3단계 검증 -> 수정된 레코드 조회 후, 수정일시 변경여부 확인
-        ParentQnaTypeDto updatedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId());
+        ParentQnaTypeDto updatedDto = parentQnaTypeDao.select(dto.getParentQnaTypeId(),true);
         assertTrue(updatedDto != null);
         assertTrue(updatedDto.getParentQnaTypeId().equals(dto.getParentQnaTypeId()));
         assertTrue(!updatedDto.getUpdatedTime().equals(insertedDto.getUpdatedTime()));
@@ -319,7 +323,8 @@ public class ParentQnaTypeDaoTest {
     @Test
     void update_3(){
         // 1단계 데이터 선택 -> (1) 레코드 3건 삽입, (2) 존재하지 않는 레코드 생성
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             parentQnaTypeDao.insert(dto);
         }
@@ -345,7 +350,7 @@ public class ParentQnaTypeDaoTest {
         String id = "TEST_ID";
         ParentQnaTypeDto dto = createSampleDto(id);
         parentQnaTypeDao.insert(dto);
-        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(id);
+        ParentQnaTypeDto insertedDto = parentQnaTypeDao.select(id,true);
 
         // (2) columnName에 해당하는 컬럼 Null 처리
         switch (columnName){
@@ -364,7 +369,8 @@ public class ParentQnaTypeDaoTest {
     void delete_1(){
         // 1단계 데이터 선택
         // (1) 레코드 3건 삽입
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             parentQnaTypeDao.insert(dto);
         }
@@ -378,9 +384,9 @@ public class ParentQnaTypeDaoTest {
         // (1) 결과값 == 1
         assertTrue(rowCnt == 1);
         // (2) 전체 레코드 수 == 2
-        assertTrue(parentQnaTypeDao.count() == 2);
+        assertTrue(parentQnaTypeDao.count() == insertCnt - 1);
         // (3) 삭제된 ID로 조회 시, null 반환
-        assertTrue(parentQnaTypeDao.select(targetId) == null);
+        assertTrue(parentQnaTypeDao.select(targetId,true) == null);
     }
 
     @DisplayName("부모 문의유형 레코드 삭제 - 실패 - 조회된 레코드 없음")
@@ -388,7 +394,8 @@ public class ParentQnaTypeDaoTest {
     void delete_2(){
         // 1단계 데이터 선택
         // (1) 레코드 3건 삽입
-        for(int i = 0; i < 3; i++){
+        int insertCnt = 3;
+        for(int i = 0; i < insertCnt; i++){
             ParentQnaTypeDto dto = createSampleDto("TEST_" + i);
             parentQnaTypeDao.insert(dto);
         }
@@ -402,7 +409,7 @@ public class ParentQnaTypeDaoTest {
         // (1) 결과값 == 0
         assertTrue(rowCnt == 0);
         // (2) 전체 레코드 수 == 3
-        assertTrue(parentQnaTypeDao.count() == 3);
+        assertTrue(parentQnaTypeDao.count() == insertCnt);
     }
 
     @DisplayName("부모 문의유형 레코드 전체 삭제 - 성공")
