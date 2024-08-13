@@ -6,16 +6,30 @@ import java.util.List;
 import java.util.Map;
 
 public interface BoardDao {
-    BoardDto select(int notice_number);
 
-    BoardDto select(Integer notice_number);
-    int delete(Integer notice_number, String notice_creatior);
+    // 특정 공지사항을 조회하는 메서드
+    BoardDto select(Integer noticeId);
+
+    // 공지사항을 삭제하는 메서드
+    int delete(Integer noticeId, String noticeCreatorId);
+
+    // 공지사항을 삽입하는 메서드
     int insert(BoardDto boardDto);
+
+    // 공지사항을 업데이트하는 메서드
     int update(BoardDto boardDto);
 
+    // 모든 공지사항을 조회하는 메서드
     List<BoardDto> selectAll();
-    List<BoardDto> selectPage(Map map);
+
+    // 페이지네이션을 적용하여 공지사항을 조회하는 메서드
+    List<BoardDto> selectPage(Map<String, Object> map);
+
+    // 모든 공지사항을 삭제하는 메서드
     int deleteAll();
+
+    // 공지사항의 총 개수를 조회하는 메서드
     int count();
+
 
 }

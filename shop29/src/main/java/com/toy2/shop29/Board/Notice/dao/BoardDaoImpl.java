@@ -12,53 +12,55 @@ import java.util.Map;
 public class BoardDaoImpl implements BoardDao {
 
     @Autowired
-    SqlSession session;
+    private SqlSession session;
 
-   String namespace="com.toy2.shop29.Board.Notice.dao.BoardMapper.";
+    private static final String namespace = "com.toy2.shop29.Board.Notice.dao.BoardMapper.";
 
     @Override
-    public BoardDto select(int notice_number) {
-        return null;
+    public BoardDto select(Integer noticeId) {
+        return session.selectOne(namespace + "select", noticeId);
     }
 
     @Override
-    public BoardDto select(Integer notice_number) {
-        return session.selectOne(namespace +"select", notice_number);
-    }
-
-
-    @Override
-    public int delete(Integer notice_number, String notice_creatior) {
-        return 0;
+    public int delete(Integer noticeId, String noticeCreatorId) {
+        // MyBatis의 delete 쿼리 실행
+        return session.delete(namespace + "delete", Map.of("noticeId", noticeId, "noticeCreatorId", noticeCreatorId));
     }
 
     @Override
     public int insert(BoardDto boardDto) {
-        return 0;
+        // MyBatis의 insert 쿼리 실행
+        return session.insert(namespace + "insert", boardDto);
     }
 
     @Override
     public int update(BoardDto boardDto) {
-        return 0;
+        // MyBatis의 update 쿼리 실행
+        return session.update(namespace + "update", boardDto);
     }
 
     @Override
     public List<BoardDto> selectAll() {
-        return List.of();
+        // MyBatis의 selectAll 쿼리 실행
+        return session.selectList(namespace + "selectAll");
     }
 
     @Override
-    public List<BoardDto> selectPage(Map map) {
-        return List.of();
+    public List<BoardDto> selectPage(Map<String, Object> map) {
+        // MyBatis의 selectPage 쿼리 실행
+        return session.selectList(namespace + "selectPage", map);
     }
 
     @Override
     public int deleteAll() {
-        return 0;
+        // MyBatis의 deleteAll 쿼리 실행
+        return session.delete(namespace + "deleteAll");
     }
 
     @Override
     public int count() {
-        return 0;
+        // MyBatis의 count 쿼리 실행
+        return session.selectOne(namespace + "count");
     }
+
 }
