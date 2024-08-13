@@ -22,7 +22,7 @@ public class UserDto {
     private String addressReference;  // 주소 참고 항목
     private String email;   // 이메일
     private String phoneNumber;  // 전화번호
-    private LocalDate birthDate;  // 생년월일
+    private String birthDate;  // 생년월일
     private Integer gender;  // 성별 (1: 남성, 0: 여성)
     private LocalDate registrationDate;  // 가입일자
     private LocalDate withdrawalDate;  // 탈퇴일자
