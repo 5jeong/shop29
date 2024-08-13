@@ -8,8 +8,6 @@ import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.exception.IncorrectPasswordException;
 import com.toy2.shop29.users.exception.UserAccountLockedException;
 import com.toy2.shop29.users.exception.UserNotFoundException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import javax.security.auth.login.AccountLockedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +47,7 @@ class LoginServiceTest {
 
     @DisplayName("정상 로그인 테스트")
     @Test
-    void validLogin() throws AccountLockedException {
+    void validLogin() {
         // given: 유효한 아이디, 패스워드로 로그인 시도
         String validUserId = "testUser";
         String validPassword = "password123";
