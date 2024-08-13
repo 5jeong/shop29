@@ -14,12 +14,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 @ToString
 public class UserUpdateDto {
 
+
+    private String userId;
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d).{8,20}$", message = "비밀번호는 8~20자, 대소문자 및 숫자로 이루어져야 합니다.")
     private String password;  // 비밀번호
 
-    @NotBlank(message = "비밀번호 확인을 입력해주세요.")
-    private String passwordConfirm; // 비밀번호 확인
+//    @NotBlank(message = "비밀번호 확인을 입력해주세요.")
+//    private String passwordConfirm; // 비밀번호 확인
 
     @NotBlank(message = "이름을 입력해주세요.")
     @Pattern(regexp = "^[^0-9]{2,15}$", message = "이름은 숫자를 포함할 수 없으며 2~15자 이내여야 합니다.")
