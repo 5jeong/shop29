@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product Detail</title>
+</head>
+<body>
+
+<h1 th:text="${product.getProduct_name()}">상품 이름</h1>
+<p th:text="${product.getSize_table()}">상품 사이즈 측정 표</p>
+<p>Price: <span th:text="${product.getPrice()}"></span></p>
+
+<!-- 장바구니 버튼 -->
+<form action="/cart/add" method="post">
+    <input type="hidden" name="productId" th:value="${product.getProduct_id()}" />
+    <button type="submit">장바구니</button>
+</form>
+
+<!-- 결제 버튼 -->
+<form action="/checkout" method="post">
+    <input type="hidden" name="productId" th:value="${product.getProduct_id()}" />
+    <button type="submit">구매</button>
+</form>
+
+</body>
+</html>
