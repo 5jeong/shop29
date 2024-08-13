@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -31,22 +32,31 @@ public class LoginController {
 
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute(name = "loginForm") LoginFormDto loginFormDto,
-                        BindingResult bindingResult, HttpServletRequest request, Model model) {
+                        BindingResult bindingResult, HttpServletRequest request,Model model,
+                        @RequestParam(name = "redirectURI", defaultValue = "/") String redirectURI) {
         if (bindingResult.hasErrors()) {
-            log.info("bindingResult : {} ",bindingResult);
+            log.info("bindingResult : {} ", bindingResult);
             return "login/loginForm";
         }
 
-        try {
-            UserDto loginUser = loginService.loginCheck(loginFormDto.getUserId(), loginFormDto.getPassword());
-            log.info("login? {}", loginUser);
-            HttpSession session = request.getSession();
-            session.setAttribute("loginMember", loginUser);
-            return "redirect:/";
-        } catch (UserNotFoundException | UserAccountLockedException | IncorrectPasswordException e) {
-            model.addAttribute("loginError",e.getMessage());
-            return "login/loginForm";
+        // 예외가 발생하면 해당 예외는 LoginExceptionHandler에서 처리됨
+        request.setAttribute("loginForm",loginFormDto);
+        UserDto loginUser = loginService.loginCheck(loginFormDto.getUserId(), loginFormDto.getPassword());
+        log.info("login : {}", loginUser);
+
+        HttpSession session = request.getSession();
+        session.setAttribute("loginUser", loginUser);
+        return "redirect:" + redirectURI;
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
         }
+        return "redirect:/";
     }
 
 }
