@@ -11,7 +11,7 @@ public interface UserMapper {
     // id로 회원 조회
     UserDto findById(String userId);
 
-    // email로 회원 조회
+    // email로 회원id 조회
     String findByEmail(String email);
 
     // phoneNumber로 회원 조회
@@ -23,7 +23,7 @@ public interface UserMapper {
     // id로 회원 삭제
     int deleteUser(String userId);
 
-    //회원 수정
+    //회원수정 폼에서 수정
     int updateUser(@Param("userId") String userId, @Param("userUpdateDto") UserUpdateDto userUpdateDto);
 
     // 회원 갯수 세기
