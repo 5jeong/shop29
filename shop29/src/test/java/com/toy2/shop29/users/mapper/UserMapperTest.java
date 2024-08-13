@@ -124,7 +124,6 @@ class UserMapperTest {
         userUpdateDto.setAddressLine1("경기 화성시");
         userUpdateDto.setAddressLine2("201호");
         userUpdateDto.setAddressReference("");
-        userUpdateDto.setBirthDate("1990-02-12");
         userUpdateDto.setGender(1);
 
         //업데이트 부분
@@ -132,6 +131,7 @@ class UserMapperTest {
         userUpdateDto.setUserName("Updated Name");
         userUpdateDto.setPhoneNumber("010-9876-5432");
         userUpdateDto.setEmail("updated@example.com");
+        userUpdateDto.setBirthDate("1990-04-14");
 
         // 업데이트 실행
         int updateCount = userMapper.updateUser("testUser", userUpdateDto);
@@ -141,18 +141,19 @@ class UserMapperTest {
         UserDto updatedUser = userMapper.findById("testUser");
         System.out.println("updatedUser = " + updatedUser);
 
+        System.out.println("updatedUser.getBirthDate() = " + updatedUser.getBirthDate());
         assertThat(updatedUser.getUserName()).isEqualTo("Updated Name");
         assertThat(updatedUser.getPassword()).isEqualTo("UpdatedPassword123");
         assertThat(updatedUser.getPhoneNumber()).isEqualTo("010-9876-5432");
         assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");
+        assertThat(updatedUser.getBirthDate()).isEqualTo("1990-04-14");
 
         // 수정되지 않은 필드 확인
-        assertThat(updatedUser.getBirthDate()).isEqualTo("1990-02-12");
-        assertThat(updatedUser.getGender()).isEqualTo(1);
-        assertThat(updatedUser.getPostalCode()).isEqualTo("12345");
-        assertThat(updatedUser.getAddressLine1()).isEqualTo("경기 화성시");
-        assertThat(updatedUser.getAddressLine2()).isEqualTo("201호");
-        assertThat(updatedUser.getAddressReference()).isEqualTo("");
+        assertThat(updatedUser.getGender()).isEqualTo(userRegisterDto.getGender());
+        assertThat(updatedUser.getPostalCode()).isEqualTo(userRegisterDto.getPostalCode());
+        assertThat(updatedUser.getAddressLine1()).isEqualTo(userRegisterDto.getAddressLine1());
+        assertThat(updatedUser.getAddressLine2()).isEqualTo(userRegisterDto.getAddressLine2());
+        assertThat(updatedUser.getAddressReference()).isEqualTo(userRegisterDto.getAddressReference());
 
     }
 
@@ -212,7 +213,7 @@ class UserMapperTest {
         assertThat(updatedUser.getLoginFailureCount()).isEqualTo(0);
         assertThat(updatedUser.getLockExpiryTime()).isNull();
         assertThat(updatedUser.getLastLoginFailureTime()).isNull();
-        ;
+
     }
 
 }

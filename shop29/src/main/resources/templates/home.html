@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="../static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" style="max-width: 600px">
+  <div class="py-5 text-center">
+    <h2>홈 화면</h2>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button" th:if="${session.loginUser == null}"
+              th:onclick="|location.href='@{/user/signup}'|">
+        회원 가입
+      </button>
+      <button class="w-100 btn btn-dark btn-lg" th:if="${session.loginUser != null}"
+              th:onclick="|location.href='@{/user/update}'|" type="button">
+        회원 수정
+      </button>
+    </div>
+
+    <div class="col">
+
+      <form th:action="@{/login}" method="post">
+        <button class="w-100 btn btn-dark btn-lg" th:if="${session.loginUser == null}"  type="submit" >
+          로그인
+        </button>
+      </form>
+
+      <form th:action="@{/logout}" method="post">
+        <button class="w-100 btn btn-dark btn-lg" th:if="${session.loginUser != null}"  type="submit" >
+          로그아웃
+        </button>
+      </form>
+
+    </div>
+  </div>
+  <hr class="my-4">
+</div> <!-- /container -->
+</body>
+</html>
