@@ -114,6 +114,4 @@ class UserServiceImplTest {
         // Then: 중복 에러가 발생했는지 확인
         assertThat(bindingResult.hasFieldErrors("phoneNumber")).isTrue();
     }
-
-
 }
