@@ -61,21 +61,20 @@ public class QnaDaoImpl implements QnaDao{
         return session.selectOne(namespace + "selectWith", qnaId);
     }
 
-    // 테스트용
     @Override
     public QnaDto select(int qnaId, Boolean isDeleted) {
         Map<String, Object> map = new HashMap<>();
         map.put("qnaId", qnaId);
         map.put("isDeleted", isDeleted);
 
-        return session.selectOne(namespace + "selectForTest", map);
+        return session.selectOne(namespace + "select", map);
     }
 
-    // 테스트용
-    @Override
-    public List<QnaDto> selectAll() throws DataAccessException {
-        return List.of();
-    }
+//    // 테스트용
+//    @Override
+//    public List<QnaDto> selectAll() throws DataAccessException {
+//        return List.of();
+//    }
 
     @Override
     public int count() {

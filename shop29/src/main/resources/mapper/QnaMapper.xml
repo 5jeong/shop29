@@ -309,7 +309,7 @@
             AND q.is_deleted = false
     </select>
 
-    <select id="selectForTest" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaDto">
+    <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaDto">
         SELECT
             *
         FROM `Qna`
