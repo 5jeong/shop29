@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toy2.shop29.cart.dao.CartDaoMapper">
+
+<!--    모든 장바구니 개수 조회-->
+    <select id="countCart" resultType="int">
+        SELECT count(*) FROM Cart
+    </select>
+
+    <!--    모든 장바구니 상품 개수 조회-->
+    <select id="countCartItem" resultType="int">
+        SELECT count(*) FROM CartItem
+    </select>
+
+<!--    해당 유저의 장바구니 상품 개수 조회-->
+    <select id="countUserCartProducts" resultType="int">
+        SELECT COUNT(*)
+        FROM CartItem ci
+                 JOIN Cart c ON ci.cart_id = c.cart_id
+        WHERE c.user_id = #{userId};
+    </select>
+
+    <!--해당 유저 장바구니 존재 유무 조회-->
+    <select id="countUserCart" resultType="int">
+        SELECT COUNT(*)
+        FROM CART
+        WHERE user_id = #{userId};
+    </select>
+
+    <!--장바구니 생성-->
+    <insert id="createCart" parameterType="map">
+        INSERT INTO Cart (user_id, is_user)
+        VALUES (#{userId}, #{isUser})
+    </insert>
+
+    <!--    유저 아이디로 해당 유저의 장바구니 상품 전체 조회-->
+    <select id="selectUserCartProductsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.response.CartDto">
+        SELECT
+            ci.product_id,
+            ci.quantity,
+            p.product_name,
+            p.price,
+            p.sale_ratio
+        FROM
+            CartItem ci
+                JOIN
+            Product p ON ci.product_id = p.product_id
+                JOIN
+            Cart c ON ci.cart_id = c.cart_id
+        WHERE
+            c.user_id = #{userId};
+    </select>
+
+<!--    (유저 아이디와 상품 번호로) 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
+    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.response.CartDto">
+        SELECT
+            ci.product_id,
+            ci.quantity,
+            p.product_name,
+            p.price,
+            p.sale_ratio
+        FROM
+            CartItem ci
+                JOIN
+            Product p ON ci.product_id = p.product_id
+                JOIN
+            Cart c ON ci.cart_id = c.cart_id
+        WHERE
+            c.user_id = #{userId}
+          AND ci.product_id = #{productId};
+    </select>
+
+    <!--    장바구니 해당 상품 담기-->
+    <insert id="insertUserCartProduct" parameterType="map">
+        INSERT INTO CartItem (cart_id, product_id, quantity)
+        VALUES ((SELECT cart_id FROM Cart WHERE user_id = #{userId}),#{productId},#{quantity});
+    </insert>
+
+    <!--    장바구니 해당 상품 수량 업데이트-->
+    <update id="updateCartLastUpdate" parameterType="map">
+        UPDATE Cart
+        SET last_update_time = (now())
+        WHERE user_id = #{userId};
+    </update>
+
+<!--    장바구니 해당 상품 수량 업데이트-->
+    <update id="updateUserCartProductQuantity" parameterType="map">
+        UPDATE CartItem
+        SET quantity = #{quantity}
+        WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
+          AND product_id = #{productId};
+    </update>
+
+    <!--    장바구니 해당 상품 삭제-->
+    <delete id="deleteUserCartProduct" parameterType="map">
+        DELETE FROM CartItem
+        WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
+          AND product_id = #{productId};
+    </delete>
+
+    <!--    장바구니 해당 상품 삭제-->
+    <delete id="deleteUserCart" parameterType="String">
+        DELETE FROM CART
+        WHERE user_id = #{userId};
+    </delete>
+
+    <!--    장바구니 전체 삭제-->
+    <delete id="deleteCart">
+        DELETE FROM CART
+    </delete>
+
+    <!--    장바구니 상품 전체 삭제-->
+    <delete id="deleteCartItem">
+        DELETE FROM CARTITEM
+    </delete>
+
+</mapper>

@@ -1,0 +1,63 @@
+package com.toy2.shop29.product.service;
+
+import com.toy2.shop29.product.domain.ProductDto;
+
+import java.util.List;
+import java.util.Map;
+
+public interface ProductService {
+    //1.새 상품 등록 (insert)
+    int addProduct(ProductDto productDto);
+
+    //2-1.특정 product_id에 해당하는 상품 정보 조회하여 반환 (select)
+    ProductDto read(Integer product_id);
+
+    //2-2.모든 상품 정보 조회해서 반환 (select)
+    List<ProductDto> getList();
+
+    //2-3.특정 페이지에 해당하는 상품리스트 조회해서 반환 (select)
+    List<ProductDto> getPage(Map map);
+
+    //3.상품 수정 (update)
+    int modify(ProductDto productDto);
+
+    //4. 주어진 product_id에 해당하는 상품 삭제 (delete)
+    int remove(Integer product_id);
+
+    //총 상품 개수
+    int getCount();
+
+    //특정 카테고리에 해당하는 상품들 조회
+    List<ProductDto> getProductsByCategory(int categoryId);
+
+    //특정 브랜드에 해당하는 상품들을 조회
+    List<ProductDto> getProductsByBrand(int brandId);
+
+    //특정 가격 범위 안에 있는 상품들을 조회
+    List<ProductDto> getProductsByPriceRange(int minPrice, int maxPrice);
+
+    //가격 내림차순으로 상품들 정렬
+    List<ProductDto> sortByPriceDesc(Map<String, Object> paramMap);
+
+    //가격 오름차순으로 상품들 정렬
+    List<ProductDto> sortByPriceAsc(Map<String, Object> paramMap);
+
+    //최신 상품순으로 정렬
+    List<ProductDto> sortByNewest(Map<String, Object> paramMap);
+
+    //할인율 높은순으로 정렬
+    List<ProductDto> sortByHighDiscount(Map<String, Object> paramMap);
+
+    //높은 별점순으로 정렬
+    List<ProductDto> sortedByRating(Map<String, Object> paramMap);
+
+
+//    //특정 중분류에 해당하는 모든 제품 개수 세기
+//    int getCountByMiddleCategory(Integer middleCategoryId);
+//
+//    //특정 중분류에 해당하는 모든 상품 페이징
+//    List<ProductDto> getPageByMiddleCategory(Map<String, Object> map);
+
+
+
+}

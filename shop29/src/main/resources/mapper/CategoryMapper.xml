@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.CategoryMapper">
+
+    <select id="selectCategoryBySmallCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.CategoryDto">
+        SELECT
+            mj.major_category_id,
+            mj.major_category_name,
+            mc.middle_category_id,
+            mc.middle_category_name,
+            sc.small_category_id,
+            sc.small_category_name,
+            sc.created_id,
+            sc.created_date,
+            sc.updated_id,
+            sc.updated_date
+        FROM
+            smallcategory sc
+                JOIN
+            middlecategory mc ON sc.middle_category_id = mc.middle_category_id
+                JOIN
+            majorcategory mj ON mc.major_category_id = mj.major_category_id
+        WHERE
+            sc.small_category_id = #{smallCategoryId}
+    </select>
+
+
+
+
+
+    <select id="findAllMajorCategories" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        SELECT * FROM major_category
+    </select>
+
+    <select id="findMiddleCategoriesByMajorId" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT * FROM middle_category WHERE major_category_id = #{majorCategoryId}
+    </select>
+
+    <select id="findSmallCategoriesByMiddleId" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        SELECT * FROM small_category WHERE middle_category_id = #{middleCategoryId}
+    </select>
+
+    <select id="findAllCategories" resultType="com.toy2.shop29.product.domain.CategoryDto">
+        SELECT * FROM category
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

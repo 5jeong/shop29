@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>공지사항 상세</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<h1 th:text="${board.getNoticeTitle()}">공지사항 제목</h1>
+<p th:text="${board.getNoticeCreatorId()}">작성 날짜</p>
+<div th:text="${board.getNoticeContent()}">공지사항 내용</div>
+
+<a href="/board/list">목록으로 돌아가기</a>
+
+<a th:href="@{/board/edit(noticeId=${board.noticeId})}">수정</a>
+
+<form th:action="@{/board/delete}" method="post" style="display:inline;">
+  <input type="hidden" name="noticeId" th:value="${board.noticeId}">
+  <input type="hidden" name="noticeCreatorId" th:value="${board.noticeCreatorId}">
+  <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
+</form>
+</body>
+</html>

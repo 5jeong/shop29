@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.OptionKeyMapper">
+
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.OptionKeyDto">
+        SELECT * FROM optionkey
+    </select>
+
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.OptionKeyDto">
+        SELECT * FROM optionkey WHERE option_key_id = #{optionKeyId}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.OptionKeyDto">
+        INSERT INTO optionkey (option_key_name, created_date, created_id, updated_date, updated_id)
+        VALUES (#{optionKeyName}, NOW(), #{createdId}, NOW(), #{updatedId})
+    </insert>
+
+    <update id="update" parameterType="com.toy2.shop29.product.domain.OptionKeyDto">
+        UPDATE optionkey
+        SET option_key_name = #{optionKeyName},
+            updated_date = NOW(),
+            updated_id = #{updatedId}
+        WHERE option_key_id = #{optionKeyId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM optionkey WHERE option_key_id = #{optionKeyId}
+    </delete>
+
+</mapper>
