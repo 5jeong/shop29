@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final UserMapper userMapper;
-    private final UserServiceImpl userService;
 
     public UserDto loginCheck(String userId, String password) {
         UserDto user = userMapper.findById(userId);
@@ -31,13 +30,20 @@ public class LoginService {
 
         // 계정이 잠겨있는 경우
         if (isAccountLocked(user)) {
-            throw new UserAccountLockedException("계정이 잠겨 있습니다. " + user.getLockExpiryTime() + " 이후에 다시 시도하세요.");
+            String lockExpiryTime =
+                    String.valueOf(user.getLockExpiryTime()).split("T")[0] + " " + String.valueOf(
+                                    user.getLockExpiryTime())
+                            .split("T")[1];
+            throw new UserAccountLockedException("계정이 잠겨 있습니다. " + lockExpiryTime + " 이후에 다시 시도하세요.");
         }
 
         // 비밀번호를 잘못 입력한 경우
         if (invalidPassword(password, user)) {
             handlerLoginFailure(user);
-            throw new IncorrectPasswordException("비밀번호가 일치하지않습니다. '\n'5회 로그인 실패 시 로그인이 10분 동안 제한됩니다. (" + user.getLoginFailureCount() + "/5)");
+
+            Integer loginFailureCount = user.getLoginFailureCount()+1;
+            throw new IncorrectPasswordException(
+                    "비밀번호가 일치하지않습니다. '5회 로그인 실패 시 로그인이 10분 동안 제한됩니다. (" + loginFailureCount + "/5)");
         }
 
         // 로그인 성공시 로그인 실패 관련 컬럼 초기화
@@ -70,6 +76,5 @@ public class LoginService {
     private static boolean invalidPassword(String password, UserDto user) {
         return !user.getPassword().equals(password);
     }
-
 
 }
