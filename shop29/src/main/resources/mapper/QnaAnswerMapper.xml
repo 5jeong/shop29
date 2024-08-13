@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.qna.QnaAnswerMapper">
+
+    <!-- CREATE -->
+    <insert id="insert" parameterType="com.toy2.shop29.qna.domain.QnaAnswerDto" useGeneratedKeys="true" keyProperty="qnaAnswerId">
+        INSERT INTO `QnaAnswer`(
+            `admin_id`, -- 관리자 ID
+            `qna_id`, -- 문의 ID
+            `content`, -- 답변 내용
+            `created_id`, -- 생성자 ID
+            `updated_id` -- 수정자 ID
+        )VALUES (
+            #{adminId},
+            #{qnaId},
+            #{content},
+            #{createdId},
+            #{updatedId}
+        );
+    </insert>
+
+    <!-- READ -->
+    <select id="selectBy" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
+        SELECT
+            *
+        FROM `QnaAnswer`
+        WHERE
+            `qna_id` = #{qnaId}
+            <if test="isDeleted != null">
+                AND `is_deleted` = #{isDeleted}
+            </if>
+    </select>
+
+    <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
+        SELECT
+            *
+        FROM `QnaAnswer`
+        WHERE `qna_answer_id` = #{qnaAnswerId}
+        <if test="isDeleted != null">
+            AND `is_deleted` = #{isDeleted}
+        </if>
+    </select>
+
+    <select id="selectAll" parameterType="boolean" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
+        SELECT
+            *
+        FROM `QnaAnswer`
+        <if test="isDeleted != null">
+            WHERE `is_deleted` = #{isDeleted}
+        </if>
+        ORDER BY `qna_answer_id` DESC;
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM `QnaAnswer`
+    </select>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.toy2.shop29.qna.domain.QnaAnswerDto">
+        UPDATE `QnaAnswer`
+        SET
+            `admin_id` = #{adminId},
+            `qna_id` = #{qnaId},
+            `content` = #{content},
+            `updated_time` = now(),
+            `updated_id` = #{updatedId}
+        WHERE `qna_answer_id` = #{qnaAnswerId};
+    </update>
+
+
+    <!-- DELETE -->
+    <update id="softDelete" parameterType="map">
+        UPDATE `QnaAnswer`
+        SET
+            `is_deleted` = true,
+            `deleted_time` = now(),
+            `deleted_id` = #{deletedId}
+        WHERE `qna_answer_id` = #{qnaAnswerId};
+    </update>
+
+
+    <delete id="deleteAll" >
+        DELETE FROM `QnaAnswer`;
+    </delete>
+
+
+</mapper>

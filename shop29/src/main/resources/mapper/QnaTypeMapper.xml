@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.qna.QnaTypeMapper">
+
+    <!--  CREATE-->
+    <!-- 문의타입 생성 -->
+    <insert id="insert" parameterType="com.toy2.shop29.qna.domain.QnaTypeDto">
+        INSERT INTO `QnaType`(
+            `qna_type_id`, -- 문의유형 ID
+            `parent_qna_type_id`, -- 부모문의유형 ID
+            `name`, -- 문의유형 이름
+            `description`, -- 문의유형 설명
+            `is_order_id_active`, -- 주문ID 사용여부
+            `is_product_id_active`, -- 상품ID 사용여부
+            `is_active`, -- 사용여부
+            `created_id`, -- 생성자 ID
+            `updated_id` -- 수정자 ID
+        )
+        VALUES(
+            #{qnaTypeId},
+            #{parentQnaTypeId},
+            #{name},
+            #{description},
+            #{isOrderIdActive},
+            #{isProductIdActive},
+            #{isActive},
+            #{createdId},
+            #{updatedId}
+        );
+    </insert>
+
+    <resultMap id="qnaTypeMap" type="com.toy2.shop29.qna.domain.QnaTypeDto">
+        <id column="qna_type_id" property="qnaTypeId"/>
+        <result column="parent_qna_type_id" property="parentQnaTypeId"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="is_order_id_active" property="isOrderIdActive"/>
+        <result column="is_product_id_active" property="isProductIdActive"/>
+        <result column="is_active" property="isActive"/>
+        <result column="created_id" property="createdId"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_id" property="updatedId"/>
+        <result column="updated_time" property="updatedTime"/>
+        <association property="parentQnaType" resultMap="parentQnaTypeMap"/>
+    </resultMap>
+
+    <resultMap id="parentQnaTypeMap" type="com.toy2.shop29.qna.domain.ParentQnaTypeDto">
+        <id column="p_parent_qna_type_id" property="parentQnaTypeId"/>
+        <result column="p_name" property="name"/>
+        <result column="p_description" property="description"/>
+        <result column="p_is_active" property="isActive"/>
+        <result column="p_created_id" property="createdId"/>
+        <result column="p_created_time" property="createdTime"/>
+        <result column="p_updated_id" property="updatedId"/>
+        <result column="p_updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- READ -->
+    <!-- 문의타입 단건 조회 -->
+    <select id="select" parameterType="map" resultMap="qnaTypeMap">
+        SELECT
+            qt.*
+            <if test="withParent == true">
+                ,
+                pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
+                pqt.`name` AS p_name,
+                pqt.`description` AS p_description,
+                pqt.`is_active` AS p_is_active,
+                pqt.`created_time` AS p_created_time,
+                pqt.`created_id` AS p_created_id,
+                pqt.`updated_time` AS p_updated_time,
+                pqt.`updated_id` AS p_updated_id
+            </if>
+        FROM `QnaType` AS qt
+        <if test="withParent == true">
+            JOIN `ParentQnaType` AS pqt
+            ON qt.`parent_qna_type_id` = pqt.`parent_qna_type_id`
+        </if>
+        WHERE qt.`qna_type_id` = #{qnaTypeId}
+        <if test="isActive != null">
+            AND qt.`is_active` = #{isActive}
+            <if test="withParent == true">
+                AND pqt.`is_active` = #{isActive}
+            </if>
+        </if>
+        ORDER BY qt.`qna_type_id`
+    </select>
+
+    <!-- 문의타입 전체 조회 -->
+    <select id="selectAll" resultMap="qnaTypeMap">
+        SELECT
+            qt.*
+            <if test="withParent == true">
+                ,
+                pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
+                pqt.`name` AS p_name,
+                pqt.`description` AS p_description,
+                pqt.`is_active` AS p_is_active,
+                pqt.`created_time` AS p_created_time,
+                pqt.`created_id` AS p_created_id,
+                pqt.`updated_time` AS p_updated_time,
+                pqt.`updated_id` AS p_updated_id
+            </if>
+        FROM `QnaType` AS qt
+        <if test="withParent == true">
+            JOIN `ParentQnaType` AS pqt
+            ON qt.`parent_qna_type_id` = pqt.`parent_qna_type_id`
+        </if>
+        <if test="isActive != null">
+            WHERE qt.`is_active` = #{isActive}
+            <if test="withParent == true">
+                AND pqt.`is_active` = #{isActive}
+            </if>
+        </if>
+        ORDER BY qt.`qna_type_id`
+    </select>
+
+    <!-- 문의타입 전체개수 조회 -->
+    <select id="count" resultType="int">
+        SELECT count(*)
+        FROM `QnaType`
+    </select>
+
+    <!-- UPDATE -->
+    <!-- 문의타입 단건 수정 -->
+    <update id="update" parameterType="com.toy2.shop29.qna.domain.QnaTypeDto">
+        UPDATE `QnaType`
+        SET
+            `parent_qna_type_id` = #{parentQnaTypeId},
+            `name` = #{name},
+            `description` = #{description},
+            `is_order_id_active` = #{isOrderIdActive},
+            `is_product_id_active` = #{isProductIdActive},
+            `is_active` = #{isActive},
+            `updated_id` = #{updatedId},
+            `updated_time` = now()
+        WHERE `qna_type_id` = #{qnaTypeId}
+    </update>
+
+    <!-- DELETE -->
+    <!-- 문의타입 단건 삭제 -->
+    <delete parameterType="String" id="delete">
+        DELETE
+        FROM `QnaType`
+        WHERE `qna_type_id` = #{qnaTypeId}
+    </delete>
+
+    <!-- 문의타입 전체 삭제 -->
+    <delete id="deleteAll">
+        DELETE
+        FROM `QnaType`
+    </delete>
+</mapper>
