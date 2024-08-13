@@ -4,8 +4,13 @@
 <mapper namespace="com.toy2.shop29.cart.dao.CartDaoMapper">
 
 <!--    모든 장바구니 개수 조회-->
-    <select id="countAllUsersCart" resultType="int">
-        SELECT count(*) FROM cart
+    <select id="countCart" resultType="int">
+        SELECT count(*) FROM Cart
+    </select>
+
+    <!--    모든 장바구니 상품 개수 조회-->
+    <select id="countCartItem" resultType="int">
+        SELECT count(*) FROM CartItem
     </select>
 
 <!--    해당 유저의 장바구니 상품 개수 조회-->
@@ -30,7 +35,7 @@
     </insert>
 
     <!--    유저 아이디로 해당 유저의 장바구니 상품 전체 조회-->
-    <select id="findUserCartProductsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.CartDto">
+    <select id="selectUserCartProductsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.response.CartDto">
         SELECT
             ci.product_id,
             ci.quantity,
@@ -48,7 +53,7 @@
     </select>
 
 <!--    (유저 아이디와 상품 번호로) 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
-    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.CartDto">
+    <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.response.CartDto">
         SELECT
             ci.product_id,
             ci.quantity,
@@ -73,9 +78,9 @@
     </insert>
 
     <!--    장바구니 해당 상품 수량 업데이트-->
-    <update id="modifyCartLastUpdate" parameterType="map">
+    <update id="updateCartLastUpdate" parameterType="map">
         UPDATE Cart
-        SET last_update = (now())
+        SET last_update_time = (now())
         WHERE user_id = #{userId};
     </update>
 
@@ -98,6 +103,16 @@
     <delete id="deleteUserCart" parameterType="String">
         DELETE FROM CART
         WHERE user_id = #{userId};
+    </delete>
+
+    <!--    장바구니 전체 삭제-->
+    <delete id="deleteCart">
+        DELETE FROM CART
+    </delete>
+
+    <!--    장바구니 상품 전체 삭제-->
+    <delete id="deleteCartItem">
+        DELETE FROM CARTITEM
     </delete>
 
 </mapper>

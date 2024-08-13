@@ -19,7 +19,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
 
         .container {
@@ -87,7 +86,7 @@
             font-weight: 400;
             color: rgb(160, 160, 160);
             background: rgb(255, 255, 255);
-            border: 1px solid silver;
+            border: 1px solid rgb(228, 228, 228);
         }
 
         .quantity-controls input {
@@ -102,6 +101,8 @@
             font-weight: 500;
             text-align: center;
             border: 1px solid rgb(228, 228, 228);
+            border-left: none;
+            border-right: none;
         }
 
         .price {
@@ -111,7 +112,8 @@
             margin-bottom: 10px;
         }
 
-        .buy-btn {
+        .buy-btn,
+        .save-btn {
             background-color: #000;
             color: #fff;
             border: none;
@@ -119,7 +121,8 @@
             cursor: pointer;
         }
 
-        .buy-btn:hover {
+        .buy-btn:hover,
+        .save-btn:hover {
             background-color: #444;
         }
 
@@ -128,7 +131,11 @@
             margin-bottom: 20px;
         }
 
-        .actions button:hover, .checkout-actions button:hover {
+        .continue-shopping:hover {
+            color: rgb(255, 72, 0);
+        }
+
+        .checkout:hover {
             background-color: #444;
         }
 
@@ -153,6 +160,7 @@
         }
 
         .checkout {
+            cursor: pointer;
             min-width: 40px;
             min-height: 25px;
             display: flex;
@@ -185,12 +193,6 @@
             border-bottom: 1px solid rgb(0, 0, 0);
         }
 
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
         thead {
             table-layout: fixed;
             width: 100%;
@@ -198,6 +200,7 @@
         }
 
         .continue-shopping {
+            cursor: pointer;
             display: flex;
             flex: 1 1 0%;
             -webkit-box-align: center;
@@ -215,14 +218,11 @@
             border-radius: 0px;
         }
 
-        .continue-shopping:hover {
-            background-color: #f8f8f8;
-        }
-
-        .delete {
+        .delete, .deleteSoldOut {
             background-color: white !important;
             border: 1px solid silver !important;
             color: black !important;
+            cursor: pointer;
         }
 
         .item-info {
@@ -235,19 +235,48 @@
             width: 100%;
             border-top: 4px solid rgb(0, 0, 0);
             border-bottom: 1px solid rgb(228, 228, 228);
+        }
 
-            span {
-                display: table-cell;
-                width: 36%;
-                height: 74px;
-                padding: 0px;
-                font-size: 18px;
-                font-weight: 700;
-                line-height: 24px;
-                color: rgb(0, 0, 0);
-                text-align: center;
-                vertical-align: middle;
-            }
+        .price-text {
+            display: table-cell;
+            width: 36%;
+            height: 74px;
+            padding: 0px;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 24px;
+            color: rgb(0, 0, 0);
+            text-align: center;
+            vertical-align: middle;
+            border: 0px;
+        }
+
+        .delivery-text {
+            display: table-cell;
+            height: 74px;
+            padding: 0px;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 24px;
+            color: rgb(0, 0, 0);
+            text-align: center;
+            vertical-align: middle;
+            border: 0px;
+            width: 28%;
+        }
+
+        .amout-text {
+            display: table-cell;
+            width: 36%;
+            height: 74px;
+            padding: 0px;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 24px;
+            color: rgb(0, 0, 0);
+            text-align: center;
+            vertical-align: middle;
+            border: 0px;
         }
 
         .summary-price {
@@ -262,7 +291,7 @@
             box-sizing: border-box;
             width: 36%;
             height: 149px;
-            padding: 55px 2% 0px;
+            padding: 55px 0px;
             text-align: center;
             vertical-align: top;
 
@@ -286,7 +315,7 @@
             display: table-cell;
             box-sizing: border-box;
             height: 149px;
-            padding: 55px 2% 0px;
+            padding: 55px 0px;
             text-align: center;
             vertical-align: top;
             width: 28%;
@@ -322,7 +351,7 @@
             box-sizing: border-box;
             width: 36%;
             height: 149px;
-            padding: 55px 2% 0px;
+            padding: 55px 0px;
             text-align: center;
             vertical-align: top;
 
@@ -359,42 +388,42 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:if="${#lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.product_id}">
+        <tr th:if="${#lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.productId}"
+            th:data-price="${cart.price}">
             <td><input class="chkbox" type="checkbox" checked></td>
             <td>
                 <div class="item-info">
                     <img src="https://img.29cm.co.kr/item/202407/11ef4e151edaf399aad275bb5024f198.jpg?width=150"
                          alt="Product Image">
                     <div class="item-details">
-                        <h2 th:text="${cart.product_name}">Item Name</h2>
+                        <span th:text="${cart.productName}">Item Name</span>
                     </div>
                 </div>
             </td>
             <td>
                 <div class="quantity-controls">
-                    <button class="quantity" onclick="decreaseQuantity(this)">-</button>
+                    <button class="quantity decrease">-</button>
                     <input th:value="${cart.quantity}" min="1" class="quantity-input">
-                    <button class="quantity" onclick="increaseQuantity(this)">+</button>
+                    <button class="quantity increase">+</button>
                 </div>
-                <button class="buy-btn" onclick="updateOrderCount(this)">저장</button>
+                <button class="save-btn save">저장</button>
             </td>
             <td>
                 <span class="price" th:text="${cart.price * cart.quantity} + '원'">1,927,800원</span>
                 <button class="buy-btn">BUY NOW</button>
             </td>
-            <td>조건무료 일반배송</td>
+            <td>조건무료<br/>일반배송</td>
         </tr>
         </tbody>
     </table>
     <div class="actions">
         <button class="delete">선택상품 삭제</button>
-        <button class="delete">품절상품 삭제</button>
     </div>
     <div class="summary">
         <div class="summary-header">
-            <span>총 주문금액</span>
-            <span>총 배송비</span>
-            <span>총 결제금액</span>
+            <span class="price-text">총 주문금액</span>
+            <span class="delivery-text">총 배송비</span>
+            <span class="amout-text">총 결제금액</span>
         </div>
         <div class="summary-price">
             <div class="order-amount">
@@ -403,7 +432,7 @@
             </div>
             <div class="delivery-fee">
                 <i></i>
-                <span>123</span>
+                <span>0</span>
             </div>
             <div class="pay-amount">
                 <i></i>
@@ -417,60 +446,6 @@
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        // 전체선택 체크박스를 클릭했을 때
-        $('.chkAll').on('click', function () {
-            const isChecked = $(this).is(':checked');
-            // 모든 chkbox 클래스를 가진 체크박스의 선택 상태를 변경
-            $('.chkbox').prop('checked', isChecked);
-        });
-
-        // 각 개별 체크박스를 클릭했을 때 전체 선택 체크박스의 상태를 변경
-        $('.chkbox').on('click', function () {
-            const total = $('.chkbox').length;
-            const checked = $('.chkbox:checked').length;
-            // 모든 chkbox가 선택되었는지 확인하고 chkAll의 상태를 변경
-            $('.chkAll').prop('checked', total === checked);
-        });
-    });
-
-    function increaseQuantity(button) {
-        const quantityInput = $(button).siblings('.quantity-input');
-        let currentValue = parseInt(quantityInput.val());
-        quantityInput.val(currentValue + 1);
-    }
-
-    function decreaseQuantity(button) {
-        const quantityInput = $(button).siblings('.quantity-input');
-        let currentValue = parseInt(quantityInput.val());
-        if (currentValue > 1) {
-            quantityInput.val(currentValue - 1);
-        }
-    }
-
-    function updateOrderCount(button) {
-        const row = $(button).closest('tr');
-        const id = row.data('id');
-        const quantityInput = row.find('.quantity-input');
-        const orderCount = quantityInput.val();
-
-        $.ajax({
-            url: '/cart/order-count',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({product_id: id, quantity: Number(orderCount)}),
-            beforeSend: function () {
-                // 요청이 시작되기 전에 버튼을 비활성화하거나 로딩 표시를 추가
-                $(button).prop('disabled', true);
-            },
-            success: function (response) {
-            },
-            complete: function () {
-                // 요청이 완료되면 버튼을 다시 활성화하거나 로딩 표시를 제거
-                $(button).prop('disabled', false);
-            }
-        });
-    }
 
     $(document).ready(function () {
         // 전체선택 체크박스를 클릭했을 때
@@ -487,45 +462,192 @@
             // 모든 chkbox가 선택되었는지 확인하고 chkAll의 상태를 변경
             $('.chkAll').prop('checked', total === checked);
         });
-    });
 
-    function increaseQuantity(button) {
-        const quantityInput = $(button).siblings('.quantity-input');
-        let currentValue = parseInt(quantityInput.val());
-        quantityInput.val(currentValue + 1);
-    }
+        // 수량 증가 버튼 클릭 시
+        $('.quantity-controls .increase').on('click', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            quantityInput.val(currentValue + 1);
+            updatePrice(this, currentValue + 1);
+            updateSummary();
+        });
 
-    function decreaseQuantity(button) {
-        const quantityInput = $(button).siblings('.quantity-input');
-        let currentValue = parseInt(quantityInput.val());
-        if (currentValue > 1) {
-            quantityInput.val(currentValue - 1);
-        }
-    }
-
-    function updateOrderCount(button) {
-        const row = $(button).closest('tr');
-        const id = row.data('id');
-        const quantityInput = row.find('.quantity-input');
-        const orderCount = quantityInput.val();
-
-        $.ajax({
-            url: '/cart/order-count',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({product_id: id, quantity: Number(orderCount)}),
-            beforeSend: function () {
-                // 요청이 시작되기 전에 버튼을 비활성화하거나 로딩 표시를 추가
-                $(button).prop('disabled', true);
-            },
-            success: function (response) {
-            },
-            complete: function () {
-                // 요청이 완료되면 버튼을 다시 활성화하거나 로딩 표시를 제거
-                $(button).prop('disabled', false);
+        // 수량 감소 버튼 클릭 시
+        $('.quantity-controls .decrease').on('click', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            if (currentValue > 1) {
+                quantityInput.val(currentValue - 1);
+                updatePrice(this, currentValue - 1);
+                updateSummary();
             }
         });
-    }
+
+
+        // CHECK OUT 버튼 클릭 시 실행
+        $('.checkout').on('click', function () {
+            const orderItems = [];
+
+            // 선택된 상품들을 배열에 담기
+            $('.chkbox:checked').each(function () {
+                const row = $(this).closest('tr');
+                const productId = row.data('id');
+                const quantity = row.find('.quantity-input').val();
+
+                orderItems.push({
+                    productId: productId,
+                    quantity: parseInt(quantity)
+                });
+            });
+
+            if (orderItems.length > 0) {
+                // POST 요청으로 orderItems를 전송
+                $.ajax({
+                    url: '/order/update-order',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({orderItems: orderItems}),
+                    success: function (response) {
+                        if (response.redirectUrl) {
+                            window.location.href = response.redirectUrl;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
+                        if (errorResponse && errorResponse.redirectUrl) {
+                            window.location.href = errorResponse.redirectUrl;
+                        } else {
+                            console.error('Error:', error);
+                            // 필요한 경우 추가적인 에러 처리
+                        }
+                    }
+                });
+            } else {
+                alert("주문할 상품을 선택해주세요.");
+            }
+        });
+
+        // 개별 상품 가격 업데이트
+        function updatePrice(button, quantity) {
+            const row = $(button).closest('tr');
+            const pricePerUnit = parseFloat(row.data('price'));
+            const totalPrice = pricePerUnit * quantity;
+            row.find('.price').text(totalPrice.toLocaleString() + '원');
+        }
+
+        // 요약 정보 업데이트 (총 주문금액, 총 결제금액 등)
+        function updateSummary() {
+            let totalAmount = 0;
+            let totalQuantity = 0;
+
+            $('.cart tbody tr').each(function () {
+                const quantity = parseInt($(this).find('.quantity-input').val());
+                const pricePerUnit = parseFloat($(this).data('price'));
+                totalAmount += quantity * pricePerUnit;
+                totalQuantity += quantity;
+            });
+
+            $('.summary .order-amount .price').text(totalAmount.toLocaleString() + '원');
+            $('.summary .order-amount .order-products').text(totalQuantity + '개');
+            $('.summary .pay-amount span').text(totalAmount.toLocaleString() + '원');
+        }
+
+        // 처음 로드 시 요약 정보 업데이트
+        updateSummary();
+
+        // 선택상품 삭제 버튼 클릭 시 실행
+        $('.delete').on('click', function () {
+            const selectedIds = [];
+            $('.chkbox:checked').each(function () {
+                const row = $(this).closest('tr');
+                const productId = row.data('id');
+                selectedIds.push(productId);
+            });
+
+            if (selectedIds.length > 0) {
+                $.ajax({
+                    url: '/cart/delete',
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({productIds: selectedIds}),
+                    success: function (response) {
+                        // 삭제 후 페이지를 새로고침하거나 삭제된 항목을 화면에서 제거
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("삭제 중 오류가 발생했습니다.", error);
+                    }
+                });
+            } else {
+                alert("삭제할 상품을 선택해주세요.");
+            }
+        });
+
+        // 저장 버튼 클릭 시 실행
+        $('.save-btn').on('click', function () {
+            const row = $(this).closest('tr');
+            const id = row.data('id');
+            const quantityInput = row.find('.quantity-input');
+            const orderCount = quantityInput.val();
+
+            $.ajax({
+                url: '/cart/order-count',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({product_id: id, quantity: Number(orderCount)}),
+                beforeSend: function () {
+                    // 요청이 시작되기 전에 버튼을 비활성화하거나 로딩 표시를 추가
+                    $(this).prop('disabled', true);
+                },
+                success: function (response) {
+                    // 요청 성공 후 작업 (필요에 따라 추가)
+                    alert('저장되었습니다.');
+                },
+                complete: function () {
+                    // 요청이 완료되면 버튼을 다시 활성화하거나 로딩 표시를 제거
+                    $(this).prop('disabled', false);
+                },
+                error: function (xhr, status, error) {
+                    console.error("저장 중 오류가 발생했습니다.", error);
+                }
+            });
+        });
+
+
+        // BUY NOW 버튼 클릭 시 실행
+        $('.buy-btn').on('click', function () {
+            const row = $(this).closest('tr');
+            const productId = row.data('id');
+            const quantity = row.find('.quantity-input').val();
+
+            const orderItems = [{
+                productId: productId,
+                quantity: parseInt(quantity)
+            }];
+
+            $.ajax({
+                url: '/order/update-order',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({orderItems: orderItems}),
+                success: function (response) {
+                    if (response.redirectUrl) {
+                        window.location.href = response.redirectUrl;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
+                    if (errorResponse && errorResponse.redirectUrl) {
+                        window.location.href = errorResponse.redirectUrl;
+                    } else {
+                        console.error('Error:', error);
+                    }
+                }
+            });
+        });
+
+    });
+
 
 </script>
 </body>

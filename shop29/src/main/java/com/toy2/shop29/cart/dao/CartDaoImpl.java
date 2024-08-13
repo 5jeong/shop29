@@ -1,7 +1,6 @@
 package com.toy2.shop29.cart.dao;
 
-import com.toy2.shop29.cart.domain.CartDto;
-import org.apache.ibatis.annotations.Param;
+import com.toy2.shop29.cart.domain.response.CartDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,8 +17,8 @@ public class CartDaoImpl implements CartDao {
     private static String namespace = "com.toy2.shop29.cart.dao.CartDaoMapper.";
 
     @Override
-    public int countAllUsersCart() throws Exception {
-        return session.selectOne(namespace + "countAllUsersCart");
+    public int countCart() throws Exception {
+        return session.selectOne(namespace + "countCart");
     }
 
     @Override
@@ -33,7 +32,7 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int createCart(String userId, Integer is_user) throws Exception {
+    public int createCart(String userId, int is_user) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("isUser", is_user);
@@ -41,12 +40,12 @@ public class CartDaoImpl implements CartDao {
     }
     
     @Override
-    public List<CartDto> findUserCartProductsByUserId(String userId) throws Exception {
-        return session.selectList(namespace + "findUserCartProductsByUserId", userId);
+    public List<CartDto> selectUserCartProductsByUserId(String userId) throws Exception {
+        return session.selectList(namespace + "selectUserCartProductsByUserId", userId);
     }
 
     @Override
-    public CartDto searchProductIdByUserIdAndProductId(String userId, Integer productId) throws Exception {
+    public CartDto searchProductIdByUserIdAndProductId(String userId, Long productId) throws Exception {
         Map<String, Object> map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
@@ -55,7 +54,7 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int insertUserCartProduct(String userId, Integer productId, Integer quantity) throws Exception {
+    public int insertUserCartProduct(String userId, Long productId, Long quantity) throws Exception {
         Map map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
@@ -65,12 +64,12 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int modifyCartLastUpdate(String userId) throws Exception {
-        return session.update(namespace + "modifyCartLastUpdate", userId);
+    public int updateCartLastUpdate(String userId) throws Exception {
+        return session.update(namespace + "updateCartLastUpdate", userId);
     }
 
     @Override
-    public int updateUserCartProductQuantity(String userId, Integer productId, Integer quantity) throws Exception {
+    public int updateUserCartProductQuantity(String userId, Long productId, Long quantity) throws Exception {
         Map map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
@@ -80,7 +79,7 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int deleteUserCartProduct(String userId, Integer productId) throws Exception {
+    public int deleteUserCartProduct(String userId, Long productId) throws Exception {
         Map map = new HashMap();
         map.put("userId", userId);
         map.put("productId", productId);
@@ -90,5 +89,20 @@ public class CartDaoImpl implements CartDao {
     @Override
     public int deleteUserCart(String userId) {
         return session.delete(namespace + "deleteUserCart", userId);
+    }
+
+    @Override
+    public int deleteCart() throws Exception {
+        return session.delete(namespace + "deleteCart");
+    }
+
+    @Override
+    public int deleteCartItem() throws Exception {
+        return session.delete(namespace + "deleteCartItem");
+    }
+
+    @Override
+    public int countCartItem() throws Exception {
+        return session.selectOne(namespace + "countCartItem");
     }
 }

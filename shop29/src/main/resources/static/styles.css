@@ -1,0 +1,429 @@
+body {
+    background-color: #f9f9f9;
+    font-family: "Noto Sans", sans-serif;
+}
+
+input {
+    box-sizing: border-box;
+}
+
+.inner-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-right: 20px;
+}
+
+.breadcrumb {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item {
+    color: #bbb;
+    font-size: 0.875rem;
+}
+
+.breadcrumb-divider {
+    margin: 0 8px;
+    color: #bbb;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.order-info,
+.payment-info {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 5px;
+    height: min-content;
+}
+
+.order-info {
+    flex: 1;
+}
+
+strong {
+    font-weight: bold;
+    color: black;
+}
+
+.payment-info {
+    position: sticky;
+    z-index: 5;
+    top: 116px;
+    overflow: auto;
+    flex: 1 1 0%;
+    min-width: 370px;
+    max-height: 1200px;
+    margin-left: 35px;
+    border: 3px solid black;
+}
+
+h2 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.shipping-form .radio-group {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+.radio-group label {
+    margin-right: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.checkbox label {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.price-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.price-details li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.price-details .price,
+.price-details .total-price {
+    font-weight: bold;
+}
+
+.price-details .discount {
+    color: #f00;
+}
+
+.agree-checkboxes label {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    margin-bottom: 10px;
+}
+
+.checkout-btn {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto 0;
+}
+
+.product {
+    display: flex;
+    width: 100%;
+    padding: 10px 0px;
+}
+
+.product-info {
+    flex-direction: column;
+}
+
+.order-footer {
+    justify-content: right;
+}
+
+.order-header {
+    justify-content: space-between;
+}
+
+.order-footer,
+.order-header {
+    display: flex;
+    align-items: center;
+
+    & > div {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.checkbox {
+    background: rgb(55, 95, 255);
+    border-color: rgb(55, 95, 255);
+    width: 24px;
+    height: 24px;
+}
+
+.coupon-info,
+.mileage-info,
+.product-info,
+.payment-method,
+.payment-details {
+    background-color: #fff;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 20px 0px;
+}
+
+.coupon-info h2,
+.mileage-info h2,
+.payment-method h2 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.coupon-toggle {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.coupon-toggle .switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.coupon-toggle .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.coupon-toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.coupon-toggle .slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.coupon-toggle input:checked + .slider {
+    background-color: #2196f3;
+}
+
+.coupon-toggle input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-info img {
+    margin-right: 20px;
+}
+
+.product-details {
+    font-size: 0.875rem;
+}
+
+.product-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.product-options,
+.product-price,
+.total-product-price,
+.shipping-cost,
+.coupon-discount,
+.mileage-used,
+.total-price,
+.coupon-amount {
+    margin-bottom: 5px;
+}
+
+.coupon-change {
+    display: flex;
+    align-items: center;
+}
+
+.coupon-change input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.coupon-change button {
+    padding: 8px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.mileage-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.mileage-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.mileage-input button {
+    padding: 8px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.payment-tab {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    text-align: center;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.payment-tab.active {
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+}
+
+.payment-methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.payment-methods button {
+    cursor: pointer;
+}
+
+.card-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.benefits p,
+.policy p {
+    font-size: 0.875rem;
+    margin-bottom: 5px;
+}
+
+.payment-methods {
+    position: relative;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 100%;
+
+    & > button {
+        border-width: 1px;
+        border-style: solid;
+        border-image: initial;
+        -webkit-box-pack: center;
+        justify-content: center;
+        cursor: pointer;
+        margin: 0px;
+        position: relative;
+        min-width: 84px;
+        height: 44px;
+        min-height: 44px;
+        flex: initial;
+        border-radius: 4px;
+        display: flex;
+        gap: 3px;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 100%;
+
+        & > span {
+            white-space: nowrap;
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.interceptor;
 
 import com.toy2.shop29.cart.service.CartService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -10,7 +11,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
-import java.util.UUID;
 
 @Component
 public class CartSessionInterceptor implements HandlerInterceptor {
@@ -39,14 +39,37 @@ public class CartSessionInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         try {
             HttpSession session = request.getSession(true);
-            String userId = (String) session.getAttribute("userId");
-            String guestId = (String) session.getAttribute("guestId");
-            //
+            // TODO : 임시아이디
+            session.setAttribute("loginUser", "user001");
+
+            String userId = (String) session.getAttribute("loginUser");
+            String guestId = null;
+
+            // 비로그인 연장
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("guestId".equals(cookie.getName())) {
+                        guestId = cookie.getValue();
+                        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                        cookie.setHttpOnly(true); // XSS 공격 방지
+                        cookie.setPath("/"); // 쿠키의 적용 경로 설정 (전체 사이트에 적용)
+                        response.addCookie(cookie); // 브라우저에 쿠키 저장
+
+                        // 쿠키의 유효기간을 초기화하여 연장
+                        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                        response.addCookie(cookie); // 쿠키를 다시 설정하여 유효기간 연장
+                        break;
+                    }
+                }
+            }
+
             if (userId == null && guestId == null) {
                 String uniqueId = generateId();
-                session.setAttribute("guestId", uniqueId);
-                session.setAttribute("is_user", 0);
-                session.setMaxInactiveInterval(1800);
+                Cookie cookie = new Cookie("guestId", uniqueId);
+                cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                cookie.setHttpOnly(true); // XSS 공격 방지
+                cookie.setPath("/"); // 쿠키의 적용 경로 설정 (전체 사이트에 적용)
+                response.addCookie(cookie); // 브라우저에 쿠키 저장
             }
             if (userId != null && guestId != null) {
                 cartService.updateGuestCartToUser(userId, guestId, 1);
@@ -55,6 +78,10 @@ public class CartSessionInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             HttpSession session = request.getSession(true);
             session.invalidate();
+            Cookie myCookie = new Cookie("guestId", null);
+            myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+            myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
+            response.addCookie(myCookie);
         }
         return true;
     }
