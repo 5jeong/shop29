@@ -85,6 +85,4 @@
             last_login_failure_time = NULL
         WHERE user_id = #{userId}
     </update>
-
-
 </mapper>
