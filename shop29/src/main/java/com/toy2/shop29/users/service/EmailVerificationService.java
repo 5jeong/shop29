@@ -1,6 +1,6 @@
 package com.toy2.shop29.users.service;
 
-import com.toy2.shop29.users.domain.EmailVerificationDto;
+import com.toy2.shop29.users.domain.EmailDto;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,19 +22,41 @@ public class EmailVerificationService {
     public void sendVerificationCode(String email) {
         String verificationCode = generateVerificationCode();
         // EmailDto 생성
-        EmailVerificationDto emailDto = EmailVerificationDto.builder()
+        EmailDto emailDto = EmailDto.builder()
+                .subject("회원가입 이메일 인증입니다.")
+                .body("다음 인증 코드를 사용해 주세요 : "+ "\n인증 코드: " + verificationCode)
                 .emailRecipent(email)
-                .verificationCode(verificationCode)
+                .code(verificationCode)
                 .build();
 
-        System.out.println(email);
+//        System.out.println(email);
 
         verificationCodes.put(email, verificationCode);
 
-        // 10분 후에 a자동으로 인증코드 삭제
+        // 10분 후에 자동으로 인증코드 삭제
         schedular.schedule(() -> verificationCodes.remove(email), 10, TimeUnit.MINUTES);
 
-        emailService.sendVerificationEmail(emailDto);
+        emailService.sendEmail(emailDto);
+    }
+
+    public void sendTempPassword(String email) {
+        String tempPassword = generateTempPassword();
+        // EmailDto 생성
+        EmailDto emailDto = EmailDto.builder()
+                .subject("회원가입 이메일 인증입니다.")
+                .body("다음 인증 코드를 사용해 주세요 : ")
+                .emailRecipent(email)
+                .code(tempPassword)
+                .build();
+
+//        System.out.println(email);
+
+        verificationCodes.put(email, tempPassword);
+
+        // 10분 후에 자동으로 인증코드 삭제
+        schedular.schedule(() -> verificationCodes.remove(email), 10, TimeUnit.MINUTES);
+
+        emailService.sendEmail(emailDto);
     }
 
     public boolean verifyCode(String email, String code) {
@@ -50,6 +72,10 @@ public class EmailVerificationService {
 
     private String generateVerificationCode() {
         return UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
 }
