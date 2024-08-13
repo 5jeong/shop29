@@ -2,18 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.toy2.shop29.dao.ProductMapper">
-
+<mapper namespace="com.toy2.shop29.product.dao.ProductMapper">
 
     <!-- product_id를 input으로 받아 해당하는 product를 반환하는 select -->
     <select id="select" parameterType="int" resultType="com.toy2.shop29.product.domain.ProductDto">
         SELECT product_id,
-               product_name,
                small_category_id,
+               product_name,
                brand_id,
                price,
                sale_ratio,
+               rating,
                is_exclusive,
+               size_table,
+               start_date,
                created_date,
                created_id,
                updated_date,
@@ -26,12 +28,15 @@
     <!-- 전체 product들 모두 읽어오기 -->
     <select id="selectAll" resultType="com.toy2.shop29.product.domain.ProductDto">
         SELECT product_id,
-               product_name,
                small_category_id,
+               product_name,
                brand_id,
                price,
                sale_ratio,
+               rating,
                is_exclusive,
+               size_table,
+               start_date,
                created_date,
                created_id,
                updated_date,
@@ -44,9 +49,9 @@
     <!-- 새 product 등록 -->
     <insert id="insert" parameterType="com.toy2.shop29.product.domain.ProductDto">
         INSERT INTO product
-        (product_id, product_name, small_category_id, brand_id, price, sale_ratio, is_exclusive, created_date, created_id, updated_date, updated_id)
+        (product_id, small_category_id, product_name, brand_id, price, sale_ratio, rating, is_exclusive, size_table, start_date, created_date, created_id, updated_date, updated_id)
         VALUES
-            (#{product_id}, #{product_name}, #{small_category_id}, #{brand_id}, #{price}, #{sale_ratio}, #{is_exclusive}, #{created_date}, #{created_id}, #{updated_date}, #{updated_id})
+            (#{product_id}, #{small_category_id}, #{product_name}, #{brand_id}, #{price}, #{sale_ratio}, #{rating}, #{is_exclusive}, #{size_table}, #{start_date}, #{created_date}, #{created_id}, #{updated_date}, #{updated_id})
     </insert>
 
 
@@ -55,12 +60,16 @@
     <update id="update" parameterType="com.toy2.shop29.product.domain.ProductDto">
         UPDATE product
         SET   product_id = #{product_id},
-              product_name = #{product_name},
               small_category_id = #{small_category_id},
+              product_name = #{product_name},
               brand_id = #{brand_id},
               price = #{price},
               sale_ratio = #{sale_ratio},
               is_exclusive = #{is_exclusive},
+              rating = #{rating},
+              is_exclusive = #{is_exclusive},
+              size_table = #{size_table},
+              start_date = #{start_date},
               updated_date = now(),
               updated_id = #{updated_id}
         WHERE product_id = #{product_id}
@@ -79,21 +88,228 @@
     </delete>
 
 
-    <!-- (쇼핑몰에서 특정 브랜드가 나갈때) 해당 브랜드의 상품을 모두 삭제 -->
-    <delete id="deleteByBrand" parameterType="String">
-        DELETE FROM product WHERE brand_id = #{brand_id}
-    </delete>
-
-
     <!-- 올라온 product를 모두 삭제 -->
     <delete id="deleteAll">
         DELETE FROM product
     </delete>
 
-    <!-- deleteByBrand 테스트를 위해 필요한 brand_id 같은 것들 세기 -->
-    <select id="brandCount" parameterType="String" resultType="int">
-        SELECT count(*) FROM product WHERE brand_id = #{brand_id}
+    <!-- 특정 카테고리의 상품 목록 조회 -->
+    <select id="selectProductByCategory" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        WHERE
+            small_category_id = #{smallCategoryId}
     </select>
+
+    <!-- 특정 브랜드의 상품 목록 조회 -->
+    <select id="selectProductByBrand" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        WHERE
+            brand_id = #{brandId}
+    </select>
+
+    <!-- 특정 가격 범위 내의 상품 목록 조회 -->
+    <select id="selectProductsByPriceRange" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        WHERE
+            price BETWEEN #{minPrice} AND #{maxPrice}
+    </select>
+
+
+
+    <!-- 가격 높은 순 정렬 -->
+    <select id="SortedByPriceDesc" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY
+            price DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 가격 낮은 순 정렬 -->
+    <select id="SortedByPriceAsc" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY
+            price ASC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 신상품 순 정렬 (start_date 기준) -->
+    <select id="SortedByNew" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY
+            start_date DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 할인율 높은 순 정렬 -->
+    <select id="SortedByHighDiscount" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY
+            sale_ratio DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 별점 높은 순 정렬 -->
+    <select id="SortedByRating" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY
+            rating DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+
+
+
+    <select id="selectPage" parameterType="map" resultType="com.toy2.shop29.product.domain.ProductDto">
+        SELECT
+            product_id,
+            small_category_id,
+            product_name,
+            brand_id,
+            price,
+            sale_ratio,
+            rating,
+            is_exclusive,
+            size_table,
+            start_date,
+            created_date,
+            created_id,
+            updated_date,
+            updated_id
+        FROM
+            product
+        ORDER BY created_date DESC, product_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+
 
 
 </mapper>
