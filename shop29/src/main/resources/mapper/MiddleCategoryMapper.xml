@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.MiddleCategoryMapper">
+
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT * FROM middlecategory
+    </select>
+
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT * FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
+    </select>
+
+    <select id="selectByMajorCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT * FROM middlecategory WHERE major_category_id = #{majorCategoryId}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        INSERT INTO middlecategory (major_category_id, middle_category_name, created_id, created_date, updated_id, updated_date)
+        VALUES (#{majorCategoryId}, #{middleCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
+    </insert>
+
+    <update id="update" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        UPDATE middlecategory
+        SET middle_category_name = #{middleCategoryName},
+            updated_id = #{updatedId},
+            updated_date = #{updatedDate}
+        WHERE middle_category_id = #{middleCategoryId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
+    </delete>
+
+    <select id="selectByNameAndMajorId" parameterType="map" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT * FROM middlecategory WHERE middle_category_name = #{middleCategoryName} AND major_category_id = #{majorCategoryId}
+    </select>
+
+
+
+</mapper>
