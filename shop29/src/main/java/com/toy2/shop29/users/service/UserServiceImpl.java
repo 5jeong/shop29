@@ -38,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updateUser(String userId, UserUpdateDto userUpdateDto) {
+        log.info("userUpdateDto = {}",userUpdateDto);
+        log.info("들어옴????????????????????");
+
         userMapper.updateUser(userId, userUpdateDto);
         return 0;
     }
@@ -64,7 +67,7 @@ public class UserServiceImpl implements UserService {
         return findById(userId) != null;
     }
 
-    private boolean isEmailDuplicated(String email) {
+    public boolean isEmailDuplicated(String email) {
         return findByEmail(email) != null;
     }
 
