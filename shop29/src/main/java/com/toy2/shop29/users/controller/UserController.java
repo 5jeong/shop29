@@ -1,6 +1,8 @@
 package com.toy2.shop29.users.controller;
 
+import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.domain.UserUpdateDto;
 import com.toy2.shop29.users.service.EmailVerificationService;
 import com.toy2.shop29.users.service.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Slf4j
 @Controller
@@ -27,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/user")
 public class UserController {
     private final UserServiceImpl userService;
-    private final EmailVerificationService emailVerificationService;
 
     @GetMapping("/signup")
     public String addForm(@ModelAttribute UserRegisterDto userRegisterDto) {
@@ -35,19 +37,41 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String addUser(@Validated @ModelAttribute UserRegisterDto userRegisterDto,
-                          BindingResult bindingResult, Model model, HttpSession session) {
+    public String addUser(@Validated @ModelAttribute(name = "userRegisterDto") UserRegisterDto userRegisterDto,
+                          BindingResult bindingResult, HttpSession session) {
 
         userService.validateDuplicatedInfo(userRegisterDto, bindingResult);
 
         if (bindingResult.hasErrors()) {
             log.info("회원가입 에러 : {}", bindingResult);
-//            model.addAttribute("verificationStatus",emailVerificationService.isEmail(userRegisterDto.getEmail()));
             return "user/addUserForm";
         }
 
         log.info("회원정보 :{}", userRegisterDto);
         userService.insertUser(userRegisterDto);
+        return "redirect:/";
+    }
+
+
+    @GetMapping("/update")
+    public String updateUser(Model model, @SessionAttribute(name = "loginUser", required = false) UserDto loginUser) {
+        if (loginUser == null) {
+            return "redirect:/login"; // 로그인 페이지로 리다이렉트
+        }
+        model.addAttribute("loginUser", loginUser);
+        return "user/editUserForm"; // 수정 폼 페이지로 이동
+    }
+
+
+    @PostMapping("/update")
+    public String updateUser(@Validated() @ModelAttribute(name = "loginUser") UserUpdateDto userUpdateDto,
+                             BindingResult bindingResult,
+                             @SessionAttribute(name = "loginUser", required = false) UserDto loginUser) {
+        if (bindingResult.hasErrors()) {
+            log.info("회원가입 에러 : {}", bindingResult);
+            return "user/editUserForm";
+        }
+        userService.updateUser(loginUser.getUserId(), userUpdateDto);
         return "redirect:/";
     }
 
@@ -62,33 +86,15 @@ public class UserController {
 
 
     @ResponseBody
-    @PostMapping("/sendVerificationCode")
-    public ResponseEntity<Map<String, Boolean>> sendVerificationCode(@RequestBody Map<String, String> requestData) {
-        String email = requestData.get("email");
-        emailVerificationService.sendVerificationCode(email);
+    @GetMapping("/checkUserEmail")
+    public ResponseEntity<Map<String, Boolean>> checkUserEmail(@RequestParam(name = "userEmail") String userEmail) {
+        boolean exists = userService.isEmailDuplicated(userEmail);
         Map<String, Boolean> response = new HashMap<>();
-        response.put("success", true);
+        response.put("exists", exists);
         return ResponseEntity.ok(response);
     }
 
 
-    @ResponseBody
-    @PostMapping("/verifyCode")
-    public ResponseEntity<String> verifyCode(@RequestParam(name = "email") String email,
-                                             @RequestParam("code") String code, HttpSession session) {
-//        System.out.println("이메일 : " + email);
-//        System.out.println("코드 : " + code);
-        boolean isVerified = emailVerificationService.verifyCode(email, code);
-        if (isVerified) {
-            session.setAttribute("emailVerifed", true);
-            session.setAttribute("verifiedEmail", email);
-//            System.out.println("Verification 성공.");
-            return ResponseEntity.ok("이메일 인증 성공.");
-        } else {
-//            System.out.println("Verification 실패.");
-            return ResponseEntity.badRequest().body("이메일 인증 실패. 다시 시도해주세요.");
-        }
-    }
 
 
 }
