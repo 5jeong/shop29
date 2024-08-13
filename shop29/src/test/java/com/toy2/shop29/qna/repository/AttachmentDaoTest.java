@@ -156,5 +156,49 @@ public class AttachmentDaoTest {
         assertTrue(updatedDto.getIsActive() == false);
     }
 
+    @DisplayName("첨부파일 여러건 softDelete 동작 테스트")
+    @Test
+    void softDeleteList_1(){
+        // 1단계 데이터 선택
+        // 1-1. 첨부파일 여러건 추가
+        List<AttachmentDto> list = new ArrayList<>();
+        int size = 5;
+        for(int i = 0; i < size; i++){
+            AttachmentDto dto = AttachmentDto.builder()
+                    .qnaId(sampleQna.getQnaId())
+                    .fileName("fileName")
+                    .filePath("filePath")
+                    .size(1000)
+                    .extension("jpg")
+                    .isActive(true)
+                    .createdId(userId)
+                    .updatedId(userId)
+                    .build();
+            list.add(dto);
+        }
+        int insertCnt = attachmentDao.insertList(list);
+        assertTrue(insertCnt == size);
+
+        // 1-2. 추가된 첨부파일 리스트 조회
+        List<AttachmentDto> selectedList = attachmentDao.selectAll(null);
+        assertTrue(selectedList.size() == size);
+        List<Integer> attachmentIds = new ArrayList<>();
+        for(AttachmentDto dto : selectedList){
+            attachmentIds.add(dto.getAttachmentId());
+        }
+
+        // 2단계 데이터 처리
+        int rowCnt = attachmentDao.softDeleteList(attachmentIds);
+
+        // 3단계 검증
+        assertTrue(rowCnt == size);
+        List<AttachmentDto> deletedList = attachmentDao.selectAll(null);
+        assertTrue(deletedList.size() == size);
+        for(AttachmentDto dto : deletedList){
+            assertTrue(dto.getIsActive() == false);
+        }
+
+    }
+
 
 }

@@ -16,7 +16,7 @@ public class AttachmentDto {
     private String filePath;
     private Integer width;
     private Integer height;
-    private Integer size;
+    private long size;
     private String extension;
     private Boolean isActive;
 

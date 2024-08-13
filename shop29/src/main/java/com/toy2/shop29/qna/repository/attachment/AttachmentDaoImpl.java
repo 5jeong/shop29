@@ -52,6 +52,15 @@ public class AttachmentDaoImpl implements AttachmentDao{
     }
 
     @Override
+    public List<AttachmentDto> selectAllBy(int qnaId, Boolean isActive) throws DataAccessException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("qnaId", qnaId);
+        map.put("isActive", isActive);
+
+        return session.selectList(namespace + "selectAllBy", map);
+    }
+
+    @Override
     public int count() throws DataAccessException {
         return session.selectOne(namespace + "count");
     }
@@ -68,6 +77,11 @@ public class AttachmentDaoImpl implements AttachmentDao{
     /*
         DELETE
      */
+
+    @Override
+    public int softDeleteList(List<Integer> attachmentIds) throws DataAccessException {
+        return session.update(namespace + "softDeleteList", attachmentIds);
+    }
 
     @Override
     public int deleteAll() throws DataAccessException {

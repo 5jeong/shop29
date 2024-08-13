@@ -14,11 +14,13 @@ public interface AttachmentDao {
     // Read
     AttachmentDto select(int attachmentId, Boolean isActive) throws DataAccessException;
     List<AttachmentDto> selectAll(Boolean isActive) throws DataAccessException;
+    List<AttachmentDto> selectAllBy(int qnaId, Boolean isActive) throws DataAccessException;
     int count() throws DataAccessException;
 
     // Update
     int update(AttachmentDto attachmentDto) throws DataAccessException;
 
     // Delete
+    int softDeleteList(List<Integer> attachmentIds) throws DataAccessException;
     int deleteAll() throws DataAccessException;
 }
