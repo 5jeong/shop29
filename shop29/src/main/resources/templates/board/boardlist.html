@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 목록</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        /* 테이블 기본 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            text-align: left;
+        }
+
+        /* 가운데 정렬 적용 */
+        .center-text {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1>공지사항 목록</h1>
+<table>
+    <thead>
+    <tr>
+        <th>제목</th>
+        <th class="center-text">작성자</th> <!-- 헤더 가운데 정렬 -->
+        <th>작성일시</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="board : ${list}">
+        <td><a th:href="@{/board/read(noticeId=${board.getNoticeId()})}" th:text="${board.getNoticeTitle()}"></a></td>
+        <td class="center-text" th:text="${board.getNoticeCreatorId()}"></td> <!-- 작성자 이름 가운데 정렬 -->
+        <td th:text="${board.getNoticeCreationTime()}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- 페이지 네비게이션 -->
+<div>
+    <span th:text="${ph.getBeginPage()}"></span>
+    <span th:text="${ph.getCurrentPage()}"></span>
+    <span th:text="${ph.getEndPage()}"></span>
+</div>
+<a href="http://localhost:8080">홈페이지로 가기</a>
+<a href="/board/write">공지사항 작성</a>
+
+</body>
+</html>
