@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.ProductOptionValueMapper">
+
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.ProductOptionValueDto">
+        SELECT * FROM productoptionvalue
+    </select>
+
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.ProductOptionValueDto">
+        SELECT * FROM productoptionvalue WHERE product_option_value_key = #{productOptionValueKey}
+    </select>
+
+    <select id="selectByProductId" parameterType="int" resultType="com.toy2.shop29.product.domain.ProductOptionValueDto">
+        SELECT * FROM productoptionvalue WHERE product_id = #{productId}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.ProductOptionValueDto">
+        INSERT INTO productoptionvalue (product_id, option_value_id, extra_fee, stock, created_date, created_id, updated_date, updated_id)
+        VALUES (#{productId}, #{optionValueId}, #{extraFee}, #{stock}, NOW(), #{createdId}, NOW(), #{updatedId})
+    </insert>
+
+    <update id="update" parameterType="com.toy2.shop29.product.domain.ProductOptionValueDto">
+        UPDATE productoptionvalue
+        SET option_value_id = #{optionValueId},
+            extra_fee = #{extraFee},
+            stock = #{stock},
+            updated_date = NOW(),
+            updated_id = #{updatedId}
+        WHERE product_option_value_key = #{productOptionValueKey}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM productoptionvalue WHERE product_option_value_key = #{productOptionValueKey}
+    </delete>
+
+</mapper>

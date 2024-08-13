@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.toy2.shop29.product.dao.MajorCategoryMapper">
+
+
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        SELECT * FROM majorcategory
+    </select>
+
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        SELECT * FROM majorcategory WHERE major_category_id = #{majorCategoryId}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        INSERT INTO majorcategory (major_category_name, created_id, created_date, updated_id, updated_date)
+        VALUES (#{majorCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
+    </insert>
+
+    <update id="update" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        UPDATE majorcategory
+        SET major_category_name = #{majorCategoryName},
+            updated_id = #{updatedId},
+            updated_date = #{updatedDate}
+        WHERE major_category_id = #{majorCategoryId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM majorcategory WHERE major_category_id = #{majorCategoryId}
+    </delete>
+
+    <select id="selectByName" parameterType="String" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
+        SELECT * FROM majorcategory WHERE major_category_name = #{majorCategoryName}
+    </select>
+
+
+</mapper>
