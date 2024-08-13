@@ -39,7 +39,6 @@
             `height`, -- 세로
             `size`, -- 파일 크기
             `extension`, -- 확장자
-            `is_Active`, -- 사용여부
             `created_id`, -- 생성자 ID
             `updated_id` -- 수정자 ID
         )
@@ -53,7 +52,6 @@
                 #{item.height},
                 #{item.size},
                 #{item.extension},
-                #{item.isActive},
                 #{item.createdId},
                 #{item.updatedId}
             )
@@ -82,6 +80,17 @@
         ORDER BY `attachment_id` DESC;
     </select>
 
+    <select id="selectAllBy" parameterType="map" resultType="com.toy2.shop29.qna.domain.AttachmentDto">
+        SELECT
+            *
+        FROM `Attachment`
+        WHERE `qna_id` = #{qnaId}
+        <if test="isActive != null">
+            AND `is_active` = #{isActive}
+        </if>
+        ORDER BY `attachment_id` DESC;
+    </select>
+
     <select id="count" resultType="int">
         SELECT
             COUNT(*)
@@ -106,6 +115,17 @@
     </update>
 
     <!-- DELETE -->
+    <update id="softDeleteList" parameterType="java.util.List">
+        UPDATE `Attachment`
+        SET
+            `is_active` = false
+        WHERE `attachment_id` IN (
+            <foreach collection="list" item="item" separator=",">
+                #{item}
+            </foreach>
+        );
+    </update>
+
     <delete id="deleteAll" parameterType="int">
         DELETE FROM `Attachment`
     </delete>
