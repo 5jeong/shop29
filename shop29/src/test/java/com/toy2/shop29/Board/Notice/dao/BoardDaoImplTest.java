@@ -25,7 +25,7 @@ public class BoardDaoImplTest {
         boardDao.deleteAll();
         assertTrue(boardDao.count() == 0);
 
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf","240813");
+        BoardDto boardDto = new BoardDto(1, "no title", "no content","관리자");
         assertTrue(boardDao.insert(boardDto) == 1);
         assertTrue(boardDao.count() == 1);
 
@@ -38,7 +38,7 @@ public class BoardDaoImplTest {
         boardDao.deleteAll();
         assertTrue(boardDao.count() == 0);
 
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1, "no title", "no content","관리자");
         assertTrue(boardDao.insert(boardDto) == 1);
         assertTrue(boardDao.count() == 1);
 
@@ -58,7 +58,7 @@ public class BoardDaoImplTest {
         boardDao.deleteAll();
         assertTrue(boardDao.count() == 0);
 
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1,"no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
         Integer noticeId = boardDao.selectAll().get(0).getNoticeId();
         assertTrue(boardDao.delete(noticeId, boardDto.getNoticeCreatorId()) == 1);
@@ -83,15 +83,15 @@ public class BoardDaoImplTest {
     @Test
     public void insertTest() throws Exception {
         boardDao.deleteAll();
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1, "no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
 
-        boardDto = new BoardDto("no title", "no content", "asdf");
+        boardDto = new BoardDto(1,"no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
         assertTrue(boardDao.count() == 2);
 
         boardDao.deleteAll();
-        boardDto = new BoardDto("no title", "no content", "asdf");
+        boardDto = new BoardDto(1, "no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
         assertTrue(boardDao.count() == 1);
     }
@@ -104,7 +104,7 @@ public class BoardDaoImplTest {
         List<BoardDto> list = boardDao.selectAll();
         assertTrue(list.size() == 0);
 
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1, "no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
 
         list = boardDao.selectAll();
@@ -120,7 +120,7 @@ public class BoardDaoImplTest {
         boardDao.deleteAll();
         assertTrue(boardDao.count() == 0);
 
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1, "no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
 
         Integer noticeId = boardDao.selectAll().get(0).getNoticeId();
@@ -144,7 +144,7 @@ public class BoardDaoImplTest {
         boardDao.deleteAll();
 
         for(int i =1; i<=10; i++){
-            BoardDto boardDto = new BoardDto(""+i, "no content"+i, "asdf");
+            BoardDto boardDto = new BoardDto(1,"no title"+i, "no content"+i, "asdf");
             boardDao.insert(boardDto);
         }
         Map map= new HashMap();
@@ -152,31 +152,32 @@ public class BoardDaoImplTest {
         map.put("pageSize", 3);
 
         List<BoardDto> list = boardDao.selectPage(map);
-        System.out.println(list.get(0).getNoticeTitle());
-        assertTrue(list.get(0).getNoticeTitle().equals("10"));
-        assertTrue(list.get(1).getNoticeTitle().equals("9"));
-        assertTrue(list.get(2).getNoticeTitle().equals("8"));
+        System.out.println(list.get(1).getNoticeTitle());
+        assertTrue(list.get(0).getNoticeTitle().equals("no title10"));
+        assertTrue(list.get(1).getNoticeTitle().equals("no title9"));
+        assertTrue(list.get(2).getNoticeTitle().equals("no title8"));
 
         map= new HashMap();
         map.put("offset", 0);
         map.put("pageSize", 1);
 
         list = boardDao.selectPage(map);
-        assertTrue(list.get(0).getNoticeTitle().equals("10"));
+        assertTrue(list.get(0).getNoticeTitle().equals("no title10"));
 
         map= new HashMap();
         map.put("offset", 7);
         map.put("pageSize", 3);
 
         list = boardDao.selectPage(map);
-        assertTrue(list.get(0).getNoticeTitle().equals("3"));
-        assertTrue(list.get(1).getNoticeTitle().equals("2"));
-        assertTrue(list.get(2).getNoticeTitle().equals("1"));
+        System.out.println(list.get(0).getNoticeTitle());
+        assertTrue(list.get(0).getNoticeTitle().equals("no title3"));
+        assertTrue(list.get(1).getNoticeTitle().equals("no title2"));
+        assertTrue(list.get(2).getNoticeTitle().equals("no title1"));
     }
     @Test
     public void updateTest() throws Exception {
         boardDao.deleteAll();
-        BoardDto boardDto = new BoardDto("no title", "no content", "asdf");
+        BoardDto boardDto = new BoardDto(1,"no title", "no content", "asdf");
         assertTrue(boardDao.insert(boardDto) == 1);
 
         Integer noticeId = boardDao.selectAll().get(0).getNoticeId();
