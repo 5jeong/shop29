@@ -3,13 +3,13 @@ package com.toy2.shop29.users.controller;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
-import com.toy2.shop29.users.service.EmailVerificationService;
-import com.toy2.shop29.users.service.UserServiceImpl;
-import jakarta.servlet.http.HttpSession;
+import com.toy2.shop29.users.service.email.EmailVerificationService;
+import com.toy2.shop29.users.service.user.UserService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,7 +28,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserController {
-    private final UserServiceImpl userService;
+    private final UserService userService;
+    private final EmailVerificationService emailVerificationService;
 
     @GetMapping("/signup")
     public String addForm(@ModelAttribute UserRegisterDto userRegisterDto) {
@@ -38,14 +38,14 @@ public class UserController {
 
     @PostMapping("/signup")
     public String addUser(@Validated @ModelAttribute(name = "userRegisterDto") UserRegisterDto userRegisterDto,
-                          BindingResult bindingResult, HttpSession session) {
+                          BindingResult bindingResult ) {
 
-        userService.validateDuplicatedInfo(userRegisterDto, bindingResult);
+        userService.validateDuplicatedInfo(userRegisterDto,bindingResult);
 
-        if (bindingResult.hasErrors()) {
+       if (bindingResult.hasErrors()) {
             log.info("회원가입 에러 : {}", bindingResult);
             return "user/addUserForm";
-        }
+       }
 
         log.info("회원정보 :{}", userRegisterDto);
         userService.insertUser(userRegisterDto);
@@ -81,9 +81,8 @@ public class UserController {
         boolean exists = userService.isUserIdDuplicated(userId);
         Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
 
     @ResponseBody
     @GetMapping("/checkUserEmail")
@@ -91,10 +90,33 @@ public class UserController {
         boolean exists = userService.isEmailDuplicated(userEmail);
         Map<String, Boolean> response = new HashMap<>();
         response.put("exists", exists);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @ResponseBody
+    @GetMapping("/checkUserPhoneNumber")
+    public ResponseEntity<Map<String, Boolean>> checkPhoneNumber(@RequestParam(name = "phoneNumber") String phoneNumber) {
+        boolean exists = userService.isPhoneNumberDuplicated(phoneNumber);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
+    @GetMapping("/findId")
+    public String findUserId(){
+        return "user/findUserIdForm";
+    }
 
+    @PostMapping("/findIdResult")
+    public String findUserId(@RequestParam String email,Model model){
+        String userId = userService.findByEmail(email);
+        model.addAttribute("userId",userId);
+        return "user/findIdResult";
+    }
+
+    @GetMapping("/findPassword")
+    public String findPassword(){
+        return "user/findPasswordForm";
+    }
 
 }
