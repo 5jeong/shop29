@@ -1,11 +1,9 @@
 package com.toy2.shop29.users.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.toy2.shop29.users.domain.UserRegisterDto;
-import java.time.LocalDate;
-import org.assertj.core.api.Assertions;
+import com.toy2.shop29.users.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 @Transactional
 @SpringBootTest
 class UserServiceImplTest {
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
     private UserRegisterDto userRegisterDto;
 
     @BeforeEach
@@ -63,10 +60,9 @@ class UserServiceImplTest {
     }
 
 
-
     @DisplayName("중복 회원 테스트")
     @Test
-    void idDuplicateTest (){
+    void idDuplicateTest() {
         // Given: 새로운 UserRegisterDto 설정 (중복되는 데이터 사용)
         UserRegisterDto newUserDto = new UserRegisterDto();
         newUserDto.setUserId("testUser"); // 중복 아이디
@@ -84,7 +80,7 @@ class UserServiceImplTest {
 
     @DisplayName("중복 이메일 테스트")
     @Test
-    void emailDuplicateTest (){
+    void emailDuplicateTest() {
         // Given: 새로운 UserRegisterDto 설정 (중복되는 데이터 사용)
         UserRegisterDto newUserDto = new UserRegisterDto();
         newUserDto.setEmail("testuser@example.com"); // 중복 이메일
@@ -97,11 +93,11 @@ class UserServiceImplTest {
 
         // Then: 중복 에러가 발생했는지 확인
         assertThat(bindingResult.hasFieldErrors("email")).isTrue();
-     }
+    }
 
     @DisplayName("중복 휴대폰번호 테스트")
     @Test
-    void phoneDuplicateTest (){
+    void phoneDuplicateTest() {
         // Given: 새로운 UserRegisterDto 설정 (중복되는 데이터 사용)
         UserRegisterDto newUserDto = new UserRegisterDto();
         newUserDto.setPhoneNumber("010-1234-9999"); // 중복 전화번호
