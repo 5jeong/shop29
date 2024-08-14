@@ -73,12 +73,13 @@ public class CartServiceImpl implements CartService {
             throw new IllegalArgumentException("존재하지 않는 상품 ID");
         }
 
+        // application.properties
         if (quantity > 100) {
             throw new IllegalArgumentException("수량 초과");
         }
 
         if (quantity <= 0) {
-            return deleteSpecificProduct(userId, productId);
+            deleteSpecificProduct(userId, productId);
         }
 
         int result = cartDao.updateUserCartProductQuantity(userId, productId, quantity);
@@ -102,16 +103,15 @@ public class CartServiceImpl implements CartService {
     // 상품 삭제
     @Override
     @Transactional
-    public int deleteSpecificProduct(String userId, Long productId) throws Exception {
+    public void deleteSpecificProduct(String userId, Long productId) throws Exception {
         CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId);
         if (specificProduct == null) {
-            return -1;
+            return;
         }
         int result = cartDao.deleteUserCartProduct(userId, productId);
         if (result > 0) {
             updateCartLastUpdate(userId);
         }
-        return result;
     }
 
     // 장바구니에 담은 상태에서 로그인 할 경우 장바구니 이전

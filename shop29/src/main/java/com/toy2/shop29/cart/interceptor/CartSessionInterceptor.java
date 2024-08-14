@@ -40,7 +40,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
         try {
             HttpSession session = request.getSession(true);
             // TODO : 임시아이디
-            session.setAttribute("loginUser", "user001");
+            session.setAttribute("loginUser", "user008");
 
             String userId = (String) session.getAttribute("loginUser");
             String guestId = null;

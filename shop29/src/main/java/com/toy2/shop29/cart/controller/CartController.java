@@ -55,32 +55,45 @@ public class CartController {
 
     // 장바구니 담기
     @PostMapping("/cart-item")
-    public String addCartItem(@SessionAttribute(name = "loginUser", required = false) String userId,
-                              @CookieValue(name = "guestId", required = false) String guestId,
-                              @RequestBody AddCartProductDto addCartProductDto) {
+    public ResponseEntity<Map<String, String>> addCartItem(@SessionAttribute(name = "loginUser", required = false) String userId,
+                                                           @CookieValue(name = "guestId", required = false) String guestId,
+                                                           @RequestBody AddCartProductDto addCartProductDto) {
 
         // 로그인과 비로그인인지 확인해서 장바구니에 담는 것
         // TODO : 아래 코드를 어떻게 하면 깔끔하게 작성할 수 있을지 고민
         String userInfo = getUserInfo(userId, guestId);
         int isUser = (userId != null) ? 1 : 0;
 
+        Map<String, String> response = new HashMap<>();
+
         // 유저 고유 아이디와 상품 아이디, 수량으로 장바구니에 담기
         // 장바구니에 이미 존재하는 상품이라면 담은 수량만큼 추가
         try {
             Long productId = addCartProductDto.getProductId();
-            Long quantity = addCartProductDto.getQauntity();
+            Long quantity = addCartProductDto.getQuantity();
+            if (quantity < 1){
+                // TODO : 상품 수량 1로
+                // TODO : RestController
+                response.put("status", "fail");
+                response.put("message", "상품 수량 문제");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
             cartService.addProductToCart(userInfo, productId, quantity, isUser);
+            response.put("status", "success");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             logger.error("장바구니 상품 추가 실패", e);
+            response.put("status", "fail");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return "redirect:/cart/get-list";
     }
 
     // 장바구니 상품 수량 변경
     @PostMapping("/order-count")
     public ResponseEntity<Map<String, String>> orderCount(@RequestBody OrderCountRequestDto orderCountRequestDto,
-                                                        @SessionAttribute(name = "loginUser", required = false) String userId,
-                                                        @CookieValue(name = "guestId", required = false) String guestId) {
+                                                          @SessionAttribute(name = "loginUser", required = false) String userId,
+                                                          @CookieValue(name = "guestId", required = false) String guestId) {
 
         String userInfo = getUserInfo(userId, guestId);
         Map<String, String> response = new HashMap<>();
@@ -98,6 +111,7 @@ public class CartController {
         }
     }
 
+    // 장바구니 상품 삭제
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCartItems(@SessionAttribute(name = "loginUser", required = false) String userId,
                                                   @CookieValue(name = "guestId", required = false) String guestId,
@@ -114,6 +128,7 @@ public class CartController {
         }
     }
 
+    // 로그인 비로그인 검증
     public String getUserInfo(String userId, String guestId) {
         return (userId != null) ? userId : guestId;
     }

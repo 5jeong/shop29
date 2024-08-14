@@ -15,7 +15,7 @@ public interface CartService {
     int addProductToCart(String userId, Long productId, Long quantity, int is_user) throws Exception;
     int updateProductQuantity(String userId, Long productId, Long quantity) throws Exception;
     int deleteCartProducts(String userId, List<Long> productIds) throws Exception;
-    int deleteSpecificProduct(String userId, Long productId) throws Exception;
+    void deleteSpecificProduct(String userId, Long productId) throws Exception;
     int updateGuestCartToUser(String userId, String guestId, int is_user) throws Exception;
     int updateCartLastUpdate(String userId) throws Exception;
 }

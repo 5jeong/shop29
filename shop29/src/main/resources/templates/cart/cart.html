@@ -372,12 +372,63 @@
                 line-height: 40px;
             }
         }
+
+        .cart-items {
+            margin-bottom: 5px;
+        }
+
+        .add-to-cart {
+            background-color: #6aafe6;
+            color: #d4dfe6;
+            position: relative;
+            border: none;
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-family: "paybooc-Light", sans-serif;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.25s;
+        }
+
+        .empty-text {
+            margin: 0px auto;
+            text-align: center;
+            padding: 50px;
+            font-size: 3rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Shopping Cart</h1>
-    <table class="cart">
+    <h1>장바구니</h1>
+    <div class="cart-items">
+        <button id="1215988" class="add-to-cart">
+            <span class="button-inner">상품1 담기</span>
+        </button>
+        <button id="1947442" class="add-to-cart">
+            <span class="button-inner">상품2 담기</span>
+        </button>
+        <button id="2032612" class="add-to-cart">
+            <span class="button-inner">상품3 담기</span>
+        </button>
+        <button id="2569392" class="add-to-cart">
+            <span class="button-inner">상품4 담기</span>
+        </button>
+        <button id="2588784" class="add-to-cart">
+            <span class="button-inner">상품5 담기</span>
+        </button>
+        <button class="add-to-cart">
+            <a class="button-inner" href="/order/history">주문 내역</a>
+        </button>
+    </div>
+    <!-- 주문 내역이 없는 경우 -->
+    <div class="empty-text" th:if="${cartList == null || #lists.size(cartList) == 0}">
+        <p>장바구니가 비어있습니다.</p>
+    </div>
+    <table class="cart" th:if="${#lists.size(cartList) > 0}">
         <thead>
         <tr>
             <th><input class="chkAll" type="checkbox" checked></th>
@@ -393,7 +444,7 @@
             <td><input class="chkbox" type="checkbox" checked></td>
             <td>
                 <div class="item-info">
-                    <img src="https://img.29cm.co.kr/item/202407/11ef4e151edaf399aad275bb5024f198.jpg?width=150"
+                    <img src="https://placehold.co/100x100"
                          alt="Product Image">
                     <div class="item-details">
                         <span th:text="${cart.productName}">Item Name</span>
@@ -416,7 +467,7 @@
         </tr>
         </tbody>
     </table>
-    <div class="actions">
+    <div class="actions" th:if="${#lists.size(cartList) > 0}">
         <button class="delete">선택상품 삭제</button>
     </div>
     <div class="summary">
@@ -646,6 +697,28 @@
             });
         });
 
+        $('.add-to-cart').click(function () {
+            var productId = $(this).attr('id'); // 클릭된 버튼의 ID를 가져옴
+            $.ajax({
+                url: '/cart/cart-item',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId: Number(productId),
+                    quantity: 2 // 수량을 2로 설정
+                }),
+                success: function (response) {
+                    // 요청이 성공하면 페이지 새로고침
+                    if (response.data?.message) {
+                        alert(response.data.message);
+                    }
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error: ' + error);
+                }
+            });
+        });
     });
 
 
