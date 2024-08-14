@@ -1,4 +1,4 @@
-package com.toy2.shop29.users.service;
+package com.toy2.shop29.users.service.user;
 
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
@@ -7,6 +7,7 @@ import com.toy2.shop29.users.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 @Slf4j
@@ -14,7 +15,6 @@ import org.springframework.validation.BindingResult;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
-
 
     @Override
     public UserDto findById(String userId) {
@@ -41,8 +41,7 @@ public class UserServiceImpl implements UserService {
         log.info("userUpdateDto = {}",userUpdateDto);
         log.info("들어옴????????????????????");
 
-        userMapper.updateUser(userId, userUpdateDto);
-        return 0;
+        return userMapper.updateUser(userId, userUpdateDto);
     }
 
     @Override
@@ -63,6 +62,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public int updatePassword(String userId, String tempPassword) {
+        return userMapper.updatePassword(userId,tempPassword);
+    }
+
     public boolean isUserIdDuplicated(String userId) {
         return findById(userId) != null;
     }
@@ -71,9 +75,8 @@ public class UserServiceImpl implements UserService {
         return findByEmail(email) != null;
     }
 
-    private boolean isPhoneNumberDuplicated(String phoneNumber) {
+    public boolean isPhoneNumberDuplicated(String phoneNumber) {
         return findByPhoneNumber(phoneNumber) != null;
     }
-
 
 }
