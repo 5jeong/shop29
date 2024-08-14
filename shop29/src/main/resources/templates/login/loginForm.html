@@ -130,7 +130,12 @@
 
         <button class="w-100 btn btn-primary btn-lg mt-3" type="submit">로그인</button>
 
-        <a th:href="@{/user/signup}" class="link">회원가입</a>
+        <div>
+            <a th:href="@{/user/signup}" class="link">회원가입</a>
+            <a th:href="@{/user/findId}" class="link">아이디 찾기</a>
+            <a th:href="@{/user/findPassword}" class="link">비밀번호 찾기</a>
+        </div>
+
     </form>
 
 </div>
