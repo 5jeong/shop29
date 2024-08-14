@@ -1,9 +1,9 @@
-package com.toy2.shop29.users.service;
+package com.toy2.shop29.users.service.login;
 
 import com.toy2.shop29.users.domain.UserDto;
-import com.toy2.shop29.users.exception.IncorrectPasswordException;
-import com.toy2.shop29.users.exception.UserAccountLockedException;
-import com.toy2.shop29.users.exception.UserNotFoundException;
+import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
+import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
+import com.toy2.shop29.users.exception.loginException.UserNotFoundException;
 import com.toy2.shop29.users.mapper.UserMapper;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
