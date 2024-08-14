@@ -30,13 +30,13 @@ public class BoardDto {
 
     }
 
-    public BoardDto(Integer noticeId, String noticeTitle, String noticeContent, String noticeCreatorId) {
-        this.noticeId = noticeId;
+    public BoardDto( String noticeTitle, String noticeContent, String noticeCreatorId, Date noticeCreationTime) {
+//        this.noticeId = noticeId;   //noitcId는 auto_increase라서 생략
         this.noticeTitle = noticeTitle;
         this.noticeContent = noticeContent;
         this.noticeCreatorId = noticeCreatorId;
         this.noticeCreationTime = new Date(); // 현재 날짜로 초기화
-        this.noticeModificationTime = new Date(); // 현재 날짜로 초기화
+
 
 
     }
