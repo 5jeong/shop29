@@ -78,8 +78,10 @@
 
         <div id="emailVerification" style="display: none;">
             <label for="verificationCode">인증번호</label>
-            <input type="text" id="verificationCode" class="form-control" placeholder="이메일로 받은 인증번호 입력">
-            <button type="button" class="btn btn-outline-secondary" onclick="verifyEmail()">인증 확인</button>
+            <div class="input-group">
+                <input type="text" id="verificationCode" class="form-control" placeholder="이메일로 받은 인증번호 입력">
+                <button type="button" class="btn btn-outline-secondary" onclick="verifyEmail()">인증 확인</button>
+            </div>
         </div>
 
         <button class="w-100 btn btn-primary btn-lg mt-4"  id="findIdButton" type="submit" disabled >아이디 찾기</button>
