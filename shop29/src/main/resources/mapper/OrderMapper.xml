@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.toy2.shop29.order.dao.OrderDaoMapper">
     <!--    주문 처리-->
-
+<!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--주문 처리 모든 내역 조회-->
     <select id="getCurrentOrderLists" resultType="com.toy2.shop29.order.domain.CurrentOrderDTO">
         SELECT *
@@ -136,9 +136,16 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE tid = #{tid} AND user_id = #{userId})
     </delete>
 
+<!--    해당 유저의 하나의 주문내역 상품 개수 조회-->
     <select id="countUserOrderHistoryItem" parameterType="map" resultType="int">
         SELECT count(*)
-        FROM OrderAddress
+        FROM OrderHistoryItem
+        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
+    </select>
+
+    <select id="selectUserOrderHistoryItem" parameterType="map" resultType="com.toy2.shop29.order.domain.OrderItemDTO">
+        SELECT *
+        FROM OrderHistoryItem
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
@@ -156,14 +163,8 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
-    <!-- 특정 사용자 ID와 기본 배송지 여부로 조회하는 쿼리 -->
-    <!--    <select id="selectDefaultShippingAddressByUserId" resultType="com.toy2.shop29.order.domain.ShippingAddressInfoDTO">-->
-    <!--        SELECT *-->
-    <!--        FROM ShippingAddress-->
-    <!--        WHERE user_id = #{userId} AND is_default = 1-->
-    <!--    </select>-->
-
     <!--    주문 내역-->
+    <!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--    주문내역 생성-->
     <insert id="insertOrderHistory">
         INSERT INTO OrderHistory (order_id, user_id, tid, total_price)
@@ -283,7 +284,9 @@
                  LEFT JOIN orderaddress oa ON oh.order_id = oa.order_id
         WHERE oh.user_id = #{userId}
           AND length(oh.order_status) >= 1
+        ORDER BY oh.order_time DESC
     </select>
+
 
 
     <resultMap id="OrderHistoryResultMap" type="com.toy2.shop29.order.domain.response.OrderHistoryDTO">

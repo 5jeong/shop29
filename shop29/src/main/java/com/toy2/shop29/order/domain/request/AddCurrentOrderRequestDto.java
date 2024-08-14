@@ -2,7 +2,7 @@ package com.toy2.shop29.order.domain.request;
 
 import java.util.List;
 
-public class AddCurrentOrderRequest {
+public class AddCurrentOrderRequestDto {
     public List<OrderProductDto> getOrderItems() {
         return orderItems;
     }

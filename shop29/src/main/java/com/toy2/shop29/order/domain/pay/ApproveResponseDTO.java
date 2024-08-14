@@ -1,14 +1,11 @@
-package com.toy2.shop29.order.service;
+package com.toy2.shop29.order.domain.pay;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-public class ApproveResponse {
-
+public class ApproveResponseDTO {
     private String aid;                 // 요청 고유 번호
     private String tid;                 // 결제 고유 번호
     private String cid;                 // 가맹점 코드

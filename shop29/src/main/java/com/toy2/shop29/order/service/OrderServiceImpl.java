@@ -12,12 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderDao orderDao;
+
+    @Override
+    public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
+        return orderDao.selectUserOrderHistoryItem(userId, tid);
+    }
 
     @Override
     public int countUserOrderHistoryItem(String userId, String tid) throws Exception {
@@ -95,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItemDTO> getOrderItems(String userId) throws Exception {
+    public List<OrderItemDTO> getCurrentOrderItems(String userId) throws Exception {
         return orderDao.getUserCurrentOrderProducts(userId);
     }
 
@@ -130,7 +137,10 @@ public class OrderServiceImpl implements OrderService {
         return 0;
     }
 
+    // 주문 페이지 진입 시
+    // 배송지, 상품 정보들 불러옴
     @Override
+    @Transactional
     public OrderPageResponseDTO getCurrentOrderInfo(String userId) throws Exception {
         OrderPageResponseDTO orderResponse = new OrderPageResponseDTO();
 
@@ -144,6 +154,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    // 결제 페이지 진입
     @Override
     @Transactional
     public int orderProcess(String userId, String tid, OrderCompletedRequestDTO orderRequest) throws Exception {
@@ -152,6 +163,9 @@ public class OrderServiceImpl implements OrderService {
         Long totalPrice = orderRequest.getTotalPrice();
         List<OrderProductDto> orderItems = orderRequest.getOrderItems();
 
+        // 결제 페이지 진입 시
+        // 주문 처리 테이블에 있던 컬럼은 삭제
+        // 삭제 시 오류 발생하면 예외
         int deleteCurrentOrderProductsResult = deleteUserAllProducts(userId);
         int deleteCurrentOrderResult = deleteCurrentOrder(userId);
         int addOrderAddressResult = insertOrderAddress(orderId, userId, shippingAddress);
@@ -159,6 +173,14 @@ public class OrderServiceImpl implements OrderService {
         if (deleteCurrentOrderResult != 1 || deleteCurrentOrderProductsResult < 1 || addOrderAddressResult != 1) {
             throw new IllegalArgumentException("비정상적인 접근입니다.");
         }
+
+        // TODO : Service에서 Map에 넣어서 보낼지 Dao에서 Map에 넣을지
+        // Map<String, Object> map = new HashMap<>();
+        // map.put("orderId", orderId);
+        // map.put("userId", userId);
+        // map.put("tid", tid);
+        // map.put("totalPrice", totalPrice);
+        // map.put("shippingAddressId", shippingAddress.getShippingAddressId());
 
         int createCurrentOrderResult = createOrderHistory(orderId, userId, tid, totalPrice, shippingAddress.getShippingAddressId());
 
@@ -189,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
         return 1;
     }
 
+    // 주문 내역 삭제
     @Override
     @Transactional
     public void deleteOrderHistory(String userId, String tid) throws Exception {
@@ -203,6 +226,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    // 주문내역 가져오기
     @Override
     @Transactional
     public List<OrderHistoryDTO> getOrderHistory(String userId) throws Exception {

@@ -66,7 +66,11 @@
                     <div class="form-group">
                         <label for="shipping-memo">배송시 요청사항을 선택하지 말아주세요</label>
                         <select id="shipping-memo" name="shippingMemo">
-                            <option value="">선택하지 말아주세요</option>
+                            <option value="option1">선택하지 말아주세요1</option>
+                            <option value="option1">옵션 1</option>
+                            <option value="option2">옵션 2</option>
+                            <option value="option3">옵션 3</option>
+                            <option value="option4">옵션 4</option>
                         </select>
                     </div>
                     <div class="order-footer">
@@ -212,7 +216,7 @@
             }
         });
 
-        $(".btn-pay-ready").click(function(e) {
+        $(".btn-pay-ready").click(function (e) {
             const totalPriceText = $('.total-price').text();
             const totalPriceNumber = parseInt(totalPriceText.replace(/[^0-9]/g, ''), 10);
             // 아래 데이터 외에도 필요한 데이터를 원하는 대로 담고, Controller에서 @RequestBody로 받으면 됨
@@ -226,7 +230,7 @@
                 url: '/order/pay/ready',
                 data: JSON.stringify(data),
                 contentType: 'application/json',
-                success: function(response) {
+                success: function (response) {
                     location.href = response.next_redirect_pc_url;
                 }
             });
@@ -273,7 +277,7 @@
                     addressDetail: detailAddress,
                     contact: phone1,
                     subContact: phone2,
-                    deliveryNote: $('#shipping-memo').val(),
+                    deliveryNote: $('#shipping-memo option:selected').text(),
                     isDefault: setDefaultShipping.is(':checked') ? 1 : 0
                 }
             };

@@ -70,10 +70,12 @@ public interface OrderDao {
     int countUserOrderAddress(String userId, String tid) throws Exception;
 
     int countUserOrderHistoryItem(String userId, String tid) throws Exception;
-    
+
     int checkUserExists(String userId) throws Exception;
-    
+
     int insertShippingAddress(String userId, ShippingAddressInfoDTO shippingAddressInfo) throws Exception;
-    
+
     int updateShippingAddress(String userId, ShippingAddressInfoDTO shippingAddressInfo) throws Exception;
+
+    List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
 }

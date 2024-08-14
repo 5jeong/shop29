@@ -14,7 +14,7 @@ public interface OrderService {
 
     int createUserCurrentOrder(String userId) throws Exception;
 
-    List<OrderItemDTO> getOrderItems(String userId) throws Exception;
+    List<OrderItemDTO> getCurrentOrderItems(String userId) throws Exception;
 
     int addProductToCurrentOrder(String userId, Long productId, Long quantity) throws Exception;
 
@@ -57,4 +57,6 @@ public interface OrderService {
     int countUserOrderAddress(String userId, String tid) throws Exception;
 
     int countUserOrderHistoryItem(String userId, String tid) throws Exception;
+
+    List<OrderItemDTO> selectUserOrderHistoryItem (String userId, String tid) throws Exception;
 }

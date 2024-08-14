@@ -232,4 +232,12 @@ public class OrderDaoImpl implements OrderDao {
         params.put("shippingAddressInfo", shippingAddressInfo);
         return session.update(namespace + "updateShippingAddress", params);
     }
+
+    @Override
+    public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("tid", tid);
+        return session.selectList(namespace + "selectUserOrderHistoryItem", params);
+    }
 }

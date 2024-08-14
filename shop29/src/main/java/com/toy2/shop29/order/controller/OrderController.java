@@ -1,12 +1,13 @@
 package com.toy2.shop29.order.controller;
 
 import com.toy2.shop29.cart.controller.CartController;
-import com.toy2.shop29.order.domain.pay.ReadyResponse;
-import com.toy2.shop29.order.domain.request.AddCurrentOrderRequest;
+import com.toy2.shop29.order.domain.pay.ReadyResponseDto;
+import com.toy2.shop29.order.domain.request.AddCurrentOrderRequestDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
+import com.toy2.shop29.order.domain.pay.ApproveResponseDTO;
 import com.toy2.shop29.order.service.KakaoPayService;
 import com.toy2.shop29.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +39,16 @@ public class OrderController {
     @Autowired
     private KakaoPayService kakaoPayService;
 
+    // 주문 페이지
     @GetMapping("")
     public String order(@SessionAttribute(name = "loginUser", required = true) String userId, Model model,
                         @SessionAttribute(name = "tid", required = false) String tid) throws Exception {
         // TODO : 로그인 확인
         // 주문에 필요한 데이터 모델에 추가하여 뷰로 전달
         OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(userId);
+
+        // 주문 상품이 비어져있다는건 오류나 이미 결제 시도한 상태
+        // 주문 상품이 비어있다면 장바구니로 리다이렉트
         if (orderInfo.getCurrentItemsData().isEmpty()) {
             return "redirect:/cart/get-list";
         }
@@ -50,11 +56,12 @@ public class OrderController {
         return "order/order";
     }
 
+    // 주문 내역 페이지
     @GetMapping("/history")
     public String orderHistory(@SessionAttribute(name = "loginUser", required = true) String userId, Model model) throws Exception {
         List<OrderHistoryDTO> orderHistoryList = orderService.getOrderHistory(userId);
 
-        // 주문 내역 리스트를 모델에 추가하여 뷰에 전달합니다.
+        // 주문 내역 리스트를 모델에 추가하여 뷰에 전달
         model.addAttribute("orderHistory", orderHistoryList);
 
         return "order/orderList";
@@ -62,7 +69,7 @@ public class OrderController {
 
     @PostMapping("/update-order")
     public ResponseEntity<Map<String, String>> updateOrderProducts(@SessionAttribute(name = "loginUser", required = true) String userId,
-                                                                   @RequestBody AddCurrentOrderRequest addCurrentOrderProductDto) {
+                                                                   @RequestBody AddCurrentOrderRequestDto addCurrentOrderProductDto) {
         Map<String, String> response = new HashMap<>();
         // TODO : 로그인 확인
         if (!logInCheck(userId)) {
@@ -83,19 +90,20 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    // 카카오페이 준비 페이지
     @PostMapping("/pay/ready")
-    public @ResponseBody ReadyResponse payReady(@SessionAttribute(name = "loginUser", required = true) String userId, Model model,
+    public @ResponseBody ReadyResponseDto payReady(@SessionAttribute(name = "loginUser", required = true) String userId, Model model,
                                                 @RequestBody OrderCompletedRequestDTO orderRequest,
                                                 HttpServletRequest request) {
         // TODO : 로그인 확인
         // 카카오 결제 준비하기
         try {
-            ReadyResponse readyResponse = kakaoPayService.payReady(userId, orderRequest);
+            ReadyResponseDto ReadyResponseDto = kakaoPayService.payReady(userId, orderRequest);
             // 세션에 결제 고유번호(tid) 저장
             HttpSession session = request.getSession(true);
-            session.setAttribute("tid", readyResponse.getTid());
-            logger.info("결제 고유번호: " + readyResponse.getTid());
-            return readyResponse;
+            session.setAttribute("tid", ReadyResponseDto.getTid());
+            logger.info("결제 고유번호: " + ReadyResponseDto.getTid());
+            return ReadyResponseDto;
         } catch (Exception e) {
             // TODO : 예외처리 추가
             throw new IllegalArgumentException(e);
@@ -115,6 +123,7 @@ public class OrderController {
         // 카카오 결제 요청하기
         try {
             kakaoPayService.payApprove(userId, tid, pgToken);
+            // TODO : 테스트
         } catch (Exception e) {
             return "redirect:/order/pay/error";
         }
@@ -125,7 +134,7 @@ public class OrderController {
     @GetMapping("/pay/cancel")
     public String payCancel(@SessionAttribute(name = "loginUser", required = true) String userId, HttpServletRequest request) throws Exception {
         // TODO : 로그인 확인
-
+        // TODO : 결제 취소 시 장바구니로 상품 복구
         HttpSession session = request.getSession(true);
         String tid = (String) session.getAttribute("tid");
         session.removeAttribute("tid");
@@ -137,6 +146,7 @@ public class OrderController {
     @GetMapping("/pay/fail")
     public String payFail(@SessionAttribute(name = "loginUser", required = true) String userId, HttpServletRequest request) throws Exception {
         // TODO : 로그인 확인
+        // TODO : 결제 실패 시 장바구니로 상품 복구
         HttpSession session = request.getSession(true);
         String tid = (String) session.getAttribute("tid");
         orderService.deleteOrderHistory(userId, tid);
@@ -148,5 +158,11 @@ public class OrderController {
         if (userId == null)
             return false;
         return true;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public String handleAccessDeniedException(AccessDeniedException e, Model model) {
+        model.addAttribute("message", e.getMessage());
+        return "error/accessDenied";
     }
 }
