@@ -1,6 +1,7 @@
-package com.toy2.shop29.users.service;
+package com.toy2.shop29.users.service.email;
 
 import com.toy2.shop29.users.domain.EmailDto;
+import com.toy2.shop29.users.service.user.UserService;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,59 +16,52 @@ import org.springframework.stereotype.Service;
 public class EmailVerificationService {
 
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
-    //    private final Map<EmailDto,String> emailVerifyStatus = new ConcurrentHashMap<>();
     private final EmailService emailService;
+    private final UserService userService;
     private final ScheduledExecutorService schedular = Executors.newScheduledThreadPool(1);
 
-    public void sendVerificationCode(String email) {
+    // 인증 코드 생성
+    public void generateVerificationCode(String email) {
         String verificationCode = generateVerificationCode();
         // EmailDto 생성
         EmailDto emailDto = EmailDto.builder()
-                .subject("회원가입 이메일 인증입니다.")
-                .body("다음 인증 코드를 사용해 주세요 : "+ "\n인증 코드: " + verificationCode)
+                .subject("이메일 인증을 위한 인증번호를 안내 드립니다.")
+                .body("다음 인증 코드를 사용해 주세요 : " + "\n인증 코드 : " + verificationCode)
                 .emailRecipent(email)
                 .code(verificationCode)
                 .build();
 
-//        System.out.println(email);
-
-        verificationCodes.put(email, verificationCode);
-
-        // 10분 후에 자동으로 인증코드 삭제
-        schedular.schedule(() -> verificationCodes.remove(email), 10, TimeUnit.MINUTES);
-
+        saveEmailInfo(email, verificationCode);
         emailService.sendEmail(emailDto);
     }
 
-    public void sendTempPassword(String email) {
+    // 임시 비밀번호 생성
+    public void generateTempPassword(String userId, String email) {
         String tempPassword = generateTempPassword();
         // EmailDto 생성
         EmailDto emailDto = EmailDto.builder()
-                .subject("회원가입 이메일 인증입니다.")
-                .body("다음 인증 코드를 사용해 주세요 : ")
+                .subject("임시 비밀번호입니다.")
+                .body("다음 임시 비밀번호를 사용해 주세요 : " + "\n임시 비밀번호 : " + tempPassword)
                 .emailRecipent(email)
                 .code(tempPassword)
                 .build();
-
-//        System.out.println(email);
-
-        verificationCodes.put(email, tempPassword);
-
-        // 10분 후에 자동으로 인증코드 삭제
-        schedular.schedule(() -> verificationCodes.remove(email), 10, TimeUnit.MINUTES);
-
+        saveEmailInfo(email, tempPassword);
         emailService.sendEmail(emailDto);
+        //임시 비밀번호 저장
+        userService.updatePassword(userId, tempPassword);
     }
 
     public boolean verifyCode(String email, String code) {
         String storedCode = verificationCodes.get(email);
         System.out.println("저장코드" + storedCode);
         System.out.println(verificationCodes);
-        if (storedCode != null && storedCode.equals(code)) {
-//            verificationCodes.remove(email); // 인증 후 삭제
-            return true;
-        }
-        return false;
+        return storedCode != null && storedCode.equals(code);
+    }
+
+    private void saveEmailInfo(String email, String code) {
+        verificationCodes.put(email, code);
+        // 10분 후에 자동으로 인증코드 삭제
+        schedular.schedule(() -> verificationCodes.remove(email), 10, TimeUnit.MINUTES);
     }
 
     private String generateVerificationCode() {
