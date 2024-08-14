@@ -2,16 +2,12 @@ package com.toy2.shop29.users.controller;
 
 import com.toy2.shop29.users.domain.LoginFormDto;
 import com.toy2.shop29.users.domain.UserDto;
-import com.toy2.shop29.users.exception.IncorrectPasswordException;
-import com.toy2.shop29.users.exception.UserAccountLockedException;
-import com.toy2.shop29.users.exception.UserNotFoundException;
-import com.toy2.shop29.users.service.LoginService;
+import com.toy2.shop29.users.service.login.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +28,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute(name = "loginForm") LoginFormDto loginFormDto,
-                        BindingResult bindingResult, HttpServletRequest request,Model model,
+                        BindingResult bindingResult, HttpServletRequest request,
                         @RequestParam(name = "redirectURI", defaultValue = "/") String redirectURI) {
         if (bindingResult.hasErrors()) {
             log.info("bindingResult : {} ", bindingResult);
@@ -40,7 +36,7 @@ public class LoginController {
         }
 
         // 예외가 발생하면 해당 예외는 LoginExceptionHandler에서 처리됨
-        request.setAttribute("loginForm",loginFormDto);
+        request.setAttribute("loginForm", loginFormDto);
         UserDto loginUser = loginService.loginCheck(loginFormDto.getUserId(), loginFormDto.getPassword());
         log.info("login : {}", loginUser);
 
