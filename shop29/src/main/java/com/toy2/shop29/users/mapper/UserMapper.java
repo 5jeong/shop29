@@ -38,5 +38,8 @@ public interface UserMapper {
     // 로그인 성공 또는 계정 잠금이 풀린경우 잠금관련 컬럼 초기화
     int resetLoginFailureCount(String userId);
 
+    // 비밀번호 변경
+    int updatePassword(@Param("userId") String userId, @Param("tempPassword") String tempPassword);
+
 }
 

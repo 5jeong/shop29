@@ -85,4 +85,13 @@
             last_login_failure_time = NULL
         WHERE user_id = #{userId}
     </update>
+
+    <!-- 비밀번호 찾기 -->
+    <update id="updatePassword" parameterType="map">
+        UPDATE user
+        SET password = #{tempPassword}
+        WHERE user_id = #{userId}
+    </update>
+
+
 </mapper>
