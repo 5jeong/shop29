@@ -36,7 +36,7 @@ public class CartController {
      * @return 장바구니 페이지
      * @throws Exception .
      */
-    @GetMapping("/get-list")
+    @GetMapping("")
     public String getCartList(@SessionAttribute(name = "loginUser", required = false) String userId,
                               @CookieValue(name = "guestId", required = false) String guestId,
                               Model model) {
@@ -52,6 +52,7 @@ public class CartController {
         try {
             List<CartDto> getAllCart = cartService.getUserCartProducts(userInfo, isUser);
             model.addAttribute("cartList", getAllCart);
+            model.addAttribute("isLogin", isUser);
         } catch (Exception e) {
             logger.error("장바구니 리스트 조회 실패", e);
         }
@@ -137,7 +138,6 @@ public class CartController {
                                                   @RequestBody DeleteCartItemsRequestDto deleteRequest) {
 
         String userInfo = getUserInfo(userId, guestId);
-
         try {
             cartService.deleteCartProducts(userInfo, deleteRequest.getProductIds());
             return ResponseEntity.ok("삭제 완료");

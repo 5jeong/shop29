@@ -105,4 +105,5 @@ public class CartDaoImpl implements CartDao {
     public int countCartItem() throws Exception {
         return session.selectOne(namespace + "countCartItem");
     }
+
 }

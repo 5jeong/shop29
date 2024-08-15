@@ -67,37 +67,45 @@ public class CartServiceImpl implements CartService {
     /**
      * 해당 유저 장바구니에 상품 추가
      *
-     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param userId    유저 uid(로그인, 비로그인 포함)
      * @param productId 상품 id
-     * @param quantity 상품 수량
-     * @param isUser 로그인 비로그인 확인
+     * @param quantity  상품 수량
+     * @param isUser    로그인 비로그인 확인
      * @throws Exception .
      */
     @Override
     @Transactional
-    public int addProductToCart(String userId, Long productId, Long quantity, int isUser) throws Exception {
+    public void addProductToCart(String userId, Long productId, Long quantity, int isUser) throws Exception {
         ensureUserCartExists(userId, isUser);
+
+        // 해당 유저의 장바구니에서 상품을 가져옴
         CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId);
 
-        int result;
+        // 이미 장바구니에 존재하는 경우 수량을 더함
+        long totalQuantity = (specificProduct != null) ? specificProduct.getQuantity() + quantity : quantity;
+
+        // 수량 제한 적용: 최대 100, 최소 1
+        totalQuantity = Math.max(1, Math.min(totalQuantity, 100));
+
         if (specificProduct != null) {
-            result = updateProductQuantity(userId, productId, specificProduct.getQuantity() + quantity);
+            // 기존 제품이 있을 경우 수량 업데이트
+            updateProductQuantity(userId, productId, totalQuantity);
         } else {
-            result = cartDao.insertUserCartProduct(userId, productId, quantity);
+            // 새로 추가하는 경우
+            int result = cartDao.insertUserCartProduct(userId, productId, totalQuantity);
             if (result > 0) {
                 updateCartLastUpdate(userId);
             }
         }
-
-        return result;
     }
+
 
     /**
      * 해당 유저 장바구니 상품 수량 수정
      *
-     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param userId    유저 uid(로그인, 비로그인 포함)
      * @param productId 상품 id
-     * @param quantity 상품 수량
+     * @param quantity  상품 수량
      * @throws Exception .
      */
     @Override
@@ -128,7 +136,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 장바구니 페이지에서 선택한 상품들 삭제하는 메서드
      *
-     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param userId     유저 uid(로그인, 비로그인 포함)
      * @param productIds 상품 id가 포함된 리스트 [1,2,3]
      * @throws Exception .
      */
@@ -144,7 +152,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 장바구니 특정 상품 삭제하는 메서드
      *
-     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param userId    유저 uid(로그인, 비로그인 포함)
      * @param productId 상품 id
      * @throws Exception .
      */
@@ -165,24 +173,27 @@ public class CartServiceImpl implements CartService {
      * 로그인하면 비로그인에서 담은 장바구니를 유저 장바구니로 담는 메서드
      *
      * @param loginUser 로그인 유저 uid
-     * @param guestId 게스트 id
-     * @param isUser 로그인 비로그인 확인
+     * @param guestId   게스트 id
+     * @param isUser    로그인 비로그인 확인
      * @throws Exception .
      */
     // TODO : 테스트 필요
     @Override
     @Transactional
     public int updateGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
+        // 장바구니 없거나(장바구니에 담은 것이 없음) 장바구니에 담은 상품이 없을 경우 유저 장바구니에 담을 필요가 없기 떄문에 반환
         if (checkUserCartExist(guestId) != 1 || getUserCartProductsCount(guestId) == 0) {
             return 0;
         }
+        // 장바구니에 담은 상품들을 리스트로 가져옴(상품 id와 상품 수량)
         List<CartDto> guestCartProducts = cartDao.selectUserCartProductsByUserId(guestId);
+
+        // 가져온 상품들을 해당 유저의 uid로 상품에 추가
         for (CartDto cartDto : guestCartProducts) {
             addProductToCart(loginUser, cartDto.getProductId(), cartDto.getQuantity(), isUser);
         }
-        int result = cartDao.deleteUserCart(guestId);
-
-        return 1;
+        // 정상적으로 상품까지 추가하면 해당 유저의 비로그인 장바구니는 필요없으니 삭제
+        return cartDao.deleteUserCart(guestId);
     }
 
     /**

@@ -43,7 +43,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
         try {
             HttpSession session = request.getSession(true);
             // TODO : 임시아이디
-            session.setAttribute("loginUser", "user008");
+            session.setAttribute("loginUser", "user001");
 
             String userId = (String) session.getAttribute("loginUser");
             String guestId = null;
@@ -74,6 +74,9 @@ public class CartSessionInterceptor implements HandlerInterceptor {
                 cookie.setPath("/"); // 쿠키의 적용 경로 설정 (전체 사이트에 적용)
                 response.addCookie(cookie); // 브라우저에 쿠키 저장
             }
+
+            // 로그인한 유저uid와 비로그인 guestid가 둘다 존재한다면
+            // 비로그인 장바구니를 유저 장바구니로 옮김
             if (userId != null && guestId != null) {
                 cartService.updateGuestCartToUser(userId, guestId, 1);
             }

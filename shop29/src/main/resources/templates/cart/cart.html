@@ -6,400 +6,19 @@
     <title>Shopping Cart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
+    <link rel="stylesheet" th:href="@{/cart/styles.css}"/>
+    <script>
+        let msg = "[[${msg}]]";
+
+        const messages = {
+            "LOGIN_ERR": "로그인 후 이용 가능합니다.",
+            "ORDER_ERR": "주문 중 오류가 발생했습니다. 다시 시도해 주세요.",
+        };
+
+        if (messages[msg]) {
+            alert(messages[msg]);
         }
-
-        body {
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            width: 90%;
-            max-width: 1200px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f8f8f8;
-        }
-
-        img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .item-details {
-            margin-left: 5px;
-            text-align: left;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-
-        .quantity-controls button {
-            cursor: pointer;
-            display: flex;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            min-height: 25px;
-            width: 36px;
-            min-width: initial;
-            height: 36px;
-            font-size: 20px;
-            font-weight: 400;
-            color: rgb(160, 160, 160);
-            background: rgb(255, 255, 255);
-            border: 1px solid rgb(228, 228, 228);
-        }
-
-        .quantity-controls input {
-            display: block;
-            color: rgb(26, 26, 26);
-            outline: none;
-            width: 37px;
-            height: 36px;
-            margin: 0px;
-            padding: 0px;
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-            border: 1px solid rgb(228, 228, 228);
-            border-left: none;
-            border-right: none;
-        }
-
-        .price {
-            display: block;
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .buy-btn,
-        .save-btn {
-            background-color: #000;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        .buy-btn:hover,
-        .save-btn:hover {
-            background-color: #444;
-        }
-
-        .summary {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .continue-shopping:hover {
-            color: rgb(255, 72, 0);
-        }
-
-        .checkout:hover {
-            background-color: #444;
-        }
-
-        .actions {
-            display: flex;
-
-            & > button {
-                display: flex;
-                -webkit-box-align: center;
-                align-items: center;
-                -webkit-box-pack: center;
-                justify-content: center;
-                min-width: 40px;
-                min-height: 25px;
-                width: 130px;
-                height: 42px;
-                margin-right: 10px;
-                font-size: 15px;
-                color: rgb(48, 48, 51);
-                border: 1px solid rgb(160, 160, 160);
-            }
-        }
-
-        .checkout {
-            cursor: pointer;
-            min-width: 40px;
-            min-height: 25px;
-            display: flex;
-            flex: 1 1 0%;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            max-width: 400px;
-            height: 72px;
-            margin: 0px 4px;
-            font-size: 26px;
-            font-weight: 600;
-            color: rgb(255, 255, 255);
-            background-color: rgb(0, 0, 0);
-            border: 1px solid rgb(0, 0, 0);
-            border-radius: 0px;
-        }
-
-        .checkout-actions {
-            display: flex;
-            -webkit-box-pack: center;
-            justify-content: center;
-            margin: 0px -4px;
-        }
-
-        .summary {
-            font-size: 18px;
-            margin-top: 117px;
-            border-bottom: 1px solid rgb(0, 0, 0);
-        }
-
-        thead {
-            table-layout: fixed;
-            width: 100%;
-            border-top: 4px solid rgb(0, 0, 0);
-        }
-
-        .continue-shopping {
-            cursor: pointer;
-            display: flex;
-            flex: 1 1 0%;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            max-width: 400px;
-            height: 72px;
-            margin: 0px 4px;
-            font-size: 26px;
-            font-weight: 600;
-            color: rgb(48, 48, 51);
-            background-color: rgb(255, 255, 255);
-            border: 1px solid rgb(160, 160, 160);
-            border-radius: 0px;
-        }
-
-        .delete, .deleteSoldOut {
-            background-color: white !important;
-            border: 1px solid silver !important;
-            color: black !important;
-            cursor: pointer;
-        }
-
-        .item-info {
-            display: flex;
-        }
-
-        .summary-header {
-            display: table;
-            table-layout: fixed;
-            width: 100%;
-            border-top: 4px solid rgb(0, 0, 0);
-            border-bottom: 1px solid rgb(228, 228, 228);
-        }
-
-        .price-text {
-            display: table-cell;
-            width: 36%;
-            height: 74px;
-            padding: 0px;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 24px;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            vertical-align: middle;
-            border: 0px;
-        }
-
-        .delivery-text {
-            display: table-cell;
-            height: 74px;
-            padding: 0px;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 24px;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            vertical-align: middle;
-            border: 0px;
-            width: 28%;
-        }
-
-        .amout-text {
-            display: table-cell;
-            width: 36%;
-            height: 74px;
-            padding: 0px;
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 24px;
-            color: rgb(0, 0, 0);
-            text-align: center;
-            vertical-align: middle;
-            border: 0px;
-        }
-
-        .summary-price {
-            display: table;
-            table-layout: fixed;
-            width: 100%;
-        }
-
-        .order-amount {
-            position: relative;
-            display: table-cell;
-            box-sizing: border-box;
-            width: 36%;
-            height: 149px;
-            padding: 55px 0px;
-            text-align: center;
-            vertical-align: top;
-
-            :first-child {
-                display: block;
-                font-size: 17px;
-                font-weight: 500;
-                line-height: 40px;
-            }
-
-            :last-child {
-                display: block;
-                margin-top: 10px;
-                font-size: 0.875rem;
-                font-weight: 500;
-            }
-        }
-
-        .delivery-fee {
-            position: relative;
-            display: table-cell;
-            box-sizing: border-box;
-            height: 149px;
-            padding: 55px 0px;
-            text-align: center;
-            vertical-align: top;
-            width: 28%;
-
-            i {
-                position: absolute;
-                top: 40%;
-                left: -15px;
-                display: block;
-                width: 30px;
-                height: 30px;
-                background: url(https://img.29cm.co.kr/next29cm/order/icon_cout.gif) 0px 0px / 60px 30px no-repeat;
-            }
-
-            & > span {
-                display: block;
-                font-size: 17px;
-                font-weight: 500;
-                line-height: 40px;
-            }
-        }
-
-        .chkbox, .chkAll {
-            background: rgb(55, 95, 255);
-            border-color: rgb(55, 95, 255);
-            width: 24px;
-            height: 24px;
-        }
-
-        .pay-amount {
-            position: relative;
-            display: table-cell;
-            box-sizing: border-box;
-            width: 36%;
-            height: 149px;
-            padding: 55px 0px;
-            text-align: center;
-            vertical-align: top;
-
-            & > i {
-                position: absolute;
-                top: 40%;
-                left: -15px;
-                display: block;
-                width: 30px;
-                height: 30px;
-                background: url(https://img.29cm.co.kr/next29cm/order/icon_cout.gif) -30px 0px / 60px 30px no-repeat;
-            }
-
-            & > span {
-                display: block;
-                font-size: 17px;
-                font-weight: 500;
-                line-height: 40px;
-            }
-        }
-
-        .cart-items {
-            margin-bottom: 5px;
-        }
-
-        .add-to-cart {
-            background-color: #6aafe6;
-            color: #d4dfe6;
-            position: relative;
-            border: none;
-            display: inline-block;
-            padding: 2px 5px;
-            border-radius: 5px;
-            font-family: "paybooc-Light", sans-serif;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.25s;
-        }
-
-        .empty-text {
-            margin: 0px auto;
-            text-align: center;
-            padding: 50px;
-            font-size: 3rem;
-            font-weight: bold;
-        }
-    </style>
+    </script>
 </head>
 <body>
 <div class="container">
@@ -461,7 +80,7 @@
             </td>
             <td>
                 <span class="price" th:text="${cart.price * cart.quantity} + '원'">1,927,800원</span>
-                <button class="buy-btn">BUY NOW</button>
+                <button class="buy-btn" >BUY NOW</button>
             </td>
             <td>조건무료<br/>일반배송</td>
         </tr>
@@ -493,8 +112,11 @@
     </div>
     <div class="checkout-actions">
         <button class="continue-shopping">CONTINUE SHOPPING</button>
-        <button class="checkout">CHECK OUT</button>
+        <button class="checkout" th:data-login="${isLogin}">CHECK OUT</button>
     </div>
+    <form id="hidden-order-form" action="/order/update-order" method="POST" style="display:none;">
+        <input type="hidden" name="orderItems" id="orderItems">
+    </form>
 </div>
 <script>
 
@@ -534,9 +156,24 @@
             }
         });
 
+        // 수량 감소 버튼 클릭 시
+        $('.quantity-input').on('change', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            if (currentValue > 1) {
+                quantityInput.val(currentValue - 1);
+                updatePrice(this, currentValue - 1);
+                updateSummary();
+            }
+        });
 
         // CHECK OUT 버튼 클릭 시 실행
         $('.checkout').on('click', function () {
+            if ($('.checkout').data('login') === 0){
+                alert('로그인 후 주문 가능합니다.');
+                window.location.href = '/login';
+                return
+            }
             const orderItems = [];
 
             // 선택된 상품들을 배열에 담기
@@ -552,27 +189,11 @@
             });
 
             if (orderItems.length > 0) {
-                // POST 요청으로 orderItems를 전송
-                $.ajax({
-                    url: '/order/update-order',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({orderItems: orderItems}),
-                    success: function (response) {
-                        if (response.redirectUrl) {
-                            window.location.href = response.redirectUrl;
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
-                        if (errorResponse && errorResponse.redirectUrl) {
-                            window.location.href = errorResponse.redirectUrl;
-                        } else {
-                            console.error('Error:', error);
-                            // 필요한 경우 추가적인 에러 처리
-                        }
-                    }
-                });
+                // 숨겨진 폼의 input 필드에 orderItems 데이터를 JSON 문자열로 설정
+                $('#orderItems').val(JSON.stringify(orderItems));
+
+                // 폼 제출
+                $('#hidden-order-form').submit();
             } else {
                 alert("주문할 상품을 선택해주세요.");
             }
@@ -640,6 +261,10 @@
             const id = row.data('id');
             const quantityInput = row.find('.quantity-input');
             const orderCount = quantityInput.val();
+            if (orderCount > 100) {
+                quantityInput.val(100);
+                alert("수량 최대 100개까지 가능합니다.");
+            }
 
             $.ajax({
                 url: '/cart/order-count',
@@ -653,6 +278,7 @@
                 success: function (response) {
                     // 요청 성공 후 작업 (필요에 따라 추가)
                     alert('저장되었습니다.');
+                    location.reload()
                 },
                 complete: function () {
                     // 요청이 완료되면 버튼을 다시 활성화하거나 로딩 표시를 제거
@@ -667,6 +293,11 @@
 
         // BUY NOW 버튼 클릭 시 실행
         $('.buy-btn').on('click', function () {
+            if ($('.checkout').data('login') === 0){
+                alert('로그인 후 주문 가능합니다.');
+                window.location.href = '/login';
+                return
+            }
             const row = $(this).closest('tr');
             const productId = row.data('id');
             const quantity = row.find('.quantity-input').val();
@@ -676,25 +307,10 @@
                 quantity: parseInt(quantity)
             }];
 
-            $.ajax({
-                url: '/order/update-order',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({orderItems: orderItems}),
-                success: function (response) {
-                    if (response.redirectUrl) {
-                        window.location.href = response.redirectUrl;
-                    }
-                },
-                error: function (xhr, status, error) {
-                    const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
-                    if (errorResponse && errorResponse.redirectUrl) {
-                        window.location.href = errorResponse.redirectUrl;
-                    } else {
-                        console.error('Error:', error);
-                    }
-                }
-            });
+            $('#orderItems').val(JSON.stringify(orderItems));
+
+            // 폼 제출
+            $('#hidden-order-form').submit();
         });
 
         $('.add-to-cart').click(function () {
