@@ -21,7 +21,7 @@
                updated_date,
                updated_id
         FROM product
-        where product_id = #{product_id}
+        where product_id = #{productId}
     </select>
 
 
@@ -51,7 +51,7 @@
         INSERT INTO product
         (product_id, small_category_id, product_name, brand_id, price, sale_ratio, rating, is_exclusive, size_table, start_date, created_date, created_id, updated_date, updated_id)
         VALUES
-            (#{product_id}, #{small_category_id}, #{product_name}, #{brand_id}, #{price}, #{sale_ratio}, #{rating}, #{is_exclusive}, #{size_table}, #{start_date}, #{created_date}, #{created_id}, #{updated_date}, #{updated_id})
+            (#{productId}, #{smallCategoryId}, #{productName}, #{brandId}, #{price}, #{saleRatio}, #{rating}, #{isExclusive}, #{sizeTable}, #{startDate}, #{created_date}, #{createdId}, #{updatedDate}, #{updatedId})
     </insert>
 
 
@@ -59,20 +59,20 @@
     <!-- 이때 created_id, created_date는 안 바꿔주게 조심 -->
     <update id="update" parameterType="com.toy2.shop29.product.domain.ProductDto">
         UPDATE product
-        SET   product_id = #{product_id},
-              small_category_id = #{small_category_id},
-              product_name = #{product_name},
-              brand_id = #{brand_id},
+        SET   product_id = #{productId},
+              small_category_id = #{smallCategoryId},
+              product_name = #{productName},
+              brand_id = #{brandId},
               price = #{price},
-              sale_ratio = #{sale_ratio},
-              is_exclusive = #{is_exclusive},
+              sale_ratio = #{saleRatio},
+              is_exclusive = #{isExclusive},
               rating = #{rating},
-              is_exclusive = #{is_exclusive},
-              size_table = #{size_table},
-              start_date = #{start_date},
+              is_exclusive = #{isExclusive},
+              size_table = #{sizeTable},
+              start_date = #{startDate},
               updated_date = now(),
-              updated_id = #{updated_id}
-        WHERE product_id = #{product_id}
+              updated_id = #{updatedId}
+        WHERE product_id = #{productId}
     </update>
 
 
@@ -84,7 +84,7 @@
 
     <!-- product_id를 input 받아 해당하는 product를 삭제 -->
     <delete id="delete" parameterType="int">
-        DELETE FROM product WHERE product_id = #{product_id}
+        DELETE FROM product WHERE product_id = #{productId}
     </delete>
 
 
@@ -308,6 +308,71 @@
         ORDER BY created_date DESC, product_id DESC
         LIMIT #{offset}, #{pageSize}
     </select>
+
+
+
+
+    <select id="selectProductWithCategories" resultMap="ProductCategoryResultMap">
+        SELECT
+            p.product_id,
+            p.product_name,
+            p.price,
+            p.sale_ratio,
+            p.rating,
+            p.is_exclusive,
+            p.size_table,
+            p.start_date,
+            p.created_date,
+            p.created_id,
+            p.updated_date,
+            p.updated_id,
+            mc.major_category_name,
+            midc.middle_category_name,
+            sc.small_category_name
+        FROM
+            product p
+                JOIN smallcategory sc ON p.small_category_id = sc.small_category_id
+                JOIN middlecategory midc ON sc.middle_category_id = midc.middle_category_id
+                JOIN majorcategory mc ON midc.major_category_id = mc.major_category_id
+        WHERE p.product_id = #{productId}
+    </select>
+
+    <resultMap id="ProductCategoryResultMap" type="com.toy2.shop29.product.domain.ProductWithCategoriesDto">
+        <id property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="price" column="price"/>
+        <result property="saleRatio" column="sale_ratio"/>
+        <result property="rating" column="rating"/>
+        <result property="isExclusive" column="is_exclusive"/>
+        <result property="sizeTable" column="size_table"/>
+        <result property="startDate" column="start_date"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="createdId" column="created_id"/>
+        <result property="updatedDate" column="updated_date"/>
+        <result property="updatedId" column="updated_id"/>
+
+        <!-- 카테고리 이름 매핑 -->
+        <result property="majorCategoryName" column="major_category_name"/>
+        <result property="middleCategoryName" column="middle_category_name"/>
+        <result property="smallCategoryName" column="small_category_name"/>
+    </resultMap>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

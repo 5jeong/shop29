@@ -1,6 +1,7 @@
 package com.toy2.shop29.product.dao;
 
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
 
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,12 @@ public interface ProductDao {
 
     int countMiddleCategory(int middleCategoryId);
 
+
+
     List<ProductDto> selectPageByMiddleCategory(Map<String,Object> map);
 
-
+    //제품ID로 상품의 분류 정보까지 조회
+    ProductWithCategoriesDto selectProductWithCategories(int productId);
 
 
 }

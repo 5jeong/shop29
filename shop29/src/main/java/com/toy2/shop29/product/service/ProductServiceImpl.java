@@ -2,6 +2,7 @@ package com.toy2.shop29.product.service;
 
 import com.toy2.shop29.product.dao.ProductDao;
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +25,8 @@ public class ProductServiceImpl implements ProductService {
 
     //2-1.특정 product_id에 해당하는 상품 정보 조회하여 반환 (select)
     @Override
-    public ProductDto read(Integer product_id){
-        ProductDto productDto = productDao.select(product_id);
+    public ProductDto read(Integer productId){
+        ProductDto productDto = productDao.select(productId);
         //원래는 조회수+1 시키는게 여기에 있는데 나는 따로 조회수 신경 안써서 패스
         return productDto;
     }
@@ -110,7 +111,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDto> sortedByRating(Map<String, Object> paramap){
         return productDao.SortedByRating(paramap);
-    };
+    }
+
+
+    @Override
+    public ProductWithCategoriesDto getProductWithCategories(int productId) {
+        return productDao.selectProductWithCategories(productId);
+    }
+
 
 
 

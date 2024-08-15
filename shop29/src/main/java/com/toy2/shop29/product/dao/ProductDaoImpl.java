@@ -1,6 +1,7 @@
 package com.toy2.shop29.product.dao;
 
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -151,6 +152,12 @@ public class ProductDaoImpl implements ProductDao {
         return session.selectList(namespace + "selectPageByCategory", map);
     }
 
+
+    //상품Dto에 상품 카테고리 모두 넣어서 반환(상품상세)
+    @Override
+    public ProductWithCategoriesDto selectProductWithCategories(int productId) {
+        return session.selectOne(namespace + "selectProductWithCategories", productId);
+    }
 
 
 }

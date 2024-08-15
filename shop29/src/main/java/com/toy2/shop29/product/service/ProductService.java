@@ -1,6 +1,7 @@
 package com.toy2.shop29.product.service;
 
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ public interface ProductService {
     int addProduct(ProductDto productDto);
 
     //2-1.특정 product_id에 해당하는 상품 정보 조회하여 반환 (select)
-    ProductDto read(Integer product_id);
+    ProductDto read(Integer producId);
 
     //2-2.모든 상품 정보 조회해서 반환 (select)
     List<ProductDto> getList();
@@ -22,7 +23,7 @@ public interface ProductService {
     int modify(ProductDto productDto);
 
     //4. 주어진 product_id에 해당하는 상품 삭제 (delete)
-    int remove(Integer product_id);
+    int remove(Integer productId);
 
     //총 상품 개수
     int getCount();
@@ -51,6 +52,8 @@ public interface ProductService {
     //높은 별점순으로 정렬
     List<ProductDto> sortedByRating(Map<String, Object> paramMap);
 
+    //상품에 해당하는 모든 카테고리 가져오기
+    ProductWithCategoriesDto getProductWithCategories(int productId);
 
 //    //특정 중분류에 해당하는 모든 제품 개수 세기
 //    int getCountByMiddleCategory(Integer middleCategoryId);

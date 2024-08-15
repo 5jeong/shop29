@@ -2,6 +2,7 @@ package com.toy2.shop29.product.controller;
 
 import com.toy2.shop29.product.domain.PageHandler;
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
 import com.toy2.shop29.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,13 +28,15 @@ public class ProductController {
     // 상품 상세 페이지 이동
     @GetMapping("/{productId}")
     public String getProductDetail(@PathVariable("productId") int productId, Model model) {
-        // MyBatis를 사용해 상품 정보를 가져옵니다.
-        ProductDto product = productService.read(productId);
 
-        if (product == null) {
-            // 상품이 존재하지 않는 경우 에러 페이지로 이동
-            return "error/404";
-        }
+        // 상품과 관련된 카테고리 정보를 포함한 상세 정보를 가져옵니다
+        ProductWithCategoriesDto product = productService.getProductWithCategories(productId);
+
+        //error/404페이지 아직 안 만들어서 주석 처리
+//        if (product == null) {
+//            // 상품이 존재하지 않는 경우 에러 페이지로 이동
+//            return "error/404";
+//        }
 
         // 모델에 해당 상품 정보를 추가하여 뷰에 전달
         model.addAttribute("product", product);
@@ -42,46 +45,41 @@ public class ProductController {
         return "product/detail";
     }
 
-//    @GetMapping("/read")
-//    public String read(Integer productId, Model model) {
-//        try {
-//            ProductDto productDto = productService.read(productId);
-//            model.addAttribute("productDto", productDto);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return "products/read";
-//    }
 
-
-
-
-    @GetMapping("/board")
-    //page와 pageSize로 offset을 계산하기 때문에 필요하고, 값을 넘겨주기 위해 model이 필요하다
+    //상품 게시판으로 이동
+    @GetMapping("/list")
+    //page와 pageSize로 offset을 계산하기 때문에 필요하고, 값을 넘겨주기 위해 model이 필요
     public String list(@RequestParam(name = "page", required = false) Integer page,
                        @RequestParam(name = "pageSize", required = false) Integer pageSize,
                        @RequestParam(name = "sortOption", required = false, defaultValue = "") String sortOption,  // 정렬 옵션
                        Model model){
 
+        //레퍼런스페이지 기준 pageSize 50
         if(page==null){ page=1; }
         if(pageSize==null){ pageSize=50; }
 
 
 
         try{
+            //전체 상품 개수 가져오기
             int totalCnt = productService.getCount();
+
+            //pageHandler에 계산된 totalCnt와 param으로 가져온 page,Pasize보내기
             PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
 
+            //sort된 상품 리스트를 담을 list
             List<ProductDto> list;
 
+            //페이징을 할때 사용할 offset과 pageSize 정보를 map에 저장
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("offset", ((page-1)*pageSize));
             paramMap.put("pageSize", pageSize);
 
 
-            // 정렬 옵션에 따른 상품 목록을 가져옵니다.
-            switch ("sortOption") {
+            // param으로 받은 정렬옵션에 따른 상품 목록(list)을 switch로 조절
+            //switch문을 service단으로 옮기기
+//            list = productService.sort(sortOption,paramMap); <<
+            switch (sortOption) {
                 case "priceDesc": //높은 가격 순
                     list = productService.sortByPriceDesc(paramMap);
                     break;
@@ -97,10 +95,11 @@ public class ProductController {
                 case "rating": //높은 별점순
                     list = productService.sortedByRating(paramMap);
                     break;
-                default:
+                default: //기본 정렬
                     list = productService.getPage(paramMap);
                     break;
             }
+
 
 
             model.addAttribute("list",list);
@@ -112,13 +111,11 @@ public class ProductController {
 
         }catch (Exception e){
             e.printStackTrace();
-
 //            return "error/500";
-
         }
 
 
-        return "product/ProductsBoard";
+        return "product/productList";
 
     }
 
