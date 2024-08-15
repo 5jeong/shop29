@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Order Page</title>
-    <link rel="stylesheet" th:href="@{/order/styles.css}"/>
+    <link rel="stylesheet" th:href="@{/css/order/styles.css}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -117,7 +117,12 @@
                 <div class="payment-options">
                     <div class="payment-methods">
                         <!--                        <button type="button"><span>무통장입금</span></button>-->
-                        <button type="button" class="btn-pay-ready"><span>카카오페이</span></button>
+                        <label>
+                            <input type="radio" id="kakaoPay" >
+                        </label>
+                        <button type="button" class="btn-pay-ready">
+                            <img alt="카카오페이" th:src="@{/images/payment-kakao.png}" src="/images/payment-kakao.png"/>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -216,29 +221,15 @@
             }
         });
 
-        $(".btn-pay-ready").click(function (e) {
-            const totalPriceText = $('.total-price').text();
-            const totalPriceNumber = parseInt(totalPriceText.replace(/[^0-9]/g, ''), 10);
-            // 아래 데이터 외에도 필요한 데이터를 원하는 대로 담고, Controller에서 @RequestBody로 받으면 됨
-            let data = {
-                productName: '상품명',    // 카카오페이에 보낼 대표 상품명
-                totalPrice: totalPriceNumber // 총 결제금액
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: '/order/pay/ready',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function (response) {
-                    location.href = response.next_redirect_pc_url;
-                }
-            });
-        });
-
         // Checkout button click event
         $('.checkout-btn').on('click', function (event) {
             event.preventDefault();
+
+            const kakaoPayCheckbox = $('#kakaoPay');
+            if (!kakaoPayCheckbox.is(':checked')) {
+                alert("결제방법을 선택해주세요.");
+                return;
+            }
 
             const totalPriceText = $('.total-price').text();
             const totalPriceNumber = parseInt(totalPriceText.replace(/[^0-9]/g, ''), 10);
