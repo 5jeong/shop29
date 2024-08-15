@@ -3,7 +3,7 @@ package com.toy2.shop29.order.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toy2.shop29.cart.controller.CartController;
-import com.toy2.shop29.order.domain.pay.ReadyResponseDto;
+import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
@@ -133,7 +133,7 @@ public class OrderController {
      * @throws Exception .
      */
     @PostMapping("/pay/ready")
-    public @ResponseBody ReadyResponseDto payReady(
+    public @ResponseBody KakaoPayReadyResponseDto payReady(
             @SessionAttribute(name = "loginUser", required = true) String userId,
             Model model,
             @RequestBody OrderCompletedRequestDTO orderRequest,
@@ -141,13 +141,13 @@ public class OrderController {
         // TODO : 로그인 확인
         // 카카오 결제 준비하기
         try {
-            ReadyResponseDto ReadyResponseDto = kakaoPayService.payReady(userId, orderRequest);
+            KakaoPayReadyResponseDto KakaoPayReadyResponseDto = kakaoPayService.payReady(userId, orderRequest);
             // 세션에 결제 고유번호(tid) 저장
             HttpSession session = request.getSession(true);
-            session.setAttribute("tid", ReadyResponseDto.getTid());
-            logger.info("결제 고유번호: " + ReadyResponseDto.getTid());
-            logger.info("결제 리다이렉트: " + ReadyResponseDto.getNext_redirect_pc_url());
-            return ReadyResponseDto;
+            session.setAttribute("tid", KakaoPayReadyResponseDto.getTid());
+            logger.info("결제 고유번호: " + KakaoPayReadyResponseDto.getTid());
+            logger.info("결제 리다이렉트: " + KakaoPayReadyResponseDto.getNext_redirect_pc_url());
+            return KakaoPayReadyResponseDto;
         } catch (Exception e) {
             // TODO : 예외처리 추가
             throw new IllegalArgumentException(e);

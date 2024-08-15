@@ -4,8 +4,8 @@ import com.toy2.shop29.cart.controller.CartController;
 import com.toy2.shop29.cart.service.CartService;
 import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
-import com.toy2.shop29.order.domain.pay.ApproveResponseDTO;
-import com.toy2.shop29.order.domain.pay.ReadyResponseDto;
+import com.toy2.shop29.order.domain.pay.KakaoPayApproveResponseDTO;
+import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     // 카카오페이 결제창 연결
     @Override
     @Transactional
-    public ReadyResponseDto payReady(String userId, OrderCompletedRequestDTO orderRequest) throws Exception {
+    public KakaoPayReadyResponseDto payReady(String userId, OrderCompletedRequestDTO orderRequest) throws Exception {
         List<OrderProductDto> products = orderRequest.getOrderItems();
 
         // 상품 총 개수
@@ -74,11 +74,11 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         RestTemplate template = new RestTemplate();
         String url = "https://open-api.kakaopay.com/online/v1/payment/ready";
         // RestTemplate의 postForEntity : POST 요청을 보내고 ResponseEntity로 결과를 반환받는 메소드
-        ResponseEntity<ReadyResponseDto> responseEntity = template.postForEntity(url, requestEntity, ReadyResponseDto.class);
+        ResponseEntity<KakaoPayReadyResponseDto> responseEntity = template.postForEntity(url, requestEntity, KakaoPayReadyResponseDto.class);
 
-        ReadyResponseDto ReadyResponseDto = responseEntity.getBody();
-        orderService.orderProcess(userId, ReadyResponseDto.getTid(), orderRequest);
-        return ReadyResponseDto;
+        KakaoPayReadyResponseDto KakaoPayReadyResponseDto = responseEntity.getBody();
+        orderService.orderProcess(userId, KakaoPayReadyResponseDto.getTid(), orderRequest);
+        return KakaoPayReadyResponseDto;
     }
 
     // 카카오페이 결제 승인
@@ -86,7 +86,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     // 최종적으로 결제 완료 처리를 하는 단계
     @Override
     @Transactional
-    public ApproveResponseDTO payApprove(String userId, String tid, String pgToken) throws Exception {
+    public KakaoPayApproveResponseDTO payApprove(String userId, String tid, String pgToken) throws Exception {
         HttpEntity<Map<String, String>> requestEntity = getMapHttpEntity(tid, pgToken);
 
         RestTemplate template = new RestTemplate();
@@ -97,7 +97,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
             for (OrderItemDTO orderItemDTO : historyItems) {
                 cartService.deleteSpecificProduct(userId, orderItemDTO.getProductId());
             }
-            return template.postForObject(url, requestEntity, ApproveResponseDTO.class);
+            return template.postForObject(url, requestEntity, KakaoPayApproveResponseDTO.class);
         } catch (Exception e) {
             System.out.println(e);
             throw new Exception(e.getMessage());
