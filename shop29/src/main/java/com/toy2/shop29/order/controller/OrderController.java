@@ -1,8 +1,9 @@
 package com.toy2.shop29.order.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toy2.shop29.cart.controller.CartController;
 import com.toy2.shop29.order.domain.pay.ReadyResponseDto;
-import com.toy2.shop29.order.domain.request.AddCurrentOrderRequestDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
@@ -10,12 +11,11 @@ import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.service.KakaoPayService;
 import com.toy2.shop29.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.HttpSessionRequiredException;
@@ -41,7 +41,15 @@ public class OrderController {
     // 주문 페이지
     @GetMapping("")
     public String order(@SessionAttribute(name = "loginUser", required = true) String userId, Model model,
-                        @SessionAttribute(name = "tid", required = false) String tid) throws Exception {
+                        @SessionAttribute(name = "tid", required = false) String tid,
+                        HttpServletResponse response) throws Exception {
+        // 응답에 대한 모든 데이터를 디스크, 메모리에 저장하지 않음. 모든 요청이 서버로 직접 전달
+        response.setHeader("Cache-Control", "no-store");
+        // 응답을 캐시하지 않도록 함
+        response.setHeader("Pragma", "no-cache");
+        // 응답 즉시 만료 설정
+        response.setDateHeader("Expires", 0);
+
         // TODO : 로그인 확인
         // 주문에 필요한 데이터 모델에 추가하여 뷰로 전달
         OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(userId);
@@ -49,7 +57,7 @@ public class OrderController {
         // 주문 상품이 비어져있다는건 오류나 이미 결제 시도한 상태
         // 주문 상품이 비어있다면 장바구니로 리다이렉트
         if (orderInfo.getCurrentItemsData().isEmpty()) {
-            return "redirect:/cart/get-list";
+            return "redirect:/cart";
         }
         model.addAttribute("order", orderInfo);
         return "order/order";
@@ -67,33 +75,39 @@ public class OrderController {
     }
 
     @PostMapping("/update-order")
-    public ResponseEntity<Map<String, String>> updateOrderProducts(@SessionAttribute(name = "loginUser", required = true) String userId,
-                                                                   @RequestBody AddCurrentOrderRequestDto addCurrentOrderProductDto) {
+    public String updateOrderProducts(@SessionAttribute(name = "loginUser", required = true) String userId,
+                                      @RequestParam("orderItems") String orderItemsJson,
+                                      RedirectAttributes rattr) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
         Map<String, String> response = new HashMap<>();
         // TODO : 로그인 확인
         if (!logInCheck(userId)) {
             response.put("redirectUrl", "/login");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return "redirect:/login";
         }
-        List<OrderProductDto> productDtoList = addCurrentOrderProductDto.getOrderItems();
         try {
-            orderService.addProducts(userId, productDtoList);
+            List<OrderProductDto> orderItems = objectMapper.readValue(orderItemsJson, new TypeReference<>() {
+            });
+            orderService.addProducts(userId, orderItems);
             response.put("status", "success");
             response.put("redirectUrl", "/order");
+        } catch (IllegalArgumentException e) {
+            logger.error("상품 수량 수정 에러");
+            rattr.addFlashAttribute("msg","ORDER_ERR");
+            return "redirect:/cart";
         } catch (Exception e) {
-            logger.error("상품 수량 수정 에러", e);
-            response.put("status", "fail");
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            throw new RuntimeException(e);
         }
-        return ResponseEntity.ok(response);
+        return "redirect:/order";
     }
 
     // 카카오페이 준비 페이지
     @PostMapping("/pay/ready")
     public @ResponseBody ReadyResponseDto payReady(@SessionAttribute(name = "loginUser", required = true) String userId, Model model,
-                                                @RequestBody OrderCompletedRequestDTO orderRequest,
-                                                HttpServletRequest request) {
+                                                   @RequestBody OrderCompletedRequestDTO orderRequest,
+                                                   HttpServletRequest request) {
         // TODO : 로그인 확인
         // 카카오 결제 준비하기
         try {

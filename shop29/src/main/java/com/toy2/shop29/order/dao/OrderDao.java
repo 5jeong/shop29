@@ -78,4 +78,6 @@ public interface OrderDao {
     int updateShippingAddress(String userId, ShippingAddressInfoDTO shippingAddressInfo) throws Exception;
 
     List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
+
+    Long countProduct(Long productId) throws Exception;
 }

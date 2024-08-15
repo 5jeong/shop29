@@ -3,8 +3,8 @@ package com.toy2.shop29.order.service;
 import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
-import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
+import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.utils.GenerateId;
@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -129,6 +127,9 @@ public class OrderServiceImpl implements OrderService {
         for (OrderProductDto product : products) {
             Long productId = product.getProductId();
             Long quantity = product.getQuantity();
+            if (orderDao.countProduct(productId) < 1){
+                throw new IllegalArgumentException("비정상적인 접근입니다.");
+            }
             int addResult = addProductToCurrentOrder(userId, productId, quantity);
             if (addResult > 1) {
                 throw new IllegalArgumentException("비정상적인 접근입니다.");

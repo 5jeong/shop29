@@ -66,6 +66,14 @@
         WHERE CurrentOrder.user_id = #{userId};
     </select>
 
+    <!--    상품 조회-->
+    <select id="countProduct" parameterType="long" resultType="long">
+        SELECT count(*)
+        FROM Product
+        WHERE product_id = #{productId};
+    </select>
+
+
     <!--    상품 가격 조회-->
     <select id="getProductPrice" parameterType="long" resultType="long">
         SELECT price

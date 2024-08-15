@@ -240,4 +240,9 @@ public class OrderDaoImpl implements OrderDao {
         params.put("tid", tid);
         return session.selectList(namespace + "selectUserOrderHistoryItem", params);
     }
+
+    @Override
+    public Long countProduct(Long productId) throws Exception {
+        return session.selectOne(namespace + "countProduct", productId);
+    }
 }

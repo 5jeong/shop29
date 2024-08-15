@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Order Page</title>
-    <link rel="stylesheet" th:href="@{/styles.css}"/>
+    <link rel="stylesheet" th:href="@{/order/styles.css}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -64,9 +64,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="shipping-memo">배송시 요청사항을 선택하지 말아주세요</label>
+                        <label for="shipping-memo">배송시 요청사항을 선택해주세요</label>
                         <select id="shipping-memo" name="shippingMemo">
-                            <option value="option1">선택하지 말아주세요1</option>
+                            <option value="option1">싫어요</option>
                             <option value="option1">옵션 1</option>
                             <option value="option2">옵션 2</option>
                             <option value="option3">옵션 3</option>
@@ -88,7 +88,7 @@
                  class="product-info">
                 <div class="product">
                     <img
-                            src="https://placehold.co/170x170"
+                            src="https://placehold.co/100x100"
                             alt="Product image of striped bedding set"
                     />
                     <div class="product-details">
@@ -139,7 +139,7 @@
                 <label><input type="checkbox" required/> (필수) 결제대행 서비스 이용약관 보기</label>
             </div>
 
-            <button class="checkout-btn" type="button">CHECK OUT</button>
+            <button class="checkout-btn" type="button" th:data-value="${isLogin}">CHECK OUT</button>
         </div>
     </div>
 </div>
