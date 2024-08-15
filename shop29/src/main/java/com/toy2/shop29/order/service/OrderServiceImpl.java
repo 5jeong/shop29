@@ -1,5 +1,6 @@
 package com.toy2.shop29.order.service;
 
+import com.toy2.shop29.cart.service.CartService;
 import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
@@ -18,6 +19,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderDao orderDao;
+    private final CartService cartService;
+
+    public OrderServiceImpl(CartService cartService) {
+        this.cartService = cartService;
+    }
+
 
     @Override
     public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
@@ -127,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
         for (OrderProductDto product : products) {
             Long productId = product.getProductId();
             Long quantity = product.getQuantity();
-            if (orderDao.countProduct(productId) < 1){
+            if (orderDao.countProduct(productId) < 1) {
                 throw new IllegalArgumentException("비정상적인 접근입니다.");
             }
             int addResult = addProductToCurrentOrder(userId, productId, quantity);
@@ -216,6 +223,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void deleteOrderHistory(String userId, String tid) throws Exception {
+        List<OrderItemDTO> orderHistoryItems = selectUserOrderHistoryItem(userId, tid);
+        for (OrderItemDTO orderItem : orderHistoryItems) {
+            Long productId = orderItem.getProductId();
+            Long quantity = orderItem.getQuantity();
+            cartService.addProductToCart(userId, productId, quantity, 1);
+        }
 
         int deleteAddressResult = deletePayFailedOrderAddress(userId, tid);
         int deleteOrderItem = deletePayFailedOrderHistoryItem(userId, tid);
@@ -223,7 +236,6 @@ public class OrderServiceImpl implements OrderService {
 
         if (deleteAddressResult != 1 || deleteOrderItem < 1 || deleteOrderHistory != 1) {
             throw new IllegalArgumentException("비정상적 접근입니다.");
-
         }
     }
 

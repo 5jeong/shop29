@@ -30,6 +30,7 @@ public class OrderSessionInterceptor implements HandlerInterceptor {
             orderService.deleteOrderHistory(userId, tid);
             session.removeAttribute("tid");
         }
+
         return true;
     }
 }

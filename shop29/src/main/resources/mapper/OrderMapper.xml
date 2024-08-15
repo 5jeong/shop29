@@ -141,7 +141,7 @@
     <delete id="deletePayFailedOrderHistoryItem" parameterType="map">
         DELETE
         FROM OrderHistoryItem
-        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE tid = #{tid} AND user_id = #{userId})
+        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </delete>
 
 <!--    해당 유저의 하나의 주문내역 상품 개수 조회-->
