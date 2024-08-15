@@ -154,15 +154,19 @@ public class OrderController {
         return "pay/payFail";
     }
 
+    @GetMapping("/pay/error")
+    public String payError() throws Exception {
+        return "pay/payError";
+    }
+
     private boolean logInCheck(String userId) {
         if (userId == null)
             return false;
         return true;
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public String handleAccessDeniedException(AccessDeniedException e, Model model) {
-        model.addAttribute("message", e.getMessage());
-        return "error/accessDenied";
+    @ExceptionHandler(HttpSessionRequiredException.class)
+    public String handleSessionException(HttpSessionRequiredException ex) {
+        return "redirect:/login";
     }
 }

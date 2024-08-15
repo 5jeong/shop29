@@ -33,14 +33,14 @@
     <select id="countUserCurrentOrderById" resultType="int">
         SELECT count(*)
         FROM CurrentOrder
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
     </select>
 
     <!--    주문 처리 내역 유저별 조회-->
     <select id="getCurrentOrderById" resultType="com.toy2.shop29.order.domain.CurrentOrderDTO">
         SELECT *
         FROM CurrentOrder
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
     </select>
 
     <!--    주문 처리 생성-->

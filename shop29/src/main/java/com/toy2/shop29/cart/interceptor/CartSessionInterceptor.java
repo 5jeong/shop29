@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.interceptor;
 
 import com.toy2.shop29.cart.service.CartService;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +37,9 @@ public class CartSessionInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(@Nullable HttpServletRequest request,
+                             HttpServletResponse response,
+                             Object handler) throws Exception {
         try {
             HttpSession session = request.getSession(true);
             // TODO : 임시아이디

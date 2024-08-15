@@ -28,7 +28,14 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    // 장바구니 페이지 요청
+    /**
+     * 장바구니 페이지 요청
+     *
+     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param guestId 게스트 id
+     * @return 장바구니 페이지
+     * @throws Exception .
+     */
     @GetMapping("/get-list")
     public String getCartList(@SessionAttribute(name = "loginUser", required = false) String userId,
                               @CookieValue(name = "guestId", required = false) String guestId,
@@ -53,7 +60,14 @@ public class CartController {
         return "cart/cart";
     }
 
-    // 장바구니 담기
+    /**
+     * 장바구니 담기
+     *
+     * @param userId 유저 uid(로그인, 비로그인 포함)
+     * @param guestId 게스트 id
+     * @return 장바구니 페이지
+     * @throws Exception .
+     */
     @PostMapping("/cart-item")
     public ResponseEntity<Map<String, String>> addCartItem(@SessionAttribute(name = "loginUser", required = false) String userId,
                                                            @CookieValue(name = "guestId", required = false) String guestId,
@@ -71,6 +85,7 @@ public class CartController {
         try {
             Long productId = addCartProductDto.getProductId();
             Long quantity = addCartProductDto.getQuantity();
+
             if (quantity < 1){
                 // TODO : 상품 수량 1로
                 // TODO : RestController
@@ -78,13 +93,17 @@ public class CartController {
                 response.put("message", "상품 수량 문제");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
+
             cartService.addProductToCart(userInfo, productId, quantity, isUser);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
+
         } catch (Exception e) {
             logger.error("장바구니 상품 추가 실패", e);
+
             response.put("status", "fail");
             response.put("message", e.getMessage());
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

@@ -4,11 +4,13 @@ import com.toy2.shop29.order.domain.OrderAddressDTO;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @Setter
+@ToString
 public class OrderHistoryDTO {
     private String orderId;
     private String orderTime;
