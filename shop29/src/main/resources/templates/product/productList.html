@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Product Board</title>
-    <link rel="stylesheet" th:href="@{/css/menu.css}">
+    <link rel="stylesheet" th:href="@{/menu.css}">
 </head>
 <body>
 
@@ -24,11 +24,11 @@
 
 <!-- 정렬 옵션 버튼들 -->
 <div style="text-align:right; margin-right: 10px;">
-    <a th:href="@{/product/board(sortOption='priceDesc')}" class="btn">높은 가격순</a>
-    <a th:href="@{/product/board(sortOption='priceAsc')}" class="btn">낮은 가격순</a>
-    <a th:href="@{/product/board(sortOption='rating')}" class="btn">별점 높은순</a>
-    <a th:href="@{/product/board(sortOption='newest')}" class="btn">신규순</a>
-    <a th:href="@{/product/board(sortOption='highDiscount')}" class="btn">할인율 높은순</a>
+    <a th:href="@{/product/list(sortOption='priceDesc')}" class="btn">높은 가격순</a>
+    <a th:href="@{/product/list(sortOption='priceAsc')}" class="btn">낮은 가격순</a>
+    <a th:href="@{/product/list(sortOption='rating')}" class="btn">별점 높은순</a>
+    <a th:href="@{/product/list(sortOption='newest')}" class="btn">신규순</a>
+    <a th:href="@{/product/list(sortOption='highDiscount')}" class="btn">할인율 높은순</a>
 </div>
 
 
@@ -48,17 +48,15 @@
         </tr>
         </thead>
         <tbody>
-        <!-- th:each는 "변수명, 상태변수 : 반복할 컬렉션" 형식입니다. -->
         <tr th:each="productDto, status: ${list}">
             <td th:text="${status.index+1}"></td>
             <!-- 이미지컬럼 fk로 받는거 필요할듯 -->
-            <!--            <td><img th:src="@{${productDto.getProduct_image}}" alt="no img/"></td>-->
-            <td><a th:href="@{/product/{productId}(productId=${productDto.getProduct_id()})}" th:text="${productDto.getProduct_name()}"></a></td>
-            <td th:text="${productDto.getBrand_id()}"></td>
-            <td th:text="${productDto.getSale_ratio()}"></td>
+            <td><a th:href="@{/product/{productId}(productId=${productDto.getProductId()})}" th:text="${productDto.getProductName()}"></a></td>
+            <td th:text="${productDto.getBrandId()}"></td>
+            <td th:text="${productDto.getSaleRatio()}"></td>
             <td th:text="${productDto.getPrice()}"></td>
             <!-- 할인율과 정가로 할인가 계산 -->
-            <td th:text="${#numbers.formatDecimal(productDto.getPrice() * (1 - productDto.getSale_ratio() / 100), 1, 2)}"></td>
+            <td th:text="${#numbers.formatDecimal(productDto.getPrice() * (1 - productDto.getSaleRatio() / 100), 1, 2)}"></td>
             <td th:text="${productDto.getRating()}"></td>
         </tr>
         </tbody>
@@ -86,7 +84,7 @@
 
     <!-- 페이지 번호 링크 -->
     <a th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"
-       th:href="@{/product/board(page=${i}, pageSize=${pageHandler.pageSize})}"
+       th:href="@{/product/list(page=${i}, pageSize=${pageHandler.pageSize})}"
        th:text="${i}"></a>
 
     <!-- 다음 페이지 링크 -->
