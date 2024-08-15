@@ -5,20 +5,23 @@
 
 <mapper namespace="com.toy2.shop29.product.dao.MajorCategoryMapper">
 
-
+    <!--모든 대분류 가져오기-->
     <select id="selectAll" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
         SELECT * FROM majorcategory
     </select>
 
+    <!-- Id로 하나의 대분류만 가져오기 -->
     <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
         SELECT * FROM majorcategory WHERE major_category_id = #{majorCategoryId}
     </select>
 
+    <!-- 대분류 새로 추가하기 -->
     <insert id="insert" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
         INSERT INTO majorcategory (major_category_name, created_id, created_date, updated_id, updated_date)
         VALUES (#{majorCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
     </insert>
 
+    <!-- 대분류 내용 수정하기 -->
     <update id="update" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
         UPDATE majorcategory
         SET major_category_name = #{majorCategoryName},
@@ -27,13 +30,10 @@
         WHERE major_category_id = #{majorCategoryId}
     </update>
 
+    <!-- Id로 하나의 대분류 삭제하기 -->
     <delete id="delete" parameterType="int">
         DELETE FROM majorcategory WHERE major_category_id = #{majorCategoryId}
     </delete>
-
-    <select id="selectByName" parameterType="String" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
-        SELECT * FROM majorcategory WHERE major_category_name = #{majorCategoryName}
-    </select>
 
 
 </mapper>

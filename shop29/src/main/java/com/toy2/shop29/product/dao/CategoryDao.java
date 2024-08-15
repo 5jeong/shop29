@@ -1,22 +1,74 @@
 package com.toy2.shop29.product.dao;
 
-import com.toy2.shop29.product.domain.CategoryDto;
-import com.toy2.shop29.product.domain.MajorCategoryDto;
-import com.toy2.shop29.product.domain.MiddleCategoryDto;
-import com.toy2.shop29.product.domain.SmallCategoryDto;
+import com.toy2.shop29.product.domain.*;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 public interface CategoryDao {
-    //모든 Major카테고리들 List로 가져오기
-    List<MajorCategoryDto> findAllMajorCategories();
 
-    //특정 MajorId에 해당하는 모든 Middle카테고리를 List로 가져오기
-    List<MiddleCategoryDto> findMiddleCategoriesByMajorId(int majorCategoryId);
+//    //select
+//    CategoryDto selectCategoryByCategoryDto( CategoryDto categoryDto);
 
-    //특정 MiddleId에 해당하는 모든 Small카테고리를 List로 가져오기
-    List<SmallCategoryDto> findSmallCategoriesByMiddleId(int middleCategoryId);
+    //select 2
+    CategoryDto selectCategorybyId(int majorCategoryId, int middleCategoryId, int smallCategoryId);
 
-    // 대분류, 중분류, 소분류 상관없이 모든 카테고리 가져오기
-    List<CategoryDto> findAllCategories();
+//    // insert
+//    int insertCategory(CategoryDto categoryDto);
+
+//    //update
+//    int updateCategory(CategoryDto categoryDto);
+
+//    //delete by Id
+//    int deleteCategory(int majorCategoryId, int middleCategoryId, int smallCategoryId);
+
+//    //delete - All
+//    int deleteAll();
+
+//    //count
+//    int countCategories();
+
+
+
+
+    int insertMajorCategory(MajorCategoryDto majorCategoryDto);
+    int insertMiddleCategory(MiddleCategoryDto middleCategoryDto);
+    int insertSmallCategory(SmallCategoryDto smallCategoryDto);
+
+
+    int updateMajorCategory(MajorCategoryDto majorCategoryDto);
+    int updateMiddleCategory(MiddleCategoryDto middleCategoryDto);
+    int updateSmallCategory(SmallCategoryDto smallCategoryDto);
+
+
+    int deleteMajorCategory(int majorCategoryId);
+    int deleteMiddleCategory(int middleCategoryId);
+    int deleteSmallCategory(int smallCategoryId);
+
+
+    int deleteAllCategories();
+
+
+
+
+
+//
+//    //모든 Major카테고리들 List로 가져오기
+//    List<MajorCategoryDto> findAllMajorCategories();
+//
+//    //특정 MajorId에 해당하는 모든 Middle카테고리를 List로 가져오기
+//    List<MiddleCategoryDto> findMiddleCategoriesByMajorId(int majorCategoryId);
+//
+//    //특정 MiddleId에 해당하는 모든 Small카테고리를 List로 가져오기
+//    List<SmallCategoryDto> findSmallCategoriesByMiddleId(int middleCategoryId);
+//
+//    // 대분류, 중분류, 소분류 상관없이 모든 카테고리 가져오기
+//    List<CategoryDto> findAllCategories();
+//
+//    //소분류에 해당하는 모든 제품 가져오기
+//    List<ProductDto> findProductsBySmallId(int smallCategoryId);
+//
+//    //대분류 중분류 JOIN해서 selsect
+//    List<CategoryDto> findMajorMiddle();
+
 }
