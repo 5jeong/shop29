@@ -2,6 +2,7 @@ package com.example.yourproject.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,5 +27,12 @@ public class GlobalExceptionHandler {
         return "error/404"; // templates/error/404.html을 반환
     }
 
-    // 필요한 경우 다른 예외 핸들러들을 추가할 수 있습니다.
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public ModelAndView handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        ModelAndView mav = new ModelAndView("error/405");
+        mav.addObject("error", "HTTP 메서드가 지원되지 않습니다.");
+        mav.addObject("message", ex.getMessage());
+        return mav;
+    }
 }
