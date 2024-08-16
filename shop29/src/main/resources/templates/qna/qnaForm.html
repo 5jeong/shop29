@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 입력폼</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .form-group > label:first-child {
+            width: 150px; /* 그룹 라벨의 넓이 설정 */
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+        .form-group-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* 라디오 버튼 간격 설정 */
+            flex: 1;
+        }
+
+        .form-group-inline label {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            font-size: small;
+        }
+        .form-group-inline label input {
+            margin-right: 5px;
+        }
+        input[type="file"] {
+            display: block;
+            margin-top: 5px;
+            padding: 10px 0;
+            width: 100%;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #333;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .image-preview {
+            width: 100px;
+            height: 100px;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+            z-index: 9998; /* 로딩 표시보다 아래에 위치 */
+        }
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 9999; /* 다른 요소 위에 표시되도록 */
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const qnaTypeRadios = document.querySelectorAll('input[name=qnaTypeId]');
+            console.log(qnaTypeRadios)
+            qnaTypeRadios.forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const orderIdActive = radio.dataset.orderIdActive;
+                    const productIdActive = radio.dataset.productIdActive;
+
+                    console.log(orderIdActive, productIdActive)
+
+                    if(orderIdActive === 'true') {
+                        document.getElementById('orderForm').style.display = 'flex';
+                        document.getElementById('orderId').disabled = false;
+                    }else{
+                        document.getElementById('orderForm').style.display = 'none';
+                        document.getElementById('orderId').disabled = true;
+                    }
+
+                    if(productIdActive === 'true') {
+                        document.getElementById('productForm').style.display = 'flex';
+                        document.getElementById('productId').disabled = false;
+                    }else{
+                        document.getElementById('productForm').style.display = 'none';
+                        document.getElementById('productId').disabled = true;
+                    }
+                });
+            });
+
+            const fileInput = document.getElementById('fileInput');
+            const imageList = document.getElementById('imageList');
+            const addFileButton = document.getElementById('addFileButton');
+            let images = []; // 이미지 파일을 저장할 배열
+
+            addFileButton.addEventListener('click', function() {
+                if(images.length >= 2) {
+                    alert('파일은 최대 2개까지 등록 가능합니다.');
+                    return;
+                }
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0]; // 선택된 파일
+                if (file) {
+                    // 파일 유효성 검사 - 타입
+                    if (!file.type.startsWith('image/')) {
+                        alert('이미지 파일을 선택해주세요.');
+                        return;
+                    }
+                    // 파일 유효성 검사 - 크기
+                    if(file.size > 10 * 1024 * 1024) {
+                        alert('파일 크기는 10MB 이하로 등록 가능합니다.');
+                        return;
+                    }
+
+                    handleFileUpload(file);
+                }
+            });
+
+            async function handleFileUpload(file) {
+                try {
+                    const savedFileName = await uploadFileToServer(file);
+                    console.log(savedFileName);
+                    if (savedFileName === null) {
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        images.push({ src: e.target.result, name: savedFileName }); // 서버에서 반환된 파일명 사용
+                        updateImageList();
+                    };
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    alert('파일 업로드 중 오류가 발생했습니다: ' + error.message);
+                }
+            }
+
+
+            async function uploadFileToServer(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // 로딩 표시와 오버레이 보이기
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+
+                try {
+                    const response = await fetch('/attachment', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        return await response.text(); // 서버에서 반환된 파일명
+                    } else {
+                        throw new Error('파일 업로드 실패');
+                    }
+                } catch (error) {
+                    alert(error.message);
+                    return null;
+                }finally{
+                    // 로딩 표시와 오버레이 숨기기
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('overlay').style.display = 'none';
+                }
+            }
+
+            function updateImageList() {
+                imageList.innerHTML = ''; // 기존 이미지 목록 초기화
+                images.forEach((image, index) => {
+                    const div = document.createElement('div');
+                    div.classList.add('image-container');
+
+                    const img = document.createElement('img');
+                    img.src = image.src;
+                    img.classList.add('image-preview');
+
+                    const button = document.createElement('button');
+                    button.textContent = 'X';
+                    button.classList.add('delete-button');
+                    button.onclick = function() {
+                        deleteImage(index);
+                    };
+
+                    div.appendChild(img);
+                    div.appendChild(button);
+                    imageList.appendChild(div);
+                });
+            }
+
+            function deleteImage(index) {
+                images.splice(index, 1); // 배열에서 이미지 삭제
+                updateImageList(); // 이미지 목록 업데이트
+            }
+
+            document.getElementById('myForm').addEventListener('submit', function(event) {
+                // 기본 제출 동작 방지
+                event.preventDefault();
+
+                // 입력 값 가져오기
+                const qnaTypeId = document.querySelector('input[name=qnaTypeId]:checked');
+                const subject = document.getElementById('subject').value.trim();
+                const content = document.getElementById('content').value.trim();
+
+                // 유효성 검사
+                if(qnaTypeId === null) {
+                    alert('문의 유형을 선택하세요.');
+                    return; // 유효성 검사 실패 시 함수 종료
+                }
+
+                if (subject === '') {
+                    alert('제목을 입력하세요.');
+                    return; // 유효성 검사 실패 시 함수 종료
+                }
+
+                if (content === '') {
+                    alert('내용을 입력하세요.');
+                    return; // 유효성 검사 실패 시 함수 종료
+                }
+
+                // 폼 태그를 가져와서, 저장된 첨부파일 이름 배열을 추가
+                document.getElementById('attachmentNames').value = images.map(image => image.name).join(',');
+
+                this.submit();
+            });
+        });
+    </script>
+</head>
+<body>
+
+<div class="form-container">
+    <form id="myForm" action="/qna" method="post">
+
+        <div th:each="entry : ${qnaTypeMap}">
+            <div class="form-group">
+                <label th:text="${entry.key}"></label>
+                <div class="form-group-inline">
+                    <label th:each="item : ${entry.value}">
+                        <input type="radio" th:name="qnaTypeId" th:value="${item.getQnaTypeId()}"
+                               th:data-order-id-active="${item.isOrderIdActive()}"
+                               th:data-product-id-active="${item.isProductIdActive()}"
+                        />
+                        <span th:text="${item.getName()}"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" id="orderForm" style="display: none">
+            <label for="orderId">주문번호</label>
+            <input type="text" id="orderId" name="orderId" disabled>
+        </div>
+
+        <div class="form-group" id="productForm" style="display: none">
+            <label for="productId">상품번호</label>
+            <input type="text" id="productId" name="productId" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="name">성명</label>
+            <input type="text" id="name" name="name" th:value="${userDto.getUserName()}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="id">아이디</label>
+            <input type="text" id="id" name="id" th:value="${userDto.getUserId()}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" th:value="${userDto.getEmail()}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="subject">제목</label>
+            <input type="text" id="subject" name="title" placeholder="제목을 입력하세요">
+        </div>
+
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" rows="5" placeholder="내용을 입력하세요."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="fileInput">사진첨부</label>
+            <div class="form-group-photo">
+                <div id="overlay" style="display: none;"></div>
+                <div id="loading" style="display: none;">
+                    <p>로딩 중...</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none">
+                <button type="button" class="custom-button" id="addFileButton">파일 추가</button>
+                <div id="imageList"></div>
+                <div class="upload-instructions">
+                    <p>상품 불량 및 오배송의 경우, 해당 제품 사진을 등록 부탁드립니다.</p>
+                    <p>파일당 10MB 이하의 용량 제한이 있습니다. 첨부파일은 최대 2개까지 등록 가능합니다.</p>
+                </div>
+                <div class="thumbnail-container" id="thumbnail-container"></div>
+            </div>
+        </div>
+
+        <div class="form-group" style="display: none">
+            <input type="text" id="attachmentNames" name="attachmentNames">
+        </div>
+
+        <button type="submit" class="btn">등록하기</button>
+    </form>
+</div>
+
+</body>
+</html>

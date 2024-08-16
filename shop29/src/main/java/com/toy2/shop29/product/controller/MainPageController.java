@@ -16,10 +16,10 @@ import java.util.Map;
 @Controller
 public class MainPageController {
 
-    
+
     @Autowired
     private CategoryService categoryService;
-    
+
 
     @GetMapping("/")
     public String showMainPage(Model model) {
@@ -29,7 +29,7 @@ public class MainPageController {
 
         model.addAttribute("majorToMiddleMap", majorToMiddleMap);
 
-        
+
         return "product/mainpage";
     }
 

@@ -4,6 +4,9 @@ package com.toy2.shop29.qna.util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,11 +16,22 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest
 public class FileUploadHandlerTest {
 
-    private FileUploadHandler fileUploadHandler = new FileUploadHandler();
-    private final String FILE_NAME = "sample-img.PNG";
-    private final String TEST_FILE_PATH = "static/test/";
+    @Autowired
+    private FileUploadHandler fileUploadHandler;
+
+
+    @Value("${file.upload.temp-file-path}")
+    private String TEMP_FILE_PATH;
+    @Value("${file.upload.file-path}")
+    private String FILE_PATH;
+    @Value("${file.upload.test-file-path}")
+    private String TEST_FILE_PATH;
+    @Value("${file.upload.test-file-name}")
+    private String TEST_FILE_NAME;
+
 
     @BeforeEach
     void setUp() throws IOException {
@@ -28,49 +42,46 @@ public class FileUploadHandlerTest {
     @Test
     void saveFile() throws IOException, URISyntaxException {
         // 1단계 데이터 선택
-        File imageFile = Paths.get(TEST_FILE_PATH + FILE_NAME).toFile();
-        String newFileName = fileUploadHandler.generateTimestampedFileName(FILE_NAME);
+        File imageFile = Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+        String newFileName = fileUploadHandler.generateTimestampedFileName(TEST_FILE_NAME);
 
         // 2단계 데이터 처리
-        String saveFileName = fileUploadHandler.saveFile(imageFile,newFileName);
+        fileUploadHandler.saveFile(imageFile,newFileName);
 
         // 3단계 검증
-        assertTrue(saveFileName != null);
-        assertTrue(fileUploadHandler.getFile(saveFileName).exists());
+        assertTrue(fileUploadHandler.getFile(newFileName).exists());
     }
 
     @DisplayName("파일 삭제 테스트 - 성공")
     @Test
     void deleteFile() throws IOException, URISyntaxException {
         // 1단계 데이터 선택
-        File imageFile = Paths.get(TEST_FILE_PATH + FILE_NAME).toFile();
-        String newFileName = fileUploadHandler.generateTimestampedFileName(FILE_NAME);
+        File imageFile = Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+        String newFileName = fileUploadHandler.generateTimestampedFileName(TEST_FILE_NAME);
 
-        String saveFileName = fileUploadHandler.saveFile(imageFile, newFileName);
+        fileUploadHandler.saveFile(imageFile, newFileName);
 
-        assertTrue(saveFileName != null);
-        File file = fileUploadHandler.getFile(saveFileName);
+        File file = fileUploadHandler.getFile(newFileName);
         assertTrue(file != null);
         assertTrue(file.exists());
 
         // 2단계 데이터 처리
-        fileUploadHandler.deleteFile(saveFileName);
+        fileUploadHandler.deleteFile(newFileName, FILE_PATH);
 
         // 3단계 검증
-        assertTrue(fileUploadHandler.getFile(saveFileName) == null);
+        assertTrue(fileUploadHandler.getFile(newFileName) == null);
     }
 
     @DisplayName("파일 복사 테스트 - 성공")
     @Test
     void copyFile() throws IOException {
         // 1단계 데이터 선택
-        File imageFile = Paths.get(TEST_FILE_PATH + FILE_NAME).toFile();
-        String newFileName = fileUploadHandler.generateTimestampedFileName(FILE_NAME);
+        File imageFile = Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+        String newFileName = fileUploadHandler.generateTimestampedFileName(TEST_FILE_NAME);
 
-        String saveFileName = fileUploadHandler.saveFile(imageFile, newFileName);
+        fileUploadHandler.saveFile(imageFile, newFileName);
 
-        assertTrue(saveFileName != null);
-        File file = fileUploadHandler.getFile(saveFileName);
+        File file = fileUploadHandler.getFile(newFileName);
         assertTrue(file != null);
         assertTrue(file.exists());
 
@@ -78,7 +89,7 @@ public class FileUploadHandlerTest {
         fileUploadHandler.copyFile(file);
 
         // 3단계 검증
-        File copiedFile = Paths.get(FileUploadHandler.TEMP_FILE_PATH + file.getName()).toFile();
+        File copiedFile = Paths.get(TEMP_FILE_PATH + file.getName()).toFile();
         assertTrue(copiedFile != null);
         assertTrue(copiedFile.exists());
     }
@@ -107,8 +118,8 @@ public class FileUploadHandlerTest {
     @Test
     void getFile() throws IOException {
         // 1단계 데이터 선택
-        String fileName = FILE_NAME;
-        Files.createFile(Paths.get(FileUploadHandler.FILE_PATH + fileName));
+        String fileName = TEST_FILE_NAME;
+        Files.createFile(Paths.get(FILE_PATH + fileName));
 
         // 2단계 데이터 처리
         File file = fileUploadHandler.getFile(fileName);
@@ -122,10 +133,10 @@ public class FileUploadHandlerTest {
     @Test
     void getImageSize() throws IOException {
         // 1단계 데이터 선택
-        File imageFile = Paths.get(TEST_FILE_PATH + FILE_NAME).toFile();
+        File imageFile = Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
 
         // 2단계 데이터 처리
-        int[] sizeArr = fileUploadHandler.getImageSize(imageFile);
+        Integer[] sizeArr = fileUploadHandler.getImageSize(imageFile);
 
         // 3단계 검증
         assertTrue(sizeArr != null);
@@ -138,7 +149,7 @@ public class FileUploadHandlerTest {
     @Test
     void getExtension(){
         // 1단계 데이터 선택
-        String fileName = FILE_NAME;
+        String fileName = TEST_FILE_NAME;
 
         // 2단계 데이터 처리
         String extension = fileUploadHandler.getExtension(fileName);
@@ -152,7 +163,7 @@ public class FileUploadHandlerTest {
     @Test
     void getFileSize(){
         // 1단계 데이터 선택
-        File imageFile = Paths.get(TEST_FILE_PATH + FILE_NAME).toFile();
+        File imageFile = Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
 
         // 2단계 데이터 처리
         long fileSize = fileUploadHandler.getFileSize(imageFile);
