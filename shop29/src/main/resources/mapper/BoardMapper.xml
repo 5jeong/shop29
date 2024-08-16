@@ -15,7 +15,6 @@
         select notice_id,
                notice_title,
                notice_content,
-               notice_number,
                notice_creator_id,
                notice_modifier_id,
                notice_creation_time,
@@ -31,7 +30,6 @@
         select notice_id,
                notice_title,
                notice_content,
-               notice_number,
                notice_creator_id,
                notice_modifier_id,
                notice_creation_time,
@@ -47,7 +45,6 @@
         select notice_id,
                notice_title,
                notice_content,
-               notice_number,
                notice_creator_id,
                notice_modifier_id,
                notice_creation_time,
@@ -55,7 +52,7 @@
                top_fixed,
                top_fixed_priority
         from Notice
-        order by notice_creation_time desc, notice_id desc
+        order by notice_id desc, notice_creation_time desc
             limit #{offset}, #{pageSize}
     </select>
 
@@ -68,6 +65,11 @@
     <delete id="deleteAll">
         delete from Notice
     </delete>
+<!--    &lt;!&ndash;관리자만 삭제 가능하게 하는 쿼리 &ndash;&gt;-->
+<!--    <delete id="deleteForAdmin">-->
+<!--        delete from board where notice_id=#{noticeId}-->
+<!--    </delete>-->
+
     <!-- 특정 공지사항을 삭제하는 쿼리 -->
     <delete id="delete" parameterType="map">
         delete from Notice
@@ -81,6 +83,22 @@
             notice_modification_time = now()
         where notice_id = #{noticeId}
     </update>
+    <!-- 상단 고정 공지사항 목록을 가져오는 쿼리 -->
+    <select id="selectFixedNotices" resultType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        SELECT notice_id,
+               notice_title,
+               notice_content,
+               notice_creator_id,
+               notice_modifier_id,
+               notice_creation_time,
+               notice_modification_time,
+               top_fixed,
+               top_fixed_priority
+        FROM Notice
+        WHERE top_fixed = 1
+        ORDER BY top_fixed_priority ASC
+    </select>
+
 
 
 </mapper>

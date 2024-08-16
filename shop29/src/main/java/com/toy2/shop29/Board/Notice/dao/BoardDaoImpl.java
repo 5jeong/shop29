@@ -62,5 +62,9 @@ public class BoardDaoImpl implements BoardDao {
         // MyBatis의 count 쿼리 실행
         return session.selectOne(namespace + "count");
     }
+    @Override
+    public List<BoardDto> selectFixedNotices() {
+        return session.selectList(namespace + "selectFixedNotices");
+    }
 
 }

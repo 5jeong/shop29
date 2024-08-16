@@ -31,5 +31,6 @@ public interface BoardDao {
     // 공지사항의 총 개수를 조회하는 메서드
     int count();
 
-
+    // 상단 고정 공지사항 목록을 가져오는 메서드
+    List<BoardDto> selectFixedNotices();
 }

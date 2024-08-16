@@ -37,16 +37,30 @@ public class BoardController {
     public String list(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                        Model m, HttpServletRequest request) {
+
+        if(currentPage == null) currentPage = 1;
+        if(pageSize == null) pageSize = 10;
+
         try {
+            // 상단 고정 공지사항 가져오기
+            List<BoardDto> fixedNotices = boardService.getFixedNotices(); // topFixed == true인 공지사항
+
+            // 일반 공지사항 가져오기
             int totalCnt = boardService.getCount();
             PageHandler pageHandler = new PageHandler(totalCnt, currentPage, pageSize);
+
             Map<String, Object> map = new HashMap<>();
             map.put("offset", (currentPage - 1) * pageSize);
             map.put("pageSize", pageSize);
 
-            List<BoardDto> list = boardService.getPage(map);
-            m.addAttribute("list", list);
-            m.addAttribute("ph", pageHandler);
+            List<BoardDto> list = boardService.getPage(map); // 일반 공지사항
+
+            // 뷰로 데이터 전달
+            m.addAttribute("fixedNotices", fixedNotices); // 상단 고정 공지사항
+            m.addAttribute("list", list);                 // 일반 공지사항
+            m.addAttribute("ph", pageHandler);            // 페이지 핸들러
+            m.addAttribute("totalCnt", totalCnt);
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -83,9 +97,7 @@ public class BoardController {
     @PostMapping("/write")
     public String writeSubmit(BoardDto boardDto) {
         try {
-            // 공지사항 작성자는 세션에서 가져오거나, 현재 로그인 사용자 정보에서 설정
-            // 예를 들어, 현재 사용자 ID를 가져오는 방법을 적용하세요.
-            boardDto.setNoticeCreatorId("관리자"); // 이 부분을 실제 사용자 ID로 설정해야 합니다.
+            boardDto.setNoticeCreatorId("관리자");
             boardService.write(boardDto);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -95,8 +107,8 @@ public class BoardController {
 
     @PostMapping("/delete")
     public String deleteNotice(@RequestParam("noticeId") Integer noticeId, @RequestParam("noticeCreatorId") String noticeCreatorId) {
-        System.out.println("Deleting notice with ID: " + noticeId); // 로그 추가
-        System.out.println("Deleting notice with noticeCreatorId: " + noticeCreatorId); // 로그 추가
+        System.out.println("Deleting notice with ID: " + noticeId);
+        System.out.println("Deleting notice with noticeCreatorId: " + noticeCreatorId);
         int deleteResult = boardService.remove(noticeId, noticeCreatorId);
         return "redirect:/board/list";
     }

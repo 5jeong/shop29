@@ -8,16 +8,24 @@
 <body>
 <h1>공지사항 수정</h1>
 <form action="/board/edit" method="post">
+    <!-- 수정할 공지사항의 ID를 숨겨서 전송 -->
     <input type="hidden" name="noticeId" th:value="${board.noticeId}"/>
+
+    <!-- 제목 입력 필드 -->
     <label for="title">제목:</label>
     <input type="text" id="title" name="noticeTitle" th:value="${board.noticeTitle}" required/>
     <br>
+
+    <!-- 내용 입력 필드 -->
     <label for="content">내용:</label>
     <textarea id="content" name="noticeContent" rows="10" required th:text="${board.noticeContent}"></textarea>
     <br>
+
+    <!-- 수정 완료 버튼 -->
     <button type="submit">수정 완료</button>
 </form>
 
+<!-- 목록 페이지로 돌아가기 링크 -->
 <a href="/board/list">목록으로 돌아가기</a>
 </body>
 </html>
