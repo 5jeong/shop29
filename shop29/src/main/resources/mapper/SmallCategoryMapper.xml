@@ -33,4 +33,13 @@
         DELETE FROM smallcategory WHERE small_category_id = #{smallCategoryId}
     </delete>
 
+    <!-- 소분류Id가 포함된 중분류Id 가져오기 -->
+    <select id="MiddleIdBySmallId" parameterType="int" resultType="int">
+        SELECT *
+        FROM smallcategory
+            WHERE
+    </select>
+
+
+
 </mapper>

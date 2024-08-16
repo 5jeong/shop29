@@ -16,13 +16,13 @@
             `updated_id` -- 수정자 ID
         )
         VALUES(
-            #{parentQnaTypeId},
-            #{name},
-            #{description},
-            #{isActive},
-            #{createdId},
-            #{updatedId}
-        );
+                  #{parentQnaTypeId},
+                  #{name},
+                  #{description},
+                  #{isActive},
+                  #{createdId},
+                  #{updatedId}
+              );
     </insert>
 
     <!-- READ -->

@@ -1,146 +1,34 @@
 package com.toy2.shop29.product.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
-import java.util.Objects;
 
+@Setter
+@Getter
 public class CategoryDto {
-    private int major_category_id;
-    private String major_category_name;
-    private int middle_category_id;
-    private String middle_category_name;
-    private int small_category_id;
-    private String small_category_name;
-    private Date created_date;
-    private String created_id;
-    private Date updated_date;
-    private String updated_id;
+    // Getters and Setters
+    private MajorCategoryDto majorCategory;
+    private MiddleCategoryDto middleCategory;
+    private SmallCategoryDto smallCategory;
 
 
-    //생성자
-    public CategoryDto() {}
 
-    public CategoryDto(int major_category_id, String major_category_name, int middle_category_id, String middle_category_name, int small_category_id, String small_category_name, Date created_date, String created_id, Date updated_date, String updated_id) {
-        this.major_category_id = major_category_id;
-        this.major_category_name = major_category_name;
-        this.middle_category_id = middle_category_id;
-        this.middle_category_name = middle_category_name;
-        this.small_category_id = small_category_id;
-        this.small_category_name = small_category_name;
-        this.created_date = created_date;
-        this.created_id = created_id;
-        this.updated_date = updated_date;
-        this.updated_id = updated_id;
+    public CategoryDto() {
     }
 
-    //toString
-    @Override
-    public String toString() {
-        return "CategoryDto{" +
-                "major_category_id=" + major_category_id +
-                ", major_category_name='" + major_category_name + '\'' +
-                ", middle_category_id=" + middle_category_id +
-                ", middle_category_name='" + middle_category_name + '\'' +
-                ", small_category_id=" + small_category_id +
-                ", small_category_name='" + small_category_name + '\'' +
-                ", created_date=" + created_date +
-                ", created_id='" + created_id + '\'' +
-                ", updated_date=" + updated_date +
-                ", updated_id='" + updated_id + '\'' +
-                '}';
+    public CategoryDto(int majorCategoryId, int middleCategoryId, int smallCategoryId) {
+        this.majorCategory = new MajorCategoryDto();
+        this.majorCategory.setMajorCategoryId(majorCategoryId);
+
+        this.middleCategory = new MiddleCategoryDto();
+        this.middleCategory.setMiddleCategoryId(middleCategoryId);
+        this.middleCategory.setMajorCategoryId(majorCategoryId); // 필요한 경우 추가
+
+        this.smallCategory = new SmallCategoryDto();
+        this.smallCategory.setSmallCategoryId(smallCategoryId);
+        this.smallCategory.setMiddleCategoryId(middleCategoryId); // 필요한 경우 추가
     }
 
-    //equals hashCode
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CategoryDto that = (CategoryDto) o;
-        return major_category_id == that.major_category_id && middle_category_id == that.middle_category_id && small_category_id == that.small_category_id && Objects.equals(major_category_name, that.major_category_name) && Objects.equals(middle_category_name, that.middle_category_name) && Objects.equals(small_category_name, that.small_category_name) && Objects.equals(created_id, that.created_id) && Objects.equals(updated_id, that.updated_id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(major_category_id, major_category_name, middle_category_id, middle_category_name, small_category_id, small_category_name, created_id, updated_id);
-    }
-
-    //getter setter
-    public int getMajor_category_id() {
-        return major_category_id;
-    }
-
-    public void setMajor_category_id(int major_category_id) {
-        this.major_category_id = major_category_id;
-    }
-
-    public String getMajor_category_name() {
-        return major_category_name;
-    }
-
-    public void setMajor_category_name(String major_category_name) {
-        this.major_category_name = major_category_name;
-    }
-
-    public int getMiddle_category_id() {
-        return middle_category_id;
-    }
-
-    public void setMiddle_category_id(int middle_category_id) {
-        this.middle_category_id = middle_category_id;
-    }
-
-    public String getMiddle_category_name() {
-        return middle_category_name;
-    }
-
-    public void setMiddle_category_name(String middle_category_name) {
-        this.middle_category_name = middle_category_name;
-    }
-
-    public int getSmall_category_id() {
-        return small_category_id;
-    }
-
-    public void setSmall_category_id(int small_category_id) {
-        this.small_category_id = small_category_id;
-    }
-
-    public String getSmall_category_name() {
-        return small_category_name;
-    }
-
-    public void setSmall_category_name(String small_category_name) {
-        this.small_category_name = small_category_name;
-    }
-
-    public Date getCreated_date() {
-        return created_date;
-    }
-
-    public void setCreated_date(Date created_date) {
-        this.created_date = created_date;
-    }
-
-    public String getCreated_id() {
-        return created_id;
-    }
-
-    public void setCreated_id(String created_id) {
-        this.created_id = created_id;
-    }
-
-    public Date getUpdated_date() {
-        return updated_date;
-    }
-
-    public void setUpdated_date(Date updated_date) {
-        this.updated_date = updated_date;
-    }
-
-    public String getUpdated_id() {
-        return updated_id;
-    }
-
-    public void setUpdated_id(String updated_id) {
-        this.updated_id = updated_id;
-    }
 }

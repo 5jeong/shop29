@@ -1,6 +1,7 @@
 package com.toy2.shop29.qna.repository.attachment;
 
 import com.toy2.shop29.qna.domain.AttachmentDto;
+import com.toy2.shop29.qna.domain.AttachmentTableName;
 import org.springframework.dao.DataAccessException;
 
 import java.util.List;
@@ -13,8 +14,9 @@ public interface AttachmentDao {
 
     // Read
     AttachmentDto select(int attachmentId, Boolean isActive) throws DataAccessException;
+    AttachmentDto selectByFileName(String fileName) throws DataAccessException;
     List<AttachmentDto> selectAll(Boolean isActive) throws DataAccessException;
-    List<AttachmentDto> selectAllBy(int qnaId, Boolean isActive) throws DataAccessException;
+    List<AttachmentDto> selectAllBy(int tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException;
     int count() throws DataAccessException;
 
     // Update

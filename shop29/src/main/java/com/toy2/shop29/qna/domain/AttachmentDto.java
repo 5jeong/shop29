@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AttachmentDto {
     private Integer attachmentId;
-    private Integer qnaId;
+    private int tableId;
+    private AttachmentTableName tableName; // 'qna' 로 제한
     private String fileName;
     private String filePath;
     private Integer width;

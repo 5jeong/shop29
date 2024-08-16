@@ -1,5 +1,6 @@
 package com.toy2.shop29.qna.domain;
 
+import com.toy2.shop29.users.domain.UserDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ public class QnaDto {
 
     // JOIN
     private QnaTypeDto qnaType;
-    private UserForQnaDto user;
+    private UserDto user;
     private QnaAnswerDto qnaAnswer;
     private List<AttachmentDto> attachments;
 }

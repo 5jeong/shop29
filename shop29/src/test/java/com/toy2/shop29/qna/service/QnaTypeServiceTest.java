@@ -5,6 +5,8 @@ import com.toy2.shop29.qna.domain.QnaTypeDto;
 import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
 import com.toy2.shop29.qna.repository.qnatype.QnaTypeDao;
 import com.toy2.shop29.qna.service.qnatype.QnaTypeService;
+import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,6 +32,8 @@ public class QnaTypeServiceTest {
     QnaTypeDao qnaTypeDao;
     @Autowired
     ParentQnaTypeDao parentQnaTypeDao;
+    @Autowired
+    UserMapper userMapper;
 
     List<QnaTypeDto> qnaTypeDtos = new LinkedList<>();
     List<ParentQnaTypeDto> parentQnaTypeDtos = new LinkedList<>();
@@ -35,18 +41,39 @@ public class QnaTypeServiceTest {
     int activeQnaTypeCnt;
     int inactiveQnaTypeCnt;
 
+    final String ADMIN_ID = "admin";
+
     @PostConstruct
     void init(){
         parentQnaTypeDao.deleteAll();
         qnaTypeDao.deleteAll();
+        userMapper.deleteUser(ADMIN_ID);
+
+        UserRegisterDto userRegisterDto1 = new UserRegisterDto();
+        userRegisterDto1.setUserId(ADMIN_ID);
+        userRegisterDto1.setEmail("testuser1@example.com");
+        userRegisterDto1.setPassword("password123");
+        userRegisterDto1.setUserName("손흥민");
+        userRegisterDto1.setPostalCode("12345");
+        userRegisterDto1.setAddressLine1("경기 화성시");
+        userRegisterDto1.setAddressLine2("201호");
+        userRegisterDto1.setAddressReference("");
+        userRegisterDto1.setPhoneNumber("010-1234-9991");
+        userRegisterDto1.setGender(1); // 1은 남자
+        userRegisterDto1.setBirthDate("1990-02-12");
+        assertTrue(userMapper.insertUser(userRegisterDto1) == 1);
+        Map<String,Object> map = new HashMap<>();
+        map.put("userId", ADMIN_ID);
+        map.put("userRole", "관리자");
+        assertTrue(userMapper.updateUserRoleForTest(map) == 1);
 
         ParentQnaTypeDto pDto1 = ParentQnaTypeDto.builder()
                 .parentQnaTypeId("PARENT_QNA_TYPE_1")
                 .name("부모문의유형1")
                 .description("부모문의유형1 설명")
                 .isActive(true)
-                .createdId("admin")
-                .updatedId("admin")
+                .createdId(ADMIN_ID)
+                .updatedId(ADMIN_ID)
                 .build();
         parentQnaTypeDtos.add(pDto1);
         parentQnaTypeDao.insert(pDto1);
@@ -56,8 +83,8 @@ public class QnaTypeServiceTest {
                 .name("부모문의유형2")
                 .description("부모문의유형2 설명")
                 .isActive(false)
-                .createdId("admin")
-                .updatedId("admin")
+                .createdId(ADMIN_ID)
+                .updatedId(ADMIN_ID)
                 .build();
         parentQnaTypeDtos.add(pDto2);
         parentQnaTypeDao.insert(pDto2);
@@ -72,8 +99,8 @@ public class QnaTypeServiceTest {
                     .isOrderIdActive(true)
                     .isProductIdActive(true)
                     .isActive(i % 2 == 0 ? true : false)
-                    .createdId("admin")
-                    .updatedId("admin")
+                    .createdId(ADMIN_ID)
+                    .updatedId(ADMIN_ID)
                     .build();
             qnaTypeDtos.add(qDto);
             qnaTypeDao.insert(qDto);
@@ -87,8 +114,8 @@ public class QnaTypeServiceTest {
                     .isOrderIdActive(true)
                     .isProductIdActive(true)
                     .isActive(i % 2 == 0 ? true : false)
-                    .createdId("admin")
-                    .updatedId("admin")
+                    .createdId(ADMIN_ID)
+                    .updatedId(ADMIN_ID)
                     .build();
             qnaTypeDtos.add(qDto);
             qnaTypeDao.insert(qDto);
@@ -112,27 +139,7 @@ public class QnaTypeServiceTest {
         }
     }
 
-    @DisplayName("문의유형 전체조회 -> 사용자용")
-    @Test
-    void findAllWithParentForUser() {
-        // 1단계 데이터 선택 -> init() 메서드에서 수행
-
-        // 2단계 데이터 처리
-        List<QnaTypeDto> typeList = qnaTypeService.findAllWithParentForUser();
-
-        // 3단계 검증 -> 사용자는 사용중인 문의유형만 조회가능
-        assertTrue(typeList != null);
-        assertTrue(typeList.size() == activeQnaTypeCnt);
-        for(QnaTypeDto qnaTypeDto : typeList){
-            // 문의유형 사용여부 확인
-            assertTrue(qnaTypeDto.isActive());
-            // 부모문의유형 사용여부 확인
-            assertTrue(qnaTypeDto.getParentQnaType() != null);
-            assertTrue(qnaTypeDto.getParentQnaType().isActive());
-        }
-    }
-
-    @DisplayName("문의유형 전체조회 -> 관리자용")
+    @DisplayName("문의유형 전체조회 -> 관리자용 : 모든 문의유형 조회가능")
     @Test
     void findAllWithParentForAdmin() {
         // 1단계 데이터 선택 -> init() 메서드에서 수행

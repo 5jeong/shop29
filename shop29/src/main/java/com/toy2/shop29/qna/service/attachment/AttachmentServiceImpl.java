@@ -1,20 +1,23 @@
 package com.toy2.shop29.qna.service.attachment;
 
 import com.toy2.shop29.qna.domain.AttachmentDto;
+import com.toy2.shop29.qna.domain.AttachmentTableName;
 import com.toy2.shop29.qna.domain.QnaDto;
 import com.toy2.shop29.qna.repository.attachment.AttachmentDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.util.FileUploadHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * AttachmentService 는 QnaService에서 사용될 목적으로 만들어짐
@@ -22,6 +25,13 @@ import java.util.Queue;
  */
 @Service
 public class AttachmentServiceImpl implements AttachmentService{
+
+    @Value("${file.upload.file-path}")
+    private String FILE_PATH;
+    @Value("${file.upload.temp-file-path}")
+    private String TEMP_FILE_PATH;
+    @Value("${file.default-mime-type}")
+    private String DEFAULT_MIME_TYPE;
 
     FileUploadHandler fileUploadHandler;
     AttachmentDao attachmentDao;
@@ -33,106 +43,139 @@ public class AttachmentServiceImpl implements AttachmentService{
         this.qnaDao = qnaDao;
     }
 
-    // * DB에 파일정보를 저장한 이후, 저장소에 파일을 저장하는 이유
-    // - 파일 저장소에 파일을 저장한 이후, DB 트랜잭션에서 예외 발생시 롤백이 어려움
-    // - 따라서, DB에 파일정보를 저장한 이후, 파일 저장소에 파일을 저장하는 것이 안전함
-    @Transactional(rollbackFor = IOException.class)
     @Override
-    public void createAttachments(int qnaId, List<File> files) throws IllegalArgumentException, IOException {
-        // 0. files가 null이거나, 비어있을 경우, 예외
-        if(files == null || files.isEmpty()){
-            throw new IllegalArgumentException("files가 null이거나, 비어있습니다.");
-        }
-
-        // 1. qnaId에 해당하는 문의글이 존재하는지 확인
-        QnaDto qnaDto = qnaDao.select(qnaId, false);
-        if(qnaDto == null){
-            throw new IllegalArgumentException("존재하지 않는 문의글입니다.");
-        }
-
-        // 2. 파일에서 메타정보를 추출하여, 첨부파일 DTO 객체 리스트 생성, DB 저장
-        List<AttachmentDto> attachmentDtos = new LinkedList<>();
+    public String getMimeType(Resource resource) {
+        String mimeType = null;
         try{
-            for(File file : files){
-                assert file != null;
+            mimeType = Files.probeContentType(resource.getFile().toPath());
+        }catch (IOException e) {
+            mimeType = DEFAULT_MIME_TYPE;
+        }
+        return mimeType;
+    }
 
-                // 파일 정보 추출
-                String fileName = file.getName(); // 파일명
-                String savedFileName = fileUploadHandler.generateTimestampedFileName(fileName); // 저장될 파일명
-                int[] imageSize = fileUploadHandler.getImageSize(file); // width, height
-                long fileSize = fileUploadHandler.getFileSize(file); // 파일 크기
-                String extension = fileUploadHandler.getExtension(fileName); // 확장자
-                String fileUrl = fileUploadHandler.createFileUrl(savedFileName); // 파일접근 URL
+    @Override
+    public Resource getResourceFromFile(String fileName) {
+        File file = fileUploadHandler.getFile(fileName);
+        if(file == null || !file.exists()){
+            return null;
+        }
+        return new FileSystemResource(file);
+    }
 
-                // 첨부파일 DTO 객체 생성
-                AttachmentDto attachmentDto = AttachmentDto.builder()
-                        .qnaId(qnaId)
-                        .fileName(savedFileName)
-                        .size(fileSize)
-                        .width(imageSize[0])
-                        .height(imageSize[1])
-                        .extension(extension)
-                        .filePath(fileUrl)
-                        .createdId(qnaDto.getUserId())
-                        .updatedId(qnaDto.getUserId())
-                        .build();
-                attachmentDtos.add(attachmentDto);
-            }
-
-            // DB 저장
-            int rowCnt = attachmentDao.insertList(attachmentDtos);
-            assert rowCnt == attachmentDtos.size();
-        }catch (IOException e){
-            e.printStackTrace();
-            throw e;
+    /**
+     * MultipartFile에 대한 유효성 검사는 Controller에서 수행
+     */
+    @Override
+    public String saveMultipartFile(MultipartFile multipartFile) throws RuntimeException {
+        // 1. MultipartFile 이 null이거나 비어있다면 예외
+        if(multipartFile == null || multipartFile.isEmpty()){
+            throw new IllegalArgumentException("MultipartFile이 비어있습니다.");
         }
 
-        assert attachmentDtos.size() == files.size();
+        // 2. 저장될 파일명 생성
+        String savedFileName = fileUploadHandler.generateTimestampedFileName(multipartFile.getOriginalFilename());
 
         // 3. 파일 저장소에 파일 저장
-        List<String> savedFileNameList = new LinkedList<>();
-        for(int i = 0; i < files.size(); i++){
-            try{
-                // 파일 저장
-                File file = files.get(i);
-                String savedFileName = attachmentDtos.get(i).getFileName();
-                fileUploadHandler.saveFile(file, savedFileName);
-                savedFileNameList.add(savedFileName);
-            }catch (IOException e){
-                e.printStackTrace();
-                // 예외 발생시, 저장된 파일들 삭제
-                deleteAllFiles(savedFileNameList);
-                throw e;
-            }
+        try{
+            fileUploadHandler.saveMultipartFile(multipartFile, savedFileName);
+        }catch (IOException e){
+            e.printStackTrace();
+            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.",e);
         }
+
+        // 4. 저장된 파일명 반환
+        return savedFileName;
     }
 
-    private void deleteAllFiles(List<String> savedFileNames){
-        for(int i = 0; i < savedFileNames.size(); i++){
-            try {
-                fileUploadHandler.deleteFile(savedFileNames.get(i));
-            } catch (IOException e) {
-                e.printStackTrace();
-
-                // 후속 처리를 위해, 미삭제 파일명 출력
-                for(int j = i; j < savedFileNames.size(); j++){
-                    System.out.println("미삭제 파일명 : " + savedFileNames.get(j));
-                }
-            }
-        }
-    }
-
-    @Transactional(rollbackFor = IOException.class)
+    @Transactional
     @Override
-    public void deleteAttachmentsBy(int qnaId) throws IOException {
-        // 1. qnaId에 해당하는 문의글이 존재하는지 확인
-        QnaDto qnaDto = qnaDao.select(qnaId, false);
-        if(qnaDto == null){
-            throw new IllegalArgumentException("존재하지 않는 문의글입니다.");
+    public void createAttachments(
+            String userId,
+            int tableId,
+            AttachmentTableName tableName,
+            List<String> attachmentNames) throws RuntimeException {
+        // 1. 첨부파일 이름 리스트가 비어있을 경우, 종료
+        if(attachmentNames == null || attachmentNames.isEmpty()){
+            return;
         }
 
-        // 2. qnaId에 해당하는 첨부파일 리스트를 조회, 리스트가 비어있을 경우, 종료
-        List<AttachmentDto> attachmentDtos = attachmentDao.selectAllBy(qnaId, true);
+        // 2. 첨부파일 이름 리스트를 순회하며, 첨부파일이 파일 저장소에 저장되있는지 확인
+        // 첨부파일이 존재하지 않을 경우, 해당 첨부파일은 제외함 -> 즉, 존재하는 첨부파일에 대해서만 작업 수행
+        List<File> savedFileList = new LinkedList<>();
+        for(String attachmentName : attachmentNames){
+            File file = fileUploadHandler.getFile(attachmentName);
+            if(file != null && file.exists()){
+                savedFileList.add(file);
+            }
+        }
+
+        // 3. 만약 첨부파일이 이미 첨부파일 테이블의 레코드에 저장된 상태라면,
+        // 하나의 첨부파일에 대해 여러 레코드가 연결될 수 있기 때문에, 예외 던짐
+        for(File file : savedFileList){
+            String savedFileName = file.getName();
+            AttachmentDto attachmentDto = attachmentDao.selectByFileName(savedFileName);
+            if(attachmentDto != null){
+                throw new IllegalArgumentException("첨부파일이 이미 다른 레코드에 연결되어 있습니다.");
+            }
+        }
+
+        // 4. tableName에 해당하는 테이블에서 tableId에 해당하는 레코드 확인 및 본인여부 확인
+        checkTableIdValidate(userId, tableId, tableName);
+
+        // 5. 첨부파일들에 대한 메타정보를 추출하여, 첨부파일 DTO 객체들 생성
+        // 파일 저장소에 저장된 파일은, 유효성 검사가 완료된 파일이기 때문에,
+        // 별도의 파일 유효성 검사는 수행하지 않음
+        List<AttachmentDto> attachmentDtos = new LinkedList<>();
+        for(File file : savedFileList){
+            Integer[] widthAndHeight = fileUploadHandler.getImageSize(file);
+            AttachmentDto dto = AttachmentDto.builder()
+                    .tableId(tableId)
+                    .tableName(tableName)
+                    .fileName(file.getName())
+                    .filePath(fileUploadHandler.createFileUrl(file.getName()))
+                    .width(widthAndHeight[0])
+                    .height(widthAndHeight[1])
+                    .size(fileUploadHandler.getFileSize(file))
+                    .extension(fileUploadHandler.getExtension(file.getName()))
+                    .createdId(userId)
+                    .updatedId(userId)
+                    .build();
+            attachmentDtos.add(dto);
+        }
+
+        // 6. 첨부파일들을 첨부파일 테이블에 저장
+        int insertedCnt = attachmentDao.insertList(attachmentDtos);
+        if(insertedCnt != attachmentDtos.size()){
+            // 실제 저장된 개수와 저장할 개수가 다를 경우,
+            // 예외를 발생시키지는 않고, 로깅만 수행하도록함
+        }
+    }
+
+    private void checkTableIdValidate(String userId, int tableId, AttachmentTableName tableName) throws IllegalArgumentException {
+        switch (tableName){
+            case QNA:
+                QnaDto qnaDto = qnaDao.select(tableId, null);
+                if(qnaDto == null){
+                    throw new IllegalArgumentException("존재하지 않는 문의글입니다.");
+                }
+                if(!qnaDto.getUserId().equals(userId)){
+                    throw new IllegalArgumentException("첨부파일 생성권한이 없습니다.");
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("지원하지 않는 테이블명입니다.");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void deleteAttachmentsBy(String userId, int tableId, AttachmentTableName tableName) throws RuntimeException {
+        // 1. tableName에 해당하는 테이블에서 tableId에 해당하는 레코드가 있는지 확인
+        checkTableIdValidate(userId, tableId, tableName);
+
+        // 2. tableId와 tableName에 해당하는 첨부파일 리스트를 조회, 리스트가 비어있을 경우, 종료
+        List<AttachmentDto> attachmentDtos = attachmentDao.selectAllBy(tableId, tableName,true);
         if(attachmentDtos.isEmpty()){
             return;
         }
@@ -142,49 +185,18 @@ public class AttachmentServiceImpl implements AttachmentService{
         for(AttachmentDto attachmentDto : attachmentDtos){
             attachmentIds.add(attachmentDto.getAttachmentId());
         }
-        int rowCnt = attachmentDao.softDeleteList(attachmentIds);
-        assert rowCnt == attachmentIds.size();
-
-        // 4. 파일 삭제 실패시 복구를 위해, 파일 복사본들 생성
-        List<String> savedFileNames = new LinkedList<>();
-        for(AttachmentDto attachmentDto : attachmentDtos){
-            savedFileNames.add(attachmentDto.getFileName());
+        int deletedCnt = attachmentDao.softDeleteList(attachmentIds);
+        if(deletedCnt != attachmentIds.size()){
+            // 실제 삭제된 개수와 삭제할 개수가 다를 경우,
+            // 예외를 발생시키지는 않고, 로깅만 수행하도록함
         }
 
-        List<String> copiedFileNames = new LinkedList<>();
-        for(String savedFileName : savedFileNames){
-            File originFile = fileUploadHandler.getFile(savedFileName);
-            fileUploadHandler.copyFile(originFile);
-            copiedFileNames.add(originFile.getName());
-        }
-
-        // 5. 파일 저장소에서 첨부파일 리스트 삭제
-        Queue<String> deletedFileNames = new LinkedList<>();
-        for(String savedFileName : savedFileNames){
-            try{
-                fileUploadHandler.deleteFile(savedFileName);
-                deletedFileNames.add(savedFileName);
-            }catch (IOException e){
-                // 예외 발생하여, 파일 삭제 실패시, 앞서 삭제된 파일들 복구
-                e.printStackTrace();
-                try{
-                    while(!deletedFileNames.isEmpty()){
-                        String deletedFileName = deletedFileNames.poll();
-                        fileUploadHandler.restoreFileFromBackup(deletedFileName);
-                    }
-                }catch (IOException e2){
-                    // 파일 복구에 실패할 경우,
-                    // 미 복구된 파일명 로깅 필요 -> 후속 수작업 복구를 위함
-                    e2.printStackTrace();
-                    for(String notDeletedFileNames : deletedFileNames){
-                        System.out.println("미복구 파일명 : " + notDeletedFileNames);
-                    }
-                    throw e2;
-                }
-            }
-        }
-
-        // 6. 복구를 위해 저장한, 파일 복사본들 삭제
-        deleteAllFiles(copiedFileNames);
+        /*
+            파일 저장소에 있는 파일은 이 메서드에서 삭제하지 않음
+            지정된 시간에 배치를 통해, 첨부파일 테이블에 있는 파일들과 실제 파일 저장소에 있는 파일들을 비교하여
+            첨부파일 테이블에 있는 파일이 실제 파일 저장소에 없을 경우, 삭제하는 작업을 수행함
+            - 파일 저장소에 모든 파일이 한 폴더에 있는 경우, 파일목록 조회에 시간이 오래 걸릴 수 있음
+            - 따라서, 추후 일자별 폴더를 생성하여 파일을 저장하는 방식으로 변경해야함
+         */
     }
 }

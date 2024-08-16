@@ -1,5 +1,6 @@
 package com.toy2.shop29.qna.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,25 +16,26 @@ import java.nio.file.Paths;
 @Component
 public class FileUploadHandler {
 
-    /**
-     * 허용되는 이미지 확장자
-     */
-    public static final String[] IMAGE_EXT = {"jpg", "jpeg", "png", "gif"};
+    @Value("${file.permit-mime-types}")
+    private String[] PERMIT_MIME_TYPES;
 
-    /**
-     * 파일 저장 경로 - 프로젝트 루트 경로를 기준으로함
-     */
-    public static final String FILE_PATH = "static/uploads/";
+    @Value("${file.max-file-size}")
+    private long MAX_FILE_SIZE;
 
-    /**
-     * 임시파일 저장 경로 - 프로젝트 루트 경로를 기준으로함
-     */
-    public static final String TEMP_FILE_PATH = "static/temp/";
+    @Value("${file.permit-extentions}")
+    private String[] PERMIT_FILE_EXT_ARRAY;
 
-    /**
-     * 파일 URL - 브라우저에서 접근 가능한 URL의 기준점
-     */
-    public static final String FILE_BASE_URL = "http://localhost:8080/uploads/";
+    @Value("${file.image-extentions}")
+    private String[] IMAGE_EXT_ARRAY;
+
+    @Value("${file.upload.file-path}")
+    private String FILE_PATH;
+
+    @Value("${file.upload.temp-file-path}")
+    private String TEMP_FILE_PATH;
+
+    @Value("${file.base-url}")
+    private String FILE_BASE_URL;
 
     /**
      * 파일 URL 생성. DB 테이블에 저장할 URL 생성 목적.
@@ -45,13 +47,73 @@ public class FileUploadHandler {
     }
 
     /**
+     * MultipartFile 유효성 검사. 크기, MIME 타입, 확장자 검사
+     * @param multipartFile 유효성 검사할 MultipartFile 객체
+     * @return 유효성 검사 결과
+     */
+    public void validateMultipartFile(MultipartFile multipartFile) throws IllegalArgumentException {
+        // 1. MultipartFile 이 null이거나 비어있다면, false 반환
+        if(multipartFile == null || multipartFile.isEmpty()){
+            throw new IllegalArgumentException("MultipartFile이 비어있습니다.");
+        }
+
+        // 2. 파일 크기 검사
+        if(multipartFile.getSize() > MAX_FILE_SIZE){
+            throw new IllegalArgumentException("파일 크기가 허용치를 초과했습니다.");
+        }
+
+        // 3. 파일 MIME 타입 검사
+        String contentType = multipartFile.getContentType();
+        if (!isPermitContentType(contentType)){
+            throw new IllegalArgumentException("허용되지 않는 파일 형식입니다.");
+        }
+
+        // 4. 파일 확장자 검사
+        String fileName = multipartFile.getOriginalFilename();
+        if (!isPermitExt(fileName)){
+            throw new IllegalArgumentException("허용되지 않는 파일 확장자입니다.");
+        }
+    }
+
+    private boolean isPermitExt(String fileName) {
+        String fileExt = getExtension(fileName);
+        boolean isPermitFileExt = false;
+        for(String permitFileExt : PERMIT_FILE_EXT_ARRAY){
+            if(permitFileExt.equalsIgnoreCase(fileExt)){
+                isPermitFileExt = true;
+                break;
+            }
+        }
+        return isPermitFileExt;
+    }
+
+    private boolean isPermitContentType(String contentType) {
+        boolean isPermitMimeType = false;
+        for(String permitMimeType : PERMIT_MIME_TYPES){
+            if(contentType.equals(permitMimeType)){
+                isPermitMimeType = true;
+                break;
+            }
+        }
+        return isPermitMimeType;
+    }
+
+    public void saveMultipartFile(MultipartFile multipartFile, String savedFileName) throws IOException {
+        // 1. MultipartFile 이 null이거나 비어있다면 예외
+        if(multipartFile == null || multipartFile.isEmpty()){
+            throw new IllegalArgumentException("MultipartFile이 비어있습니다.");
+        }
+
+        // FILE_PATH 경로에 파일 저장
+        Files.copy(multipartFile.getInputStream(), Paths.get(FILE_PATH + savedFileName));
+    }
+
+    /**
      * 파일 저장
      * @param file 저장할 파일. MultiPartFile로 받은 파일을 File로 변환하여 사용
-     * @return 저장된 파일명
-     * @throws IOException
      * @throws URISyntaxException
      */
-    public String saveFile(File file, String savedFileName) throws IOException, IllegalStateException {
+    public void saveFile(File file, String savedFileName) throws IOException, IllegalStateException {
         if(file == null || !file.exists()) {
             throw new IllegalStateException("파일이 존재하지 않습니다.");
         }
@@ -64,14 +126,13 @@ public class FileUploadHandler {
         }
 
         Files.copy(file.toPath(), path);
-        return savedFileName;
     }
 
     /**
      * TEMP_FILE_PATH 경로에 파일 복사
      * @param originFile 복사할 파일
      */
-    public void copyFile(File originFile) throws IOException{
+    public void copyFile(File originFile) throws RuntimeException{
         Path originPath = originFile.toPath();
         Path copiedPath = Paths.get(TEMP_FILE_PATH + originFile.getName());
 
@@ -79,7 +140,7 @@ public class FileUploadHandler {
             Files.copy(originPath, copiedPath);
         } catch (IOException e) {
             e.printStackTrace();
-            throw e;
+            throw new RuntimeException("파일 복사 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -104,8 +165,8 @@ public class FileUploadHandler {
      * @param fileName 삭제하고자 하는 파일명
      * @throws IOException - 파일이 존재하지 않거나, 삭제 실패시 발생
      */
-    public void deleteFile(String fileName) throws IOException {
-        Path path = Paths.get(FILE_PATH + fileName);
+    public void deleteFile(String fileName, String filePath) throws IOException {
+        Path path = Paths.get(filePath + fileName);
         Files.delete(path);
     }
 
@@ -123,8 +184,16 @@ public class FileUploadHandler {
      * @throws IOException
      */
     public void deleteAllFiles() throws IOException {
-        Path path = Paths.get(FILE_PATH);
-        Files.list(path).forEach(p -> {
+        Path filePath = Paths.get(FILE_PATH);
+        Files.list(filePath).forEach(p -> {
+            try {
+                Files.delete(p);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        Path tempFilePath = Paths.get(TEMP_FILE_PATH);
+        Files.list(tempFilePath).forEach(p -> {
             try {
                 Files.delete(p);
             } catch (IOException e) {
@@ -133,22 +202,22 @@ public class FileUploadHandler {
         });
     }
 
-    /**
-     * MultipartFile을 File로 변환 <br/>
-     * MultipartFile은 Form에서 전송된 파일을 받는 객체
-     * @param multipartFile 변환하고자 하는 MultipartFile 객체
-     * @return 변환된 File 객체
-     * @throws IllegalArgumentException multipartFile이 존재하지 않을 경우
-     * @throws IOException
-     */
-    public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        if(multipartFile.isEmpty()) {
-            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
-        }
-        File file = new File(multipartFile.getOriginalFilename());
-        multipartFile.transferTo(file);
-        return file;
-    }
+//    /**
+//     * MultipartFile을 File로 변환 <br/>
+//     * MultipartFile은 Form에서 전송된 파일을 받는 객체
+//     * @param multipartFile 변환하고자 하는 MultipartFile 객체
+//     * @return 변환된 File 객체
+//     * @throws IllegalArgumentException multipartFile이 존재하지 않을 경우
+//     * @throws IOException
+//     */
+//    public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+//        if(multipartFile.isEmpty()) {
+//            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
+//        }
+//        File file = new File(multipartFile.getOriginalFilename());
+//        multipartFile.transferTo(file);
+//        return file;
+//    }
 
     /**
      * 파일명에 포함된 특수문자를 '_'로 치환 <br/>
@@ -192,7 +261,7 @@ public class FileUploadHandler {
      */
     public boolean isImageFile(String fileName) {
         String ext = fileName.substring(fileName.lastIndexOf(".") + 1);
-        for(String imageExt : IMAGE_EXT) {
+        for(String imageExt : IMAGE_EXT_ARRAY) {
             if(imageExt.equalsIgnoreCase(ext)) {
                 return true;
             }
@@ -202,26 +271,29 @@ public class FileUploadHandler {
 
     /**
      * 이미지 파일의 width, height 추출
+     * 이미지 파일이 아닐 경우, Integer[2]{null, null} 반환
      * @param imageFile
      * @return int[0] : width, int[1] : height
-     * @throws IOException
-     * @throws IllegalArgumentException 파일이 존재하지 않거나, 이미지 파일이 아닐 경우
      */
-    public int[] getImageSize(File imageFile) throws IOException  {
-        if(!imageFile.exists()) {
-            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
-        }
+    public Integer[] getImageSize(File imageFile){
         // 이미지 파일인지 확인
-        if(!isImageFile(imageFile.getName())) {
-            throw new IllegalArgumentException("이미지 파일이 아닙니다.");
+        if(!imageFile.exists() || !isImageFile(imageFile.getName())) {
+            return new Integer[2];
         }
 
         // BufferedImage 메모리 해제 必
         BufferedImage image = null;
         try{
             image = ImageIO.read(imageFile);
-            return new int[]{image.getWidth(), image.getHeight()};
-        }finally {
+            if(image == null) {
+                return new Integer[2];
+            }
+            return new Integer[]{image.getWidth(), image.getHeight()};
+        }catch (IOException e) {
+            e.printStackTrace();
+            return new Integer[2];
+        }
+        finally {
             if(image != null) {
                 image.flush();
             }
