@@ -24,19 +24,19 @@
 <div class="container">
     <h1>장바구니</h1>
     <div class="cart-items">
-        <button id="1215988" class="add-to-cart">
+        <button id="1" class="add-to-cart">
             <span class="button-inner">상품1 담기</span>
         </button>
-        <button id="1947442" class="add-to-cart">
+        <button id="2" class="add-to-cart">
             <span class="button-inner">상품2 담기</span>
         </button>
-        <button id="2032612" class="add-to-cart">
+        <button id="3" class="add-to-cart">
             <span class="button-inner">상품3 담기</span>
         </button>
-        <button id="2569392" class="add-to-cart">
+        <button id="4" class="add-to-cart">
             <span class="button-inner">상품4 담기</span>
         </button>
-        <button id="2588784" class="add-to-cart">
+        <button id="5" class="add-to-cart">
             <span class="button-inner">상품5 담기</span>
         </button>
         <button class="add-to-cart">
@@ -47,7 +47,7 @@
     <div class="empty-text" th:if="${cartList == null || #lists.size(cartList) == 0}">
         <p>장바구니가 비어있습니다.</p>
     </div>
-    <table class="cart" th:if="${list != null && #lists.size(list) > 0}">
+    <table class="cart" th:if="${cartList != null && #lists.size(cartList) > 0}">
         <thead>
         <tr>
             <th><input class="chkAll" type="checkbox" checked></th>
@@ -58,7 +58,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:if="${list != null && #lists.size(list) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.productId}"
+        <tr th:if="${cartList != null && #lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.productId}"
             th:data-price="${cart.price}">
             <td><input class="chkbox" type="checkbox" checked></td>
             <td>
