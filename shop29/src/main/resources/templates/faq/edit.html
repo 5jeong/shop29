@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ 수정</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<h1>FAQ 수정</h1>
+
+<form th:action="@{/faq/edit}" method="post">
+    <!-- FAQ ID는 히든 필드로 폼 데이터에 포함 -->
+    <input type="hidden" name="faqId" th:value="${faq.faqId}">
+
+    <label for="faqTitle">제목:</label>
+    <input type="text" id="faqTitle" name="faqTitle" th:value="${faq.faqTitle}" required><br>
+
+    <label for="faqContent">내용:</label>
+    <textarea id="faqContent" name="faqContent" required th:text="${faq.faqContent}"></textarea><br>
+
+    <button type="submit">수정완료</button>
+</form>
+
+<div>
+    <a th:href="@{/faq/list}">목록으로 돌아가기</a>
+</div>
+
+<!-- 디버깅을 위한 데이터 표시 -->
+<div>
+    <p>FAQ ID: <span th:text="${faq.faqId}"></span></p>
+    <p>FAQ Title: <span th:text="${faq.faqTitle}"></span></p>
+    <p>FAQ Content: <span th:text="${faq.faqContent}"></span></p>
+</div>
+
+</body>
+</html>

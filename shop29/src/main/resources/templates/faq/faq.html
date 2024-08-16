@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ 상세</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        strong {
+            color: #333;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .actions a:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>FAQ 상세</h1>
+
+    <div>
+        <h2 th:text="${board.faqTitle}"></h2>
+        <p><strong>작성자:</strong> <span th:text="${board.faqCreatorId}"></span></p>
+        <p><strong>작성시간:</strong> <span th:text="${#dates.format(board.faqCreationTime, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+        <p><strong>내용:</strong></p>
+        <p th:text="${board.faqContent}"></p>
+    </div>
+
+    <div class="actions">
+        <a href="/faq/edit?faqId=${board.faqId}">수정하기</a>
+        <a href="/faq/list">목록으로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>
