@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/cart/styles.css}"/>
+    <script>
+        let msg = "[[${msg}]]";
+
+        const messages = {
+            "LOGIN_ERR": "로그인 후 이용 가능합니다.",
+            "ORDER_ERR": "주문 중 오류가 발생했습니다. 다시 시도해 주세요.",
+        };
+
+        if (messages[msg]) {
+            alert(messages[msg]);
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>장바구니</h1>
+    <div class="cart-items">
+        <button id="1" class="add-to-cart">
+            <span class="button-inner">상품1 담기</span>
+        </button>
+        <button id="2" class="add-to-cart">
+            <span class="button-inner">상품2 담기</span>
+        </button>
+        <button id="3" class="add-to-cart">
+            <span class="button-inner">상품3 담기</span>
+        </button>
+        <button id="4" class="add-to-cart">
+            <span class="button-inner">상품4 담기</span>
+        </button>
+        <button id="5" class="add-to-cart">
+            <span class="button-inner">상품5 담기</span>
+        </button>
+        <button class="add-to-cart">
+            <a class="button-inner" href="/order/history">주문 내역</a>
+        </button>
+    </div>
+    <!-- 주문 내역이 없는 경우 -->
+    <div class="empty-text" th:if="${cartList == null || #lists.size(cartList) == 0}">
+        <p>장바구니가 비어있습니다.</p>
+    </div>
+    <table class="cart" th:if="${cartList != null && #lists.size(cartList) > 0}">
+        <thead>
+        <tr>
+            <th><input class="chkAll" type="checkbox" checked></th>
+            <th>상품 정보</th>
+            <th>수량</th>
+            <th>주문금액</th>
+            <th>배송비</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${cartList != null && #lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.productId}"
+            th:data-price="${cart.price}">
+            <td><input class="chkbox" type="checkbox" checked></td>
+            <td>
+                <div class="item-info">
+                    <img src="https://placehold.co/100x100"
+                         alt="Product Image">
+                    <div class="item-details">
+                        <span th:text="${cart.productName}">Item Name</span>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="quantity-controls">
+                    <button class="quantity decrease">-</button>
+                    <input th:value="${cart.quantity}" min="1" class="quantity-input">
+                    <button class="quantity increase">+</button>
+                </div>
+                <button class="save-btn save">저장</button>
+            </td>
+            <td>
+                <span class="price" th:text="${cart.price * cart.quantity} + '원'">1,927,800원</span>
+                <button class="buy-btn" >BUY NOW</button>
+            </td>
+            <td>조건무료<br/>일반배송</td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="actions" th:if="${cartList != null && #lists.size(cartList) > 0}">
+        <button class="delete">선택상품 삭제</button>
+    </div>
+    <div class="summary">
+        <div class="summary-header">
+            <span class="price-text">총 주문금액</span>
+            <span class="delivery-text">총 배송비</span>
+            <span class="amout-text">총 결제금액</span>
+        </div>
+        <div class="summary-price">
+            <div class="order-amount">
+                <span class="price">123</span>
+                <span class="order-products">234</span>
+            </div>
+            <div class="delivery-fee">
+                <i></i>
+                <span>0</span>
+            </div>
+            <div class="pay-amount">
+                <i></i>
+                <span>123</span>
+            </div>
+        </div>
+    </div>
+    <div class="checkout-actions">
+        <button class="continue-shopping">CONTINUE SHOPPING</button>
+        <button class="checkout" th:data-login="${isLogin}">CHECK OUT</button>
+    </div>
+    <form id="hidden-order-form" action="/order/update-order" method="POST" style="display:none;">
+        <input type="hidden" name="orderItems" id="orderItems">
+    </form>
+</div>
+<script>
+
+    $(document).ready(function () {
+        // 전체선택 체크박스를 클릭했을 때
+        $('.chkAll').on('click', function () {
+            const isChecked = $(this).is(':checked');
+            // 모든 chkbox 클래스를 가진 체크박스의 선택 상태를 변경
+            $('.chkbox').prop('checked', isChecked);
+        });
+
+        // 각 개별 체크박스를 클릭했을 때 전체 선택 체크박스의 상태를 변경
+        $('.chkbox').on('click', function () {
+            const total = $('.chkbox').length;
+            const checked = $('.chkbox:checked').length;
+            // 모든 chkbox가 선택되었는지 확인하고 chkAll의 상태를 변경
+            $('.chkAll').prop('checked', total === checked);
+        });
+
+        // 수량 증가 버튼 클릭 시
+        $('.quantity-controls .increase').on('click', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            quantityInput.val(currentValue + 1);
+            updatePrice(this, currentValue + 1);
+            updateSummary();
+        });
+
+        // 수량 감소 버튼 클릭 시
+        $('.quantity-controls .decrease').on('click', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            if (currentValue > 1) {
+                quantityInput.val(currentValue - 1);
+                updatePrice(this, currentValue - 1);
+                updateSummary();
+            }
+        });
+
+        // 수량 감소 버튼 클릭 시
+        $('.quantity-input').on('change', function () {
+            const quantityInput = $(this).siblings('.quantity-input');
+            let currentValue = parseInt(quantityInput.val());
+            if (currentValue > 1) {
+                quantityInput.val(currentValue - 1);
+                updatePrice(this, currentValue - 1);
+                updateSummary();
+            }
+        });
+
+        // CHECK OUT 버튼 클릭 시 실행
+        $('.checkout').on('click', function () {
+            if ($('.checkout').data('login') === 0){
+                alert('로그인 후 주문 가능합니다.');
+                window.location.href = '/login';
+                return
+            }
+            const orderItems = [];
+
+            // 선택된 상품들을 배열에 담기
+            $('.chkbox:checked').each(function () {
+                const row = $(this).closest('tr');
+                const productId = row.data('id');
+                const quantity = row.find('.quantity-input').val();
+
+                orderItems.push({
+                    productId: productId,
+                    quantity: parseInt(quantity)
+                });
+            });
+
+            if (orderItems.length > 0) {
+                // 숨겨진 폼의 input 필드에 orderItems 데이터를 JSON 문자열로 설정
+                $('#orderItems').val(JSON.stringify(orderItems));
+
+                // 폼 제출
+                $('#hidden-order-form').submit();
+            } else {
+                alert("주문할 상품을 선택해주세요.");
+            }
+        });
+
+        // 개별 상품 가격 업데이트
+        function updatePrice(button, quantity) {
+            const row = $(button).closest('tr');
+            const pricePerUnit = parseFloat(row.data('price'));
+            const totalPrice = pricePerUnit * quantity;
+            row.find('.price').text(totalPrice.toLocaleString() + '원');
+        }
+
+        // 요약 정보 업데이트 (총 주문금액, 총 결제금액 등)
+        function updateSummary() {
+            let totalAmount = 0;
+            let totalQuantity = 0;
+
+            $('.cart tbody tr').each(function () {
+                const quantity = parseInt($(this).find('.quantity-input').val());
+                const pricePerUnit = parseFloat($(this).data('price'));
+                totalAmount += quantity * pricePerUnit;
+                totalQuantity += quantity;
+            });
+
+            $('.summary .order-amount .price').text(totalAmount.toLocaleString() + '원');
+            $('.summary .order-amount .order-products').text(totalQuantity + '개');
+            $('.summary .pay-amount span').text(totalAmount.toLocaleString() + '원');
+        }
+
+        // 처음 로드 시 요약 정보 업데이트
+        updateSummary();
+
+        // 선택상품 삭제 버튼 클릭 시 실행
+        $('.delete').on('click', function () {
+            const selectedIds = [];
+            $('.chkbox:checked').each(function () {
+                const row = $(this).closest('tr');
+                const productId = row.data('id');
+                selectedIds.push(productId);
+            });
+
+            if (selectedIds.length > 0) {
+                $.ajax({
+                    url: '/cart/delete',
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({productIds: selectedIds}),
+                    success: function (response) {
+                        // 삭제 후 페이지를 새로고침하거나 삭제된 항목을 화면에서 제거
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("삭제 중 오류가 발생했습니다.", error);
+                    }
+                });
+            } else {
+                alert("삭제할 상품을 선택해주세요.");
+            }
+        });
+
+        // 저장 버튼 클릭 시 실행
+        $('.save-btn').on('click', function () {
+            const row = $(this).closest('tr');
+            const id = row.data('id');
+            const quantityInput = row.find('.quantity-input');
+            const orderCount = quantityInput.val();
+            if (orderCount > 100) {
+                quantityInput.val(100);
+                alert("수량 최대 100개까지 가능합니다.");
+            }
+
+            $.ajax({
+                url: '/cart/order-count',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({product_id: id, quantity: Number(orderCount)}),
+                beforeSend: function () {
+                    // 요청이 시작되기 전에 버튼을 비활성화하거나 로딩 표시를 추가
+                    $(this).prop('disabled', true);
+                },
+                success: function (response) {
+                    // 요청 성공 후 작업 (필요에 따라 추가)
+                    alert('저장되었습니다.');
+                    location.reload()
+                },
+                complete: function () {
+                    // 요청이 완료되면 버튼을 다시 활성화하거나 로딩 표시를 제거
+                    $(this).prop('disabled', false);
+                },
+                error: function (xhr, status, error) {
+                    console.error("저장 중 오류가 발생했습니다.", error);
+                }
+            });
+        });
+
+
+        // BUY NOW 버튼 클릭 시 실행
+        $('.buy-btn').on('click', function () {
+            if ($('.checkout').data('login') === 0){
+                alert('로그인 후 주문 가능합니다.');
+                window.location.href = '/login';
+                return
+            }
+            const row = $(this).closest('tr');
+            const productId = row.data('id');
+            const quantity = row.find('.quantity-input').val();
+
+            const orderItems = [{
+                productId: productId,
+                quantity: parseInt(quantity)
+            }];
+
+            $('#orderItems').val(JSON.stringify(orderItems));
+
+            // 폼 제출
+            $('#hidden-order-form').submit();
+        });
+
+        $('.add-to-cart').click(function () {
+            var productId = $(this).attr('id'); // 클릭된 버튼의 ID를 가져옴
+            $.ajax({
+                url: '/cart/cart-item',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId: Number(productId),
+                    quantity: 2 // 수량을 2로 설정
+                }),
+                success: function (response) {
+                    // 요청이 성공하면 페이지 새로고침
+                    if (response.data?.message) {
+                        alert(response.data.message);
+                    }
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error: ' + error);
+                }
+            });
+        });
+    });
+
+
+</script>
+</body>
+</html>

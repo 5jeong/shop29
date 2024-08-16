@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Page</title>
+    <link rel="stylesheet" th:href="@{/css/order/styles.css}"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="breadcrumb">
+        <nav class="breadcrumb-nav">
+            <span class="breadcrumb-item">01 SHOPPING BAG</span>
+            <span class="breadcrumb-divider">&gt;</span>
+            <span class="breadcrumb-item"><strong>02 ORDER</strong></span>
+            <span class="breadcrumb-divider">&gt;</span>
+            <span class="breadcrumb-item">03 ORDER CONFIRMED</span>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="inner-container">
+            <div class="order-info">
+                <div class="order-header">
+                    <h2>배송 정보</h2>
+                    <div>
+                        기본 배송지
+                        <input class="checkbox" type="checkbox" id="default-shipping"
+                               th:if="${order?.shippingAddress != null}"
+                               th:data-recipient-name="${order.shippingAddress.recipientName}"
+                               th:data-address="${order.shippingAddress.address}"
+                               th:data-address-detail="${order.shippingAddress.addressDetail}"
+                               th:data-contact="${order.shippingAddress.contact}"
+                               th:data-sub-contact="${order.shippingAddress.subContact}"
+                               th:data-delivery-note="${order.shippingAddress.deliveryNote}"
+                               checked/>
+                    </div>
+                </div>
+                <div class="shipping-form">
+                    <div class="form-group">
+                        <label for="recipient">수령인<span class="required">*</span></label>
+                        <input type="text" id="recipient" name="recipient" required/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shipping-address">배송지<span class="required">*</span></label>
+                        <input type="text" id="shipping-address" name="shippingAddress" placeholder="우편번호 검색" required/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="detail-address">상세주소<span class="required">*</span></label>
+                        <input type="text" id="detail-address" name="detailAddress"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone1">연락처1<span class="required">*</span></label>
+                        <input type="text" id="phone1" name="phone1" placeholder=" - "/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone2">연락처2</label>
+                        <input type="text" id="phone2" name="phone2" placeholder=" - "/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shipping-memo">배송시 요청사항을 선택해주세요</label>
+                        <select id="shipping-memo" name="shippingMemo">
+                            <option value="option1">싫어요</option>
+                            <option value="option1">옵션 1</option>
+                            <option value="option2">옵션 2</option>
+                            <option value="option3">옵션 3</option>
+                            <option value="option4">옵션 4</option>
+                        </select>
+                    </div>
+                    <div class="order-footer">
+                        <div>
+                            기본 배송지로 저장
+                            <input class="checkbox" type="checkbox" id="set-default-shipping" checked/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.size(order.currentItemsData) > 0}" th:each="item : ${order.currentItemsData}"
+                 th:data-id="${item.productId}"
+                 th:data-price="${item.price}"
+                 class="product-info">
+                <div class="product">
+                    <img
+                            src="https://placehold.co/100x100"
+                            alt="Product image of striped bedding set"
+                    />
+                    <div class="product-details">
+                        <p class="product-name" th:text="${item.productName}">
+                            [침대패드] 시원스쿨 쿨매트와 사이좋게 여름차렵이불(SS/Q/K)
+                            10종
+                        </p>
+                        <p class="product-options">
+                            옵션: [패턴01] 스위트멜로디 [사이즈:SS]
+                        </p>
+                        <p class="product-price" th:text="${item.price} + '원 / 수량 ' + ${item.quantity}">
+                            39,900원 / 수량 1개
+                            <!--                            <span class="discount-price">쿠폰적용가: 35,910원</span>-->
+                        </p>
+                        <!--                        <p class="coupon-discount">-->
+                        <!--                            장바구니 쿠폰-->
+                        <!--                            <span class="coupon-green">GREEN 할인 10% 할인 쿠폰</span>-->
+                        <!--                        </p>-->
+                        <!--                        <p class="coupon-amount">-3,990원</p>-->
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-method">
+                <h2>결제방법</h2>
+                <div class="payment-options">
+                    <div class="payment-methods">
+                        <!--                        <button type="button"><span>무통장입금</span></button>-->
+                        <label>
+                            <input type="radio" id="kakaoPay" >
+                        </label>
+                        <button type="button" class="btn-pay-ready">
+                            <img alt="카카오페이" th:src="@{/images/payment-kakao.png}" src="/images/payment-kakao.png"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-info">
+            <h2>결제금액</h2>
+            <ul class="price-details">
+                <li>총 상품 금액 <span class="total-product-price">39,900원</span></li>
+                <li>배송비 <span class="shipping-cost">+4,000원</span></li>
+                <li>쿠폰 할인 금액 <span class="coupon-discount">-3,990원</span></li>
+                <li>마일리지 사용 <span class="mileage-used">0P</span></li>
+                <li>총 결제 금액 <span class="total-price">39,910원</span></li>
+            </ul>
+
+            <div class="agree-checkboxes">
+                <label><input type="checkbox" required/> (필수) 개인정보 수집/이용 동의 보기</label>
+                <label><input type="checkbox" required/> (필수) 개인정보 제3자 제공 동의 보기</label>
+                <label><input type="checkbox" required/> (필수) 결제대행 서비스 이용약관 보기</label>
+            </div>
+
+            <button class="checkout-btn" type="button" th:data-value="${isLogin}">CHECK OUT</button>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Calculate the total price based on the price * quantity of each item
+        function calculateTotalPrice() {
+            let totalPrice = 0;
+
+            // Loop through each product-info div and calculate the sum
+            $('.product-info').each(function () {
+                const price = parseFloat($(this).data('price'));
+                const quantity = parseInt($(this).find('.product-price').text().match(/수량 (\d+)/)[1]);
+
+                totalPrice += price * quantity;
+            });
+
+            return totalPrice;
+        }
+
+        // Display the calculated total price in the payment-info section
+        function updateTotalPrice() {
+            const totalProductPrice = calculateTotalPrice();
+            const shippingCost = 4000; // Assuming shipping cost is fixed
+            const couponDiscount = 3990; // Assuming coupon discount is fixed
+            const mileageUsed = 0; // Assuming mileage used is fixed
+
+
+            const finalPrice = totalProductPrice + shippingCost - couponDiscount - mileageUsed;
+
+            $('.total-product-price').text(totalProductPrice.toLocaleString('ko-KR') + '원');
+            $('.shipping-cost').text(shippingCost.toLocaleString('ko-KR') + '원');
+            $('.coupon-discount').text(couponDiscount.toLocaleString('ko-KR') + '원');
+            $('.mileage-used').text(mileageUsed.toLocaleString('ko-KR') + 'P');
+            $('.total-price').text(finalPrice.toLocaleString('ko-KR') + '원');
+        }
+
+        // Initial call to update the total price on page load
+        updateTotalPrice();
+
+        // Page load behavior for default shipping address
+        const defaultShippingCheckbox = $('#default-shipping');
+        if (defaultShippingCheckbox.is(':checked') && defaultShippingCheckbox.data('recipient-name')) {
+            const recipientName = defaultShippingCheckbox.data('recipient-name');
+            const address = defaultShippingCheckbox.data('address');
+            const addressDetail = defaultShippingCheckbox.data('address-detail');
+            const contact = defaultShippingCheckbox.data('contact');
+            const subContact = defaultShippingCheckbox.data('sub-contact');
+
+            // Fill form fields with data
+            $('#recipient').val(recipientName);
+            $('#shipping-address').val(address);
+            $('#detail-address').val(addressDetail);
+            $('#phone1').val(contact);
+            $('#phone2').val(subContact);
+        }
+
+        const setDefaultShipping = $('#set-default-shipping')
+
+        // Update form fields when default shipping checkbox changes
+        defaultShippingCheckbox.on('change', function () {
+            if ($(this).is(':checked') && $(this).data('recipient-name')) {
+                const recipientName = $(this).data('recipient-name');
+                const address = $(this).data('address');
+                const addressDetail = $(this).data('address-detail');
+                const contact = $(this).data('contact');
+                const subContact = $(this).data('sub-contact');
+
+                $('#recipient').val(recipientName);
+                $('#shipping-address').val(address);
+                $('#detail-address').val(addressDetail);
+                $('#phone1').val(contact);
+                $('#phone2').val(subContact);
+            }
+        });
+
+        // Checkout button click event
+        $('.checkout-btn').on('click', function (event) {
+            event.preventDefault();
+
+            const kakaoPayCheckbox = $('#kakaoPay');
+            if (!kakaoPayCheckbox.is(':checked')) {
+                alert("결제방법을 선택해주세요.");
+                return;
+            }
+
+            const totalPriceText = $('.total-price').text();
+            const totalPriceNumber = parseInt(totalPriceText.replace(/[^0-9]/g, ''), 10);
+            const recipient = $('#recipient').val().trim();
+            const shippingAddress = $('#shipping-address').val().trim();
+            const detailAddress = $('#detail-address').val().trim();
+            const phone1 = $('#phone1').val().trim();
+            const phone2 = $('#phone2').val().trim();
+
+            if (!recipient || !shippingAddress || !detailAddress || !phone1) {
+                alert('모든 필수 정보를 입력해주세요.');
+                return;
+            }
+
+            // Check if all required checkboxes are checked
+            let allAgreed = true;
+            $('input[type="checkbox"]:required').each(function () {
+                if (!$(this).is(':checked')) {
+                    allAgreed = false;
+                    return false; // Stop loop
+                }
+            });
+
+            if (!allAgreed) {
+                alert('모든 필수 동의 항목에 동의해주세요.');
+                return;
+            }
+
+            // Prepare the orderCompletedRequestDTO data
+            const orderCompletedRequestDTO = {
+                orderItems: [],
+                totalPrice: totalPriceNumber,
+                shippingAddress: {
+                    recipientName: recipient,
+                    address: shippingAddress,
+                    addressDetail: detailAddress,
+                    contact: phone1,
+                    subContact: phone2,
+                    deliveryNote: $('#shipping-memo option:selected').text(),
+                    isDefault: setDefaultShipping.is(':checked') ? 1 : 0
+                }
+            };
+
+            // Loop through each product-info div and add to orderItems
+            $('.product-info').each(function () {
+                const item = {
+                    productId: $(this).data('id'),
+                    productName: $(this).find('.product-name').text().trim(),
+                    quantity: parseInt($(this).find('.product-price').text().match(/수량 (\d+)/)[1]),
+                    price: parseFloat($(this).data('price')),
+                    saleRatio: 0 // Assuming saleRatio is 0 or you can calculate it based on your requirements
+                };
+                orderCompletedRequestDTO.orderItems.push(item);
+            });
+
+            // Send the POST request
+            $.ajax({
+                url: '/order/pay/ready',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(orderCompletedRequestDTO),
+                success: function (response) {
+                    location.href = response.next_redirect_pc_url;
+                },
+                error: function (xhr, status, error) {
+                    const errorResponse = xhr.responseJSON || JSON.parse(xhr.responseText);
+                    if (errorResponse && errorResponse.redirectUrl) {
+                        window.location.href = errorResponse.redirectUrl;
+                    } else {
+                        console.error('Error:', error);
+                        // 필요한 경우 추가적인 오류 처리
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
