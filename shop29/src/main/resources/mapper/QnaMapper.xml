@@ -17,15 +17,15 @@
             `updated_id` -- 수정자 ID
         )
         VALUES(
-            #{userId},
-            #{qnaTypeId},
-            #{title},
-            #{content},
-            #{orderId},
-            #{productId},
-            #{userId},
-            #{userId}
-        );
+                  #{userId},
+                  #{qnaTypeId},
+                  #{title},
+                  #{content},
+                  #{orderId},
+                  #{productId},
+                  #{userId},
+                  #{userId}
+              );
     </insert>
 
     <!-- READ -->
@@ -76,7 +76,7 @@
         <result column="pqt_updated_time" property="updatedTime"/>
     </resultMap>
 
-    <resultMap id="userMap" type="com.toy2.shop29.qna.domain.UserForQnaDto">
+    <resultMap id="userMap" type="com.toy2.shop29.users.domain.UserDto">
         <id column="u_user_id" property="userId"/>
         <result column="u_user_name" property="userName"/>
         <result column="u_user_role" property="userRole"/>
@@ -100,7 +100,8 @@
 
     <resultMap id="attachmentMap" type="com.toy2.shop29.qna.domain.AttachmentDto">
         <id column="a_attachment_id" property="attachmentId"/>
-        <result column="a_qna_id" property="qnaId"/>
+        <result column="a_table_id" property="tableId"/>
+        <result column="a_table_name" property="tableName"/>
         <result column="a_file_name" property="fileName"/>
         <result column="a_file_path" property="filePath"/>
         <result column="a_width" property="width"/>
@@ -116,105 +117,106 @@
 
     <select id="selectAllWith" parameterType="map" resultMap="qnaMap">
         SELECT
-            -- Qna, QnaType
-            qqt.*,
+        -- Qna, QnaType
+        qqt.*,
 
-            -- QnaAnswer
-            qa.qna_answer_id AS qa_qna_answer_id,
-            qa.admin_id AS qa_admin_id,
-            qa.qna_id AS qa_qna_id,
-            qa.content AS qa_content,
-            qa.is_deleted AS qa_is_deleted,
-            qa.deleted_time AS qa_deleted_time,
-            qa.deleted_id AS qa_deleted_id,
-            qa.created_id AS qa_created_id,
-            qa.created_time AS qa_created_time,
-            qa.updated_id AS qa_updated_id,
-            qa.updated_time AS qa_updated_time,
+        -- QnaAnswer
+        qa.qna_answer_id AS qa_qna_answer_id,
+        qa.admin_id AS qa_admin_id,
+        qa.qna_id AS qa_qna_id,
+        qa.content AS qa_content,
+        qa.is_deleted AS qa_is_deleted,
+        qa.deleted_time AS qa_deleted_time,
+        qa.deleted_id AS qa_deleted_id,
+        qa.created_id AS qa_created_id,
+        qa.created_time AS qa_created_time,
+        qa.updated_id AS qa_updated_id,
+        qa.updated_time AS qa_updated_time,
 
-            -- Attachment
-            a.attachment_id AS a_attachment_id,
-            a.qna_id AS a_qna_id,
-            a.file_name AS a_file_name,
-            a.file_path AS a_file_path,
-            a.width AS a_width,
-            a.height AS a_height,
-            a.size AS a_size,
-            a.extension AS a_extension,
-            a.is_active AS a_is_active,
-            a.created_id AS a_created_id,
-            a.created_time AS a_created_time,
-            a.updated_id AS a_updated_id,
-            a.updated_time AS a_updated_time
+        -- Attachment
+        a.attachment_id AS a_attachment_id,
+        a.table_id AS a_table_id,
+        a.table_name AS a_table_name,
+        a.file_name AS a_file_name,
+        a.file_path AS a_file_path,
+        a.width AS a_width,
+        a.height AS a_height,
+        a.size AS a_size,
+        a.extension AS a_extension,
+        a.is_active AS a_is_active,
+        a.created_id AS a_created_id,
+        a.created_time AS a_created_time,
+        a.updated_id AS a_updated_id,
+        a.updated_time AS a_updated_time
         FROM
-            (
-                SELECT
-                    -- Qna
-                    q.*,
-                    -- QnaType
-                    qt.qna_type_id as qt_qna_type_id,
-                    qt.parent_qna_type_id as qt_parent_qna_type_id,
-                    qt.name as qt_name,
-                    qt.description as qt_description,
-                    qt.is_order_id_active as qt_is_order_id_active,
-                    qt.is_product_id_active as qt_is_product_id_active,
-                    qt.is_active as qt_is_active,
-                    qt.created_id as qt_created_id,
-                    qt.created_time as qt_created_time,
-                    qt.updated_id as qt_updated_id,
-                    qt.updated_time as qt_updated_time
-                FROM `Qna` AS q
-                JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
-                <if test="isActive != null">
-                JOIN `ParentQnaType` AS pqt ON qt.parent_qna_type_id = pqt.parent_qna_type_id
-                </if>
-                WHERE q.is_deleted = false AND q.user_id = #{userId}
-                <if test="isActive != null">
-                    AND qt.is_active = #{isActive}
-                    AND pqt.is_active = #{isActive}
-                </if>
-                LIMIT #{offset} , #{limit}
+        (
+        SELECT
+        -- Qna
+        q.*,
+        -- QnaType
+        qt.qna_type_id as qt_qna_type_id,
+        qt.parent_qna_type_id as qt_parent_qna_type_id,
+        qt.name as qt_name,
+        qt.description as qt_description,
+        qt.is_order_id_active as qt_is_order_id_active,
+        qt.is_product_id_active as qt_is_product_id_active,
+        qt.is_active as qt_is_active,
+        qt.created_id as qt_created_id,
+        qt.created_time as qt_created_time,
+        qt.updated_id as qt_updated_id,
+        qt.updated_time as qt_updated_time
+        FROM `Qna` AS q
+        JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
+        <if test="isActive != null">
+            JOIN `ParentQnaType` AS pqt ON qt.parent_qna_type_id = pqt.parent_qna_type_id
+        </if>
+        WHERE q.is_deleted = false AND q.user_id = #{userId}
+        <if test="isActive != null">
+            AND qt.is_active = #{isActive}
+            AND pqt.is_active = #{isActive}
+        </if>
+        ORDER BY q.created_time DESC
+        LIMIT #{offset} , #{limit}
         )  AS qqt
         LEFT JOIN `QnaAnswer` AS qa ON qqt.qna_id = qa.qna_id
-        LEFT JOIN `Attachment` AS a ON qqt.qna_id = a.qna_id
-        WHERE  a.is_active = true
-        ORDER BY qqt.created_time DESC
+        -- 1:1문의의 첨부파일인 경우의 레코드만 가져오기 위해, 서브쿼리 사용
+        LEFT JOIN (SELECT * FROM `Attachment` WHERE `table_name` = 'qna') AS a ON qqt.qna_id = a.table_id
     </select>
 
     <select id="selectAllWithFilter" parameterType="map" resultMap="qnaMap">
         SELECT
-            -- Qna
-            q.*,
-            -- QnaType
-            qt.qna_type_id as qt_qna_type_id,
-            qt.parent_qna_type_id as qt_parent_qna_type_id,
-            qt.name as qt_name,
-            qt.description as qt_description,
-            qt.is_order_id_active as qt_is_order_id_active,
-            qt.is_product_id_active as qt_is_product_id_active,
-            qt.is_active as qt_is_active,
-            qt.created_id as qt_created_id,
-            qt.created_time as qt_created_time,
-            qt.updated_id as qt_updated_id,
-            qt.updated_time as qt_updated_time,
-            -- User
-            u.user_id as u_user_id,
-            u.user_name as u_user_name,
-            u.user_role as u_user_role,
-            u.phone_number as u_phone_number,
-            u.email as u_email,
-            -- QnaAnswer
-            qa.qna_answer_id AS qa_qna_answer_id,
-            qa.admin_id AS qa_admin_id,
-            qa.qna_id AS qa_qna_id,
-            qa.content AS qa_content,
-            qa.is_deleted AS qa_is_deleted,
-            qa.deleted_time AS qa_deleted_time,
-            qa.deleted_id AS qa_deleted_id,
-            qa.created_id AS qa_created_id,
-            qa.created_time AS qa_created_time,
-            qa.updated_id AS qa_updated_id,
-            qa.updated_time AS qa_updated_time
+        -- Qna
+        q.*,
+        -- QnaType
+        qt.qna_type_id as qt_qna_type_id,
+        qt.parent_qna_type_id as qt_parent_qna_type_id,
+        qt.name as qt_name,
+        qt.description as qt_description,
+        qt.is_order_id_active as qt_is_order_id_active,
+        qt.is_product_id_active as qt_is_product_id_active,
+        qt.is_active as qt_is_active,
+        qt.created_id as qt_created_id,
+        qt.created_time as qt_created_time,
+        qt.updated_id as qt_updated_id,
+        qt.updated_time as qt_updated_time,
+        -- User
+        u.user_id as u_user_id,
+        u.user_name as u_user_name,
+        u.user_role as u_user_role,
+        u.phone_number as u_phone_number,
+        u.email as u_email,
+        -- QnaAnswer
+        qa.qna_answer_id AS qa_qna_answer_id,
+        qa.admin_id AS qa_admin_id,
+        qa.qna_id AS qa_qna_id,
+        qa.content AS qa_content,
+        qa.is_deleted AS qa_is_deleted,
+        qa.deleted_time AS qa_deleted_time,
+        qa.deleted_id AS qa_deleted_id,
+        qa.created_id AS qa_created_id,
+        qa.created_time AS qa_created_time,
+        qa.updated_id AS qa_updated_id,
+        qa.updated_time AS qa_updated_time
         FROM `Qna` AS q
         JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
         JOIN `User` AS u ON q.user_id = u.user_id
@@ -287,7 +289,8 @@
             qa.updated_time AS qa_updated_time,
             -- Attachment
             a.attachment_id AS a_attachment_id,
-            a.qna_id AS a_qna_id,
+            a.table_id AS a_table_id,
+            a.table_name AS a_table_name,
             a.file_name AS a_file_name,
             a.file_path AS a_file_path,
             a.width AS a_width,
@@ -300,23 +303,37 @@
             a.updated_id AS a_updated_id,
             a.updated_time AS a_updated_time
         FROM `Qna` AS q
-        JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
-        JOIN `ParentQnaType` AS pqt ON qt.parent_qna_type_id = pqt.parent_qna_type_id
-        JOIN `User` AS u ON q.user_id = u.user_id
-        LEFT JOIN `QnaAnswer` AS qa ON q.qna_id = qa.qna_id
-        LEFT JOIN `Attachment` AS a ON q.qna_id = a.qna_id
+                 JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
+                 JOIN `ParentQnaType` AS pqt ON qt.parent_qna_type_id = pqt.parent_qna_type_id
+                 JOIN `User` AS u ON q.user_id = u.user_id
+                 LEFT JOIN `QnaAnswer` AS qa ON q.qna_id = qa.qna_id
+            -- 1:1문의의 첨부파일인 경우의 레코드만 가져오기 위해, 서브쿼리 사용
+                 LEFT JOIN (SELECT * FROM `Attachment` WHERE `table_name` = 'qna') AS a ON q.qna_id = a.table_id
         WHERE q.qna_id = #{qnaId}
-            AND q.is_deleted = false
+          AND q.is_deleted = false
     </select>
 
     <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaDto">
         SELECT
-            *
+        *
         FROM `Qna`
         WHERE `qna_id` = #{qnaId}
         <if test="isDeleted != null">
             AND `is_deleted` = #{isDeleted}
         </if>
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM `Qna`
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM `Qna`
+        WHERE `user_id` = #{userId}
     </select>
 
     <!-- UPDATE -->

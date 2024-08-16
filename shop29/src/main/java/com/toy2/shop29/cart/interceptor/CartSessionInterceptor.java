@@ -43,7 +43,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
         try {
             HttpSession session = request.getSession(true);
             // TODO : 임시아이디
-            session.setAttribute("loginUser", "user001");
+            // session.setAttribute("loginUser", "user001");
 
             String userId = (String) session.getAttribute("loginUser");
             String guestId = null;
@@ -53,13 +53,13 @@ public class CartSessionInterceptor implements HandlerInterceptor {
                 for (Cookie cookie : request.getCookies()) {
                     if ("guestId".equals(cookie.getName())) {
                         guestId = cookie.getValue();
-                        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                        cookie.setMaxAge(60 * 60 * 24 * 7); // 쿠키 유효 기간: 7일
                         cookie.setHttpOnly(true); // XSS 공격 방지
                         cookie.setPath("/"); // 쿠키의 적용 경로 설정 (전체 사이트에 적용)
                         response.addCookie(cookie); // 브라우저에 쿠키 저장
 
                         // 쿠키의 유효기간을 초기화하여 연장
-                        cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                        cookie.setMaxAge(60 * 60 * 24 * 7); // 쿠키 유효 기간: 7일
                         response.addCookie(cookie); // 쿠키를 다시 설정하여 유효기간 연장
                         break;
                     }
@@ -69,7 +69,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
             if (userId == null && guestId == null) {
                 String uniqueId = generateId();
                 Cookie cookie = new Cookie("guestId", uniqueId);
-                cookie.setMaxAge(60 * 60 * 24); // 쿠키 유효 기간: 1일
+                cookie.setMaxAge(60 * 60 * 24 * 7); // 쿠키 유효 기간: 7일
                 cookie.setHttpOnly(true); // XSS 공격 방지
                 cookie.setPath("/"); // 쿠키의 적용 경로 설정 (전체 사이트에 적용)
                 response.addCookie(cookie); // 브라우저에 쿠키 저장

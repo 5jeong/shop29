@@ -4,23 +4,28 @@
 
 <mapper namespace="com.toy2.shop29.product.dao.MiddleCategoryMapper">
 
+    <!-- 모든 중분류 가져오기 -->
     <select id="selectAll" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
         SELECT * FROM middlecategory
     </select>
 
+    <!-- Id로 하나의 중분류만 가져오기 -->
     <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
         SELECT * FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
     </select>
 
+    <!-- 대분류Id에 맞는 중분류 모두 가져오기 -->
     <select id="selectByMajorCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
         SELECT * FROM middlecategory WHERE major_category_id = #{majorCategoryId}
     </select>
 
+    <!-- 중분류 추가하기 -->
     <insert id="insert" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
         INSERT INTO middlecategory (major_category_id, middle_category_name, created_id, created_date, updated_id, updated_date)
         VALUES (#{majorCategoryId}, #{middleCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
     </insert>
 
+    <!-- Id로 하나의 중분류 내용 수정하기 -->
     <update id="update" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
         UPDATE middlecategory
         SET middle_category_name = #{middleCategoryName},
@@ -29,14 +34,9 @@
         WHERE middle_category_id = #{middleCategoryId}
     </update>
 
+    <!-- Id로 하나의 중분류 삭제하기 -->
     <delete id="delete" parameterType="int">
         DELETE FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
     </delete>
-
-    <select id="selectByNameAndMajorId" parameterType="map" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
-        SELECT * FROM middlecategory WHERE middle_category_name = #{middleCategoryName} AND major_category_id = #{majorCategoryId}
-    </select>
-
-
 
 </mapper>

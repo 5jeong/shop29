@@ -2,6 +2,8 @@ package com.toy2.shop29.qna.repository;
 
 import com.toy2.shop29.qna.domain.ParentQnaTypeDto;
 import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
+import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,10 +56,9 @@ public class ParentQnaTypeDaoTest {
 
     @Autowired
     private ParentQnaTypeDao parentQnaTypeDao;
+    @Autowired
+    private UserMapper userMapper;
 
-    /**
-        "admin" : User 테이블 內 고정 데이터
-     */
     private String userId = "admin";
 
 
@@ -66,6 +67,22 @@ public class ParentQnaTypeDaoTest {
     void deleteAll(){
         parentQnaTypeDao.deleteAll();
         assertTrue(parentQnaTypeDao.count() == 0);
+
+        userMapper.deleteUser(userId);
+        UserRegisterDto userRegisterDto = new UserRegisterDto();
+        userRegisterDto.setUserId(userId);
+        userRegisterDto.setEmail("testuser@example.com");
+        userRegisterDto.setPassword("password123");
+        userRegisterDto.setUserName("손흥민");
+        userRegisterDto.setPostalCode("12345");
+        userRegisterDto.setAddressLine1("경기 화성시");
+        userRegisterDto.setAddressLine2("201호");
+        userRegisterDto.setAddressReference("");
+        userRegisterDto.setPhoneNumber("010-1234-9999");
+        userRegisterDto.setGender(1); // 1은 남자
+        userRegisterDto.setBirthDate("1990-02-12");
+        assertTrue(userMapper.insertUser(userRegisterDto) == 1);
+
     }
 
 

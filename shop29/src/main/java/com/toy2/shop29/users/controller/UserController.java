@@ -54,24 +54,30 @@ public class UserController {
 
 
     @GetMapping("/update")
-    public String updateUser(Model model, @SessionAttribute(name = "loginUser", required = false) UserDto loginUser) {
-        if (loginUser == null) {
-            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-        }
-        model.addAttribute("loginUser", loginUser);
+    public String updateUser(Model model, @SessionAttribute(name = "loginUser", required = false) String userId) {
+//        if (loginUser == null) {
+//            return "redirect:/login"; // 로그인 페이지로 리다이렉트
+//        }
+        UserDto user = userService.findById(userId);
+        model.addAttribute("loginUser", user);
         return "user/editUserForm"; // 수정 폼 페이지로 이동
     }
 
 
     @PostMapping("/update")
-    public String updateUser(@Validated() @ModelAttribute(name = "loginUser") UserUpdateDto userUpdateDto,
+    public String updateUser(@Validated() @ModelAttribute(name = "userUpdateDto") UserUpdateDto userUpdateDto,
                              BindingResult bindingResult,
-                             @SessionAttribute(name = "loginUser", required = false) UserDto loginUser) {
+                             @SessionAttribute(name = "loginUser", required = false) String userId) {
         if (bindingResult.hasErrors()) {
-            log.info("회원가입 에러 : {}", bindingResult);
+            log.info("회원 수정에러 : {}", bindingResult);
             return "user/editUserForm";
         }
+
+        UserDto loginUser = userService.findById(userId);
+
         userService.updateUser(loginUser.getUserId(), userUpdateDto);
+
+//        userService.updateUser(userId, userUpdateDto);
         return "redirect:/";
     }
 

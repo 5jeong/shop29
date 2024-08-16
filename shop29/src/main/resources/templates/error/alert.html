@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        let msg = "[[${msg}]]";
+
+        const messages = {
+            "LOGIN_ERR": "로그인 후 이용 가능합니다.",
+            "ORDER_ERR": "주문 중 오류가 발생했습니다. 다시 시도해 주세요.",
+        };
+
+        if (messages[msg]) {
+            alert(messages[msg]);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

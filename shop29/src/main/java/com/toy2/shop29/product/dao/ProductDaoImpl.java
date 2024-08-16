@@ -1,6 +1,8 @@
 package com.toy2.shop29.product.dao;
 
 import com.toy2.shop29.product.domain.ProductDto;
+import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.ProductWithMiddleSmallDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -66,8 +68,8 @@ public class ProductDaoImpl implements ProductDao {
 
     //페이징
     @Override
-    public List<ProductDto> selectPage(Map map) {
-        return session.selectList(namespace+"selectPage", map);
+    public List<ProductDto> selectPage(Map<String, Object> paramMap) {
+        return session.selectList(namespace+"selectPage", paramMap);
     }
 
 //    public int increaseResultCnt(SearchCondition sc){
@@ -139,17 +141,20 @@ public class ProductDaoImpl implements ProductDao {
 
 
 
+    //상품Dto에 상품 카테고리 모두 넣어서 반환(상품상세)
+    @Override
+    public ProductWithCategoriesDto selectProductWithCategories(int productId) {
+        return session.selectOne(namespace + "selectProductWithCategories", productId);
+    }
 
 
+
+    //중분류에 해당하는 상품 count
     @Override
     public int countMiddleCategory(int middleCategoryId) {
         return session.selectOne(namespace + "countMiddleCategory", middleCategoryId);
     }
 
-    @Override
-    public List<ProductDto> selectPageByMiddleCategory(Map<String, Object> map) {
-        return session.selectList(namespace + "selectPageByCategory", map);
-    }
 
 
 

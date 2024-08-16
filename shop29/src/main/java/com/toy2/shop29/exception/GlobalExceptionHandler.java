@@ -1,5 +1,10 @@
 package com.toy2.shop29.exception;
 
+import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
+import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
+import com.toy2.shop29.users.exception.loginException.UserNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -8,7 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -34,5 +41,16 @@ public class GlobalExceptionHandler {
         mav.addObject("error", "HTTP 메서드가 지원되지 않습니다.");
         mav.addObject("message", ex.getMessage());
         return mav;
+    }
+
+    @ExceptionHandler({UserNotFoundException.class, UserAccountLockedException.class, IncorrectPasswordException.class})
+    public String handleLoginExceptions(RuntimeException ex, RedirectAttributes rttr, Model model,
+                                        HttpServletRequest request) {
+        // 예외 메시지를 모델에 추가하여 뷰에 전달
+
+        rttr.addFlashAttribute("loginError", ex.getMessage());
+        rttr.addFlashAttribute("loginForm", request.getAttribute("loginForm"));
+        log.error("[exceptionHandler] ex : ", request.getAttribute("loginForm"));
+        return "redirect:/login";
     }
 }

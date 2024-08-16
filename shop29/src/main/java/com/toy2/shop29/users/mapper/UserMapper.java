@@ -6,6 +6,8 @@ import com.toy2.shop29.users.domain.UserUpdateDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Map;
+
 @Mapper
 public interface UserMapper {
     // id로 회원 조회
@@ -41,5 +43,7 @@ public interface UserMapper {
     // 비밀번호 변경
     int updatePassword(@Param("userId") String userId, @Param("tempPassword") String tempPassword);
 
+    // 테스트용 메서드 - 작성자 : 김정민(24.08.16)
+    int updateUserRoleForTest(Map<String,Object> map);
 }
 

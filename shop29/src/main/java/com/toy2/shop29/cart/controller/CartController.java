@@ -125,7 +125,7 @@ public class CartController {
 
         String userInfo = getUserInfo(userId, guestId);
         Map<String, String> response = new HashMap<>();
-        
+
         try {
             cartService.updateProductQuantity(userInfo, orderCountRequestDto.getProduct_id(), orderCountRequestDto.getQuantity());
             response.put("status", "success");
@@ -143,8 +143,8 @@ public class CartController {
      * 장바구니 상품 삭제
      *
      * @param deleteRequest 상품 id 리스트
-     * @param userId  로그인 유저 uid
-     * @param guestId 비로그인 유저 id
+     * @param userId        로그인 유저 uid
+     * @param guestId       비로그인 유저 id
      * @return 성공 실패
      * @throws Exception .
      */

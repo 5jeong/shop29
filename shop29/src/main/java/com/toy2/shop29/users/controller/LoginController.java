@@ -41,7 +41,7 @@ public class LoginController {
         log.info("login : {}", loginUser);
 
         HttpSession session = request.getSession();
-        session.setAttribute("loginUser", loginUser);
+        session.setAttribute("loginUser", loginUser.getUserId());
         return "redirect:" + redirectURI;
     }
 
