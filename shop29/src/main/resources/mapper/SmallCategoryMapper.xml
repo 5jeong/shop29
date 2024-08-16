@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.SmallCategoryMapper">
+
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        SELECT * FROM smallcategory
+    </select>
+
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        SELECT * FROM smallcategory WHERE small_category_id = #{smallCategoryId}
+    </select>
+
+    <select id="selectByMiddleCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        SELECT * FROM smallcategory WHERE middle_category_id = #{middleCategoryId}
+    </select>
+
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        INSERT INTO smallcategory (middle_category_id, small_category_name, created_id, created_date, updated_id, updated_date)
+        VALUES (#{middleCategoryId}, #{smallCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
+    </insert>
+
+    <update id="update" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
+        UPDATE smallcategory
+        SET small_category_name = #{smallCategoryName},
+            updated_id = #{updatedId},
+            updated_date = #{updatedDate}
+        WHERE small_category_id = #{smallCategoryId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM smallcategory WHERE small_category_id = #{smallCategoryId}
+    </delete>
+
+    <!-- 소분류Id가 포함된 중분류Id 가져오기 -->
+    <select id="MiddleIdBySmallId" parameterType="int" resultType="int">
+        SELECT *
+        FROM smallcategory
+            WHERE
+    </select>
+
+
+
+</mapper>
