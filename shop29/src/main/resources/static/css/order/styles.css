@@ -39,7 +39,7 @@ input {
 .main-content {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 40px;
+    margin-bottom: 100px;
 }
 
 .order-info,
@@ -212,7 +212,7 @@ h2 {
     border: 1px solid #eee;
     padding: 20px;
     border-radius: 5px;
-    margin: 20px 0px;
+    margin: 10px 0px;
 }
 
 .coupon-info h2,
@@ -375,7 +375,6 @@ h2 {
 .payment-methods {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
 }
 
 .payment-methods button {
@@ -399,28 +398,41 @@ h2 {
 .payment-methods {
     position: relative;
     flex-shrink: 0;
-    box-sizing: border-box;
+    /*box-sizing: border-box;*/
     width: 100%;
+    display: flex;
+    align-items: center;
+
+    input {
+        width: 20px;
+        height: 20px;
+    }
 
     & > button {
-        border-width: 1px;
-        border-style: solid;
-        border-image: initial;
-        -webkit-box-pack: center;
-        justify-content: center;
-        cursor: pointer;
-        margin: 0px;
-        position: relative;
-        min-width: 84px;
-        height: 44px;
-        min-height: 44px;
-        flex: initial;
-        border-radius: 4px;
-        display: flex;
-        gap: 3px;
-        -webkit-box-align: center;
-        align-items: center;
-        width: 100%;
+        border: none;
+        background: none;
+        /*border-width: 1px;*/
+        /*border-style: solid;*/
+        /*border-image: initial;*/
+        /*-webkit-box-pack: center;*/
+        /*justify-content: center;*/
+        /*cursor: pointer;*/
+        /*margin: 0px;*/
+        /*position: relative;*/
+        /*min-width: 84px;*/
+        /*height: 44px;*/
+        /*min-height: 44px;*/
+        /*flex: initial;*/
+        /*border-radius: 4px;*/
+        /*display: flex;*/
+        /*gap: 3px;*/
+        /*-webkit-box-align: center;*/
+        /*align-items: center;*/
+        /*width: 100%;*/
+
+        & > img {
+            width: 80px;
+        }
 
         & > span {
             white-space: nowrap;

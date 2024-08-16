@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.toy2.shop29.order.dao.OrderDaoMapper">
     <!--    주문 처리-->
-
+<!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--주문 처리 모든 내역 조회-->
     <select id="getCurrentOrderLists" resultType="com.toy2.shop29.order.domain.CurrentOrderDTO">
         SELECT *
@@ -22,6 +22,19 @@
         FROM CurrentOrderItem
     </select>
 
+    <!--주문 내역 모든 내역 조회-->
+    <select id="countOrderHistory" resultType="int">
+        SELECT count(*)
+        FROM OrderHistory
+    </select>
+
+    <!--주문 내역 상품 모든 내역 조회-->
+    <select id="countOrderHistoryItem" resultType="int">
+        SELECT count(*)
+        FROM OrderHistoryItem
+    </select>
+
+
     <!--유저 주문 처리 상품 내역 조회-->
     <select id="countUserCurrentOrderItemById" resultType="int">
         SELECT count(*)
@@ -33,14 +46,14 @@
     <select id="countUserCurrentOrderById" resultType="int">
         SELECT count(*)
         FROM CurrentOrder
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
     </select>
 
     <!--    주문 처리 내역 유저별 조회-->
     <select id="getCurrentOrderById" resultType="com.toy2.shop29.order.domain.CurrentOrderDTO">
         SELECT *
         FROM CurrentOrder
-        WHERE user_id = #{user_id}
+        WHERE user_id = #{userId}
     </select>
 
     <!--    주문 처리 생성-->
@@ -65,6 +78,14 @@
              CurrentOrder ON CurrentOrderItem.order_id = CurrentOrder.order_id
         WHERE CurrentOrder.user_id = #{userId};
     </select>
+
+    <!--    상품 조회-->
+    <select id="countProduct" parameterType="long" resultType="long">
+        SELECT count(*)
+        FROM Product
+        WHERE product_id = #{productId};
+    </select>
+
 
     <!--    상품 가격 조회-->
     <select id="getProductPrice" parameterType="long" resultType="long">
@@ -102,6 +123,18 @@
         WHERE order_id IN (SELECT order_id FROM CurrentOrder WHERE user_id = #{userId})
     </delete>
 
+    <!--주문 처리 아이템 전체 삭제-->
+    <delete id="deleteAllOrderHistory">
+        DELETE
+        FROM OrderHistory;
+    </delete>
+
+    <!--주문 처리 아이템 전체 삭제-->
+    <delete id="deleteAllOrderHistoryItem">
+        DELETE
+        FROM OrderHistoryItem;
+    </delete>
+
     <!--    주문 완료 시 주문 처리 삭제-->
     <delete id="deleteCurrentOrder">
         DELETE
@@ -133,12 +166,19 @@
     <delete id="deletePayFailedOrderHistoryItem" parameterType="map">
         DELETE
         FROM OrderHistoryItem
-        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE tid = #{tid} AND user_id = #{userId})
+        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </delete>
 
+<!--    해당 유저의 하나의 주문내역 상품 개수 조회-->
     <select id="countUserOrderHistoryItem" parameterType="map" resultType="int">
         SELECT count(*)
-        FROM OrderAddress
+        FROM OrderHistoryItem
+        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
+    </select>
+
+    <select id="selectUserOrderHistoryItem" parameterType="map" resultType="com.toy2.shop29.order.domain.OrderItemDTO">
+        SELECT *
+        FROM OrderHistoryItem
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
@@ -156,14 +196,8 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
-    <!-- 특정 사용자 ID와 기본 배송지 여부로 조회하는 쿼리 -->
-    <!--    <select id="selectDefaultShippingAddressByUserId" resultType="com.toy2.shop29.order.domain.ShippingAddressInfoDTO">-->
-    <!--        SELECT *-->
-    <!--        FROM ShippingAddress-->
-    <!--        WHERE user_id = #{userId} AND is_default = 1-->
-    <!--    </select>-->
-
     <!--    주문 내역-->
+    <!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--    주문내역 생성-->
     <insert id="insertOrderHistory">
         INSERT INTO OrderHistory (order_id, user_id, tid, total_price)
@@ -283,7 +317,9 @@
                  LEFT JOIN orderaddress oa ON oh.order_id = oa.order_id
         WHERE oh.user_id = #{userId}
           AND length(oh.order_status) >= 1
+        ORDER BY oh.order_time DESC
     </select>
+
 
 
     <resultMap id="OrderHistoryResultMap" type="com.toy2.shop29.order.domain.response.OrderHistoryDTO">

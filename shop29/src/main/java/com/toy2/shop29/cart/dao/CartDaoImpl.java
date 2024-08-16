@@ -46,7 +46,7 @@ public class CartDaoImpl implements CartDao {
 
     @Override
     public CartDto searchProductIdByUserIdAndProductId(String userId, Long productId) throws Exception {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
 
@@ -55,7 +55,7 @@ public class CartDaoImpl implements CartDao {
 
     @Override
     public int insertUserCartProduct(String userId, Long productId, Long quantity) throws Exception {
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
         map.put("quantity", quantity);
@@ -70,7 +70,7 @@ public class CartDaoImpl implements CartDao {
 
     @Override
     public int updateUserCartProductQuantity(String userId, Long productId, Long quantity) throws Exception {
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
         map.put("quantity", quantity);
@@ -80,7 +80,7 @@ public class CartDaoImpl implements CartDao {
 
     @Override
     public int deleteUserCartProduct(String userId, Long productId) throws Exception {
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
         return session.delete(namespace + "deleteUserCartProduct", map);
@@ -105,4 +105,5 @@ public class CartDaoImpl implements CartDao {
     public int countCartItem() throws Exception {
         return session.selectOne(namespace + "countCartItem");
     }
+
 }
