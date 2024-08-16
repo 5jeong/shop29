@@ -9,10 +9,14 @@
 <h1>공지사항 작성</h1>
 <div class="form-container">
   <form action="/board/write" method="post">
+
     <label for="title">제목:</label>
     <input type="text" id="title" name="noticeTitle" required>
+
     <label for="content">내용:</label>
     <textarea id="content" name="noticeContent" rows="10" required></textarea>
+
+
     <button type="submit">작성 완료</button>
   </form>
 </div>
