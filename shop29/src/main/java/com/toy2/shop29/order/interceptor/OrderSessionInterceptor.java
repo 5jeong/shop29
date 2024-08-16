@@ -22,6 +22,10 @@ public class OrderSessionInterceptor implements HandlerInterceptor {
         String userId = (String) session.getAttribute("loginUser");
         String tid = (String) session.getAttribute("tid");
 
+        if (userId == null) {
+            response.sendRedirect("/");
+        }
+
         if (tid != null) {
             orderService.deleteOrderHistory(userId, tid);
             session.removeAttribute("tid");
