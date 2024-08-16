@@ -104,18 +104,18 @@ public class ProductController {
                     list = productService.sortedByRating(paramMap);
                     break;
                 default: //기본 정렬
-                    list = productService.getPage(paramMap);
+                    list = productService.getPageByMiddleCategory(paramMap);
                     break;
             }
 
-            //여기가 단순히 모든 middleCategory가 아닌 내가 선택한 middleCategory와 majorCategory가 같은 middleCategory들만 넘겨줘야함
-            List<MiddleCategoryDto> middleCategories = categoryService.getRelatedMiddleCategories(middleCategoryId);
+//            //여기가 단순히 모든 middleCategory가 아닌 내가 선택한 middleCategory와 majorCategory가 같은 middleCategory들만 넘겨줘야함
+//            List<MiddleCategoryDto> middleCategories = categoryService.getRelatedMiddleCategories(middleCategoryId);
 
 
             model.addAttribute("list",list);
             model.addAttribute("pageHandler",pageHandler);
             model.addAttribute("sortOption", sortOption);
-            model.addAttribute("middleCategories", middleCategories);
+//            model.addAttribute("middleCategories", middleCategories);
 
 
 

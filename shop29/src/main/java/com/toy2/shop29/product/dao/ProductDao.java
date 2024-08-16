@@ -29,7 +29,7 @@ public interface ProductDao {
     int count();
 
     //페이징
-    List<ProductDto> selectPage(Map map);
+    List<ProductDto> selectPage(Map<String, Object> paramMap);
 
     //소분류Id에 맞는 상품 조회
     List<ProductDto> selectProductByCategory(int smallCategoryId);

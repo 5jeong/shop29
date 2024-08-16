@@ -19,16 +19,16 @@
     </ul>
 </div>
 
-<!-- 중분류 선택 필터 -->
-<div id="middle category filters">
-    <h2>Categories</h2>
-    <ul>
-        <li th:each="middleCategory : ${middleCategories}">
-            <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
-               th:text="${middleCategory.middleCategoryName}">중분류 이름</a>
-        </li>
-    </ul>
-</div>
+<!--&lt;!&ndash; 중분류 선택 필터 &ndash;&gt;-->
+<!--<div id="middle category filters">-->
+<!--    <h2>Categories</h2>-->
+<!--    <ul>-->
+<!--        <li th:each="middleCategory : ${middleCategories}">-->
+<!--            <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"-->
+<!--               th:text="${middleCategory.middleCategoryName}">중분류 이름</a>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</div>-->
 
 <!-- 정렬 옵션 버튼 -->
 <div id="sort-option-filters">

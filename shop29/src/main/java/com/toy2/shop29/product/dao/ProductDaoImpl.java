@@ -68,8 +68,8 @@ public class ProductDaoImpl implements ProductDao {
 
     //페이징
     @Override
-    public List<ProductDto> selectPage(Map map) {
-        return session.selectList(namespace+"selectPage", map);
+    public List<ProductDto> selectPage(Map<String, Object> paramMap) {
+        return session.selectList(namespace+"selectPage", paramMap);
     }
 
 //    public int increaseResultCnt(SearchCondition sc){

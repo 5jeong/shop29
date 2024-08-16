@@ -183,13 +183,15 @@ public class CategoryDaoImpl implements CategoryDao {
     }
 
     @Override
+
+
     public MiddleCategoryDto findMiddleCategoryById(int middleCategoryId) {
-        return session.selectOne(namespace + ".findMiddleCategoryById", middleCategoryId);
+        return session.selectOne(namespace + "findMiddleCategoryById", middleCategoryId);
     }
 
     @Override
     public List<MiddleCategoryDto> findMiddleCategoriesByMajorCategoryId(int majorCategoryId) {
-        return session.selectList(namespace + ".findMiddleCategoriesByMajorCategoryId", majorCategoryId);
+        return session.selectList(namespace + "findMiddleCategoriesByMajorCategoryId", majorCategoryId);
     }
 
 
