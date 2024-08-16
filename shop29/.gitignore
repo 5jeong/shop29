@@ -35,7 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
-
 ### MAC ###
 .DS_STOREapplication.properties
 application.properties
+/src/main/resources/application.properties

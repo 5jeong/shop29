@@ -26,7 +26,7 @@ public class PageHandler {
         this.pageSize = pageSize;
 
         totalPage = (int)Math.ceil(totalCnt/(double)pageSize);
-        int halfNavi = naviSize/2;
+        int halfNavi = naviSize/2; //2
         this.beginPage = (page <= halfNavi) ? 1 : page - halfNavi;
         if( this.beginPage + naviSize -1 > totalPage) {
             this.beginPage = Math.max(1, totalPage - naviSize +1);
