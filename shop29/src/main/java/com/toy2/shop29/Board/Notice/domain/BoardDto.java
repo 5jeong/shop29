@@ -17,7 +17,6 @@ public class BoardDto {
     private Integer noticeId;
     private String noticeTitle;
     private String noticeContent;
-    private Integer noticeNumber=0;
     private String noticeCreatorId;
     private String noticeModifierId;
     private Date noticeCreationTime;

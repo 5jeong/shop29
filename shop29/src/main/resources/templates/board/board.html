@@ -6,14 +6,17 @@
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-<h1 th:text="${board.getNoticeTitle()}">공지사항 제목</h1>
-<p th:text="${board.getNoticeCreatorId()}">작성 날짜</p>
-<div th:text="${board.getNoticeContent()}">공지사항 내용</div>
+<h1 th:text="${board.noticeTitle}">공지사항 제목</h1>
+<p th:text="${board.noticeCreatorId}">작성 날짜</p>
+<div th:text="${board.noticeContent}">공지사항 내용</div>
 
 <a href="/board/list">목록으로 돌아가기</a>
-
-<a th:href="@{/board/edit(noticeId=${board.noticeId})}">수정</a>
-
+<form th:action="@{/board/edit}" method="get">
+<!-- 수정 버튼 클릭 시 자바스크립트 함수 호출 -->
+  <input type="hidden" name="noticeId" th:value="${board.noticeId}">
+  <input type="submit" value="수정"></input>
+</form>
+<!-- 삭제 폼 -->
 <form th:action="@{/board/delete}" method="post" style="display:inline;">
   <input type="hidden" name="noticeId" th:value="${board.noticeId}">
   <input type="hidden" name="noticeCreatorId" th:value="${board.noticeCreatorId}">
