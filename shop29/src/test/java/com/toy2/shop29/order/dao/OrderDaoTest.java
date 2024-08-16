@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class OrderDaoTest {
 
     @Autowired
-    private OrderDaoImpl orderDao;
+    private OrderDao orderDao;
 
     @BeforeEach
     void setUp() throws Exception {
