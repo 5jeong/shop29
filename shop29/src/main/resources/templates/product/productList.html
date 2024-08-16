@@ -7,38 +7,48 @@
 </head>
 <body>
 
+<!-- 기본 상단 -->
 <div id="menu">
     <ul>
-        <li id="logo">fastcampus</li>
+        <li id="logo">29CM SHOP</li>
         <li><a th:href="@{/}">Home</a></li>
-        <li><a th:href="@{/board/list}">Board</a></li>
+        <li><a th:href="@{/product/list}">Board</a></li>
         <li><a th:href="@{/login/login}">Login</a></li>
         <li><a th:href="@{/register/add}">Sign in</a></li>
         <li><a href=""><i class="fas fa-search small"></i></a></li>
     </ul>
 </div>
 
-<!--<div th:if="${middleCategoryId}">-->
-<!--    <p>Showing products for middle category ID: <span th:text="${middleCategoryId}"></span></p>-->
-<!--</div>-->
-
-<!-- 정렬 옵션 버튼들 -->
-<div style="text-align:right; margin-right: 10px;">
-    <a th:href="@{/product/list(sortOption='priceDesc')}" class="btn">높은 가격순</a>
-    <a th:href="@{/product/list(sortOption='priceAsc')}" class="btn">낮은 가격순</a>
-    <a th:href="@{/product/list(sortOption='rating')}" class="btn">별점 높은순</a>
-    <a th:href="@{/product/list(sortOption='newest')}" class="btn">신규순</a>
-    <a th:href="@{/product/list(sortOption='highDiscount')}" class="btn">할인율 높은순</a>
+<!-- 중분류 선택 필터 -->
+<div id="middle category filters">
+    <h2>Categories</h2>
+    <ul>
+        <li th:each="middleCategory : ${middleCategories}">
+            <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
+               th:text="${middleCategory.middleCategoryName}">중분류 이름</a>
+        </li>
+    </ul>
 </div>
 
+<!-- 정렬 옵션 버튼 -->
+<div id="sort-option-filters">
+    <h2>Sort by</h2>
+    <ul>
+        <li><a th:href="@{/product/list(sortOption='priceDesc', middleCategoryId=${middleCategoryId})}">Price: High to Low</a></li>
+        <li><a th:href="@{/product/list(sortOption='priceAsc', middleCategoryId=${middleCategoryId})}">Price: Low to High</a></li>
+        <li><a th:href="@{/product/list(sortOption='rating', middleCategoryId=${middleCategoryId})}">Rating</a></li>
+        <li><a th:href="@{/product/list(sortOption='newest', middleCategoryId=${middleCategoryId})}">Newest</a></li>
+        <li><a th:href="@{/product/list(sortOption='highDiscount', middleCategoryId=${middleCategoryId})}">Discount</a></li>
+    </ul>
+</div>
 
-
-<div style="text-align:center">
+<!-- 게시물 -->
+<div id="product-list" style="text-align:center">
     <table border="1">
         <thead>
         <tr>
             <td>번호</td>
-            <!-- <td>상품이미지</td>-->
+            <!-- <td>상품이미지 필요</td>-->
             <td>상품이름</td>
             <td>브랜드</td>
             <td>할인율</td>
@@ -47,50 +57,39 @@
             <td>별점</td>
         </tr>
         </thead>
+
         <tbody>
-        <tr th:each="productDto, status: ${list}">
-            <td th:text="${status.index+1}"></td>
+        <tr th:each="productDto, status : ${list}">
+            <td th:text="${status.index + 1}"></td>
             <!-- 이미지컬럼 fk로 받는거 필요할듯 -->
-            <td><a th:href="@{/product/{productId}(productId=${productDto.getProductId()})}" th:text="${productDto.getProductName()}"></a></td>
-            <td th:text="${productDto.getBrandId()}"></td>
-            <td th:text="${productDto.getSaleRatio()}"></td>
-            <td th:text="${productDto.getPrice()}"></td>
+            <td><a th:href="@{/product/{productId}(productId=${productDto.productId})}" th:text="${productDto.productName}"></a></td>
+            <td th:text="${productDto.brandId}"></td>
+            <td th:text="${productDto.saleRatio}"></td>
+            <td th:text="${productDto.price}"></td>
             <!-- 할인율과 정가로 할인가 계산 -->
-            <td th:text="${#numbers.formatDecimal(productDto.getPrice() * (1 - productDto.getSaleRatio() / 100), 1, 2)}"></td>
-            <td th:text="${productDto.getRating()}"></td>
+            <td th:text="${#numbers.formatDecimal(productDto.price * (1 - productDto.saleRatio / 100), 1, 2)}"></td>
+            <td th:text="${productDto.rating}"></td>
         </tr>
         </tbody>
     </table>
 </div>
 
-
+<!--&lt;!&ndash; 네비게이션 &ndash;&gt;-->
 <!--<div>-->
+<!--    &lt;!&ndash; 완전 첫페이지 링크 &ndash;&gt;-->
+<!--    <a th:text="1" th:href="@{/product/list(page=1, pageSize=${pageHandler.pageSize})}"></a>-->
+
 <!--    &lt;!&ndash; 이전 페이지 링크 &ndash;&gt;-->
-<!--    <a th:if="${pageHandler.showPrev}" th:href="@{/product/board(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize})}">&lt;</a>-->
+<!--    <a th:if="${pageHandler != null and pageHandler.showPrev}" th:href="@{/product/list(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize})}">&lt;</a>-->
 
 <!--    &lt;!&ndash; 페이지 번호 링크 &ndash;&gt;-->
 <!--    <a th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"-->
-<!--       th:href="@{/product/board(page=${i}, pageSize=${pageHandler.pageSize})}"-->
+<!--       th:href="@{/product/list(page=${i}, pageSize=${pageHandler.pageSize})}"-->
 <!--       th:text="${i}"></a>-->
 
 <!--    &lt;!&ndash; 다음 페이지 링크 &ndash;&gt;-->
-<!--    <a th:if="${pageHandler.showNext}" th:href="@{/product/board(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize})}">&gt;</a>-->
+<!--    <a th:if="${pageHandler != null and pageHandler.showNext}" th:href="@{/product/list(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize})}">&gt;</a>-->
 <!--</div>-->
-
-
-<div>
-    <!-- 이전 페이지 링크 -->
-    <a th:if="${pageHandler != null and pageHandler.showPrev}" th:href="@{/product/board(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize})}">&lt;</a>
-
-    <!-- 페이지 번호 링크 -->
-    <a th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"
-       th:href="@{/product/list(page=${i}, pageSize=${pageHandler.pageSize})}"
-       th:text="${i}"></a>
-
-    <!-- 다음 페이지 링크 -->
-    <a th:if="${pageHandler != null and pageHandler.showNext}" th:href="@{/product/board(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize})}">&gt;</a>
-</div>
-
 
 </body>
 </html>

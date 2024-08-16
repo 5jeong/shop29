@@ -3,6 +3,8 @@ package com.toy2.shop29.product.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Setter
 @Getter
 public class CategoryDto {
@@ -10,6 +12,7 @@ public class CategoryDto {
     private MajorCategoryDto majorCategory;
     private MiddleCategoryDto middleCategory;
     private SmallCategoryDto smallCategory;
+
 
 
     public CategoryDto() {

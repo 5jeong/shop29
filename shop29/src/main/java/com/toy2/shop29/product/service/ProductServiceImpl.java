@@ -122,17 +122,17 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-//    @Override
-//    //특정 중분류에 해당하는 모든 제품 개수 세기
-//    public int getCountByMiddleCategory(Integer middleCategoryId) {
-//        return productDao.countMiddleCategory(middleCategoryId);
-//    }
-//
-//    @Override
-//    //특정 중분류에 해당하는 모든 상품 페이징
-//    public List<ProductDto> getPageByMiddleCategory(Map<String, Object> map) {
-//        return productDao.selectPageByMiddleCategory(map);
-//    }
+    @Override
+    //특정 중분류에 해당하는 모든 제품 개수 세기
+    public int getCountByMiddleCategory(Integer middleCategoryId) {
+        return productDao.countMiddleCategory(middleCategoryId);
+    }
+
+    @Override
+    //특정 중분류에 해당하는 모든 상품 페이징
+    public List<ProductDto> getPageByMiddleCategory(Map<String, Object> map) {
+        return productDao.selectPageByMiddleCategory(map);
+    }
 
 
 

@@ -1,10 +1,13 @@
 package com.toy2.shop29.product.controller;
 
+import com.toy2.shop29.product.domain.MiddleCategoryDto;
 import com.toy2.shop29.product.domain.PageHandler;
 import com.toy2.shop29.product.domain.ProductDto;
 import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
+import com.toy2.shop29.product.service.CategoryService;
 import com.toy2.shop29.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +25,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private CategoryService categoryService;
 
 
 
@@ -52,6 +58,7 @@ public class ProductController {
     public String list(@RequestParam(name = "page", required = false) Integer page,
                        @RequestParam(name = "pageSize", required = false) Integer pageSize,
                        @RequestParam(name = "sortOption", required = false, defaultValue = "") String sortOption,  // 정렬 옵션
+                       @RequestParam(name = "middleCategoryId", required = false) Integer middleCategoryId,
                        Model model){
 
         //레퍼런스페이지 기준 pageSize 50
@@ -61,8 +68,8 @@ public class ProductController {
 
 
         try{
-            //전체 상품 개수 가져오기
-            int totalCnt = productService.getCount();
+            //중분류에 해당하는 모든 product 가져오기
+            int totalCnt = productService.getCountByMiddleCategory(middleCategoryId);
 
             //pageHandler에 계산된 totalCnt와 param으로 가져온 page,Pasize보내기
             PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
@@ -70,13 +77,14 @@ public class ProductController {
             //sort된 상품 리스트를 담을 list
             List<ProductDto> list;
 
-            //페이징을 할때 사용할 offset과 pageSize 정보를 map에 저장
+            //페이징을 할때 사용할 offset과 pageSize, middleCategory 정보를 map에 저장
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("offset", ((page-1)*pageSize));
             paramMap.put("pageSize", pageSize);
+            paramMap.put("middleCategoryId", middleCategoryId);
 
 
-            // param으로 받은 정렬옵션에 따른 상품 목록(list)을 switch로 조절
+            //RequestParam으로 받은 정렬옵션에 따른 상품 목록(list)을 switch로 조절
             //switch문을 service단으로 옮기기
 //            list = productService.sort(sortOption,paramMap); <<
             switch (sortOption) {
@@ -100,11 +108,14 @@ public class ProductController {
                     break;
             }
 
+            //여기가 단순히 모든 middleCategory가 아닌 내가 선택한 middleCategory와 majorCategory가 같은 middleCategory들만 넘겨줘야함
+            List<MiddleCategoryDto> middleCategories = categoryService.getRelatedMiddleCategories(middleCategoryId);
 
 
             model.addAttribute("list",list);
             model.addAttribute("pageHandler",pageHandler);
             model.addAttribute("sortOption", sortOption);
+            model.addAttribute("middleCategories", middleCategories);
 
 
 

@@ -55,11 +55,12 @@ public interface ProductService {
     //상품에 해당하는 모든 카테고리 가져오기
     ProductWithCategoriesDto getProductWithCategories(int productId);
 
-//    //특정 중분류에 해당하는 모든 제품 개수 세기
-//    int getCountByMiddleCategory(Integer middleCategoryId);
-//
-//    //특정 중분류에 해당하는 모든 상품 페이징
-//    List<ProductDto> getPageByMiddleCategory(Map<String, Object> map);
+    //특정 중분류에 해당하는 모든 제품 개수 세기
+    int getCountByMiddleCategory(Integer middleCategoryId);
+
+    //특정 중분류에 해당하는 모든 상품 페이징
+    List<ProductDto> getPageByMiddleCategory(Map<String, Object> map);
+
 
 
 

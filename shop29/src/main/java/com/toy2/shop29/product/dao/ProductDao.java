@@ -31,7 +31,7 @@ public interface ProductDao {
     //페이징
     List<ProductDto> selectPage(Map map);
 
-    //특정 카테고리 상품 조회
+    //소분류Id에 맞는 상품 조회
     List<ProductDto> selectProductByCategory(int smallCategoryId);
 
     //특정 브랜드 상품 조회
@@ -57,14 +57,13 @@ public interface ProductDao {
     List<ProductDto> SortedByRating(Map<String, Object> paramMap);
 
 
-    int countMiddleCategory(int middleCategoryId);
-
-
-
-    List<ProductDto> selectPageByMiddleCategory(Map<String,Object> map);
-
     //제품ID로 상품의 분류 정보까지 조회
     ProductWithCategoriesDto selectProductWithCategories(int productId);
+
+
+
+    int countMiddleCategory(int middleCategoryId);
+
 
 
 }

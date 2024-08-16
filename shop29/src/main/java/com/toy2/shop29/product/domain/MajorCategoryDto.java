@@ -10,7 +10,7 @@ import java.util.Date;
 public class MajorCategoryDto {
     private int majorCategoryId;
     private String majorCategoryName;
-    private Date createdCate;
+    private Date createdDate;
     private String createdId;
     private Date updatedDate;
     private String updatedId;

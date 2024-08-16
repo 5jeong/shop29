@@ -17,12 +17,35 @@ public class CategoryDaoImpl implements CategoryDao {
 
     String namespace = "com.toy2.shop29.product.dao.CategoryMapper.";
 
-//
-//    //모든 Major카테고리들 List로 가져오기
-//    @Override
-//    public List<MajorCategoryDto> findAllMajorCategories(){
-//        return session.selectList(namespace+"findAllMajorCategories");
-//    }
+
+
+
+
+
+
+
+    @Override
+    public List<MiddleCategoryDto> findAllMiddleCategories() {
+        return session.selectList(namespace + "findAllMiddleCategories");
+    }
+
+
+
+
+    //모든 Major카테고리들 List로 가져오기
+    @Override
+    public List<MajorCategoryDto> findAllMajorCategories(){
+        return session.selectList(namespace+"findAllMajorCategories");
+    }
+
+
+    // 대분류, 중분류, 소분류 전체 가져오기
+    @Override
+    public List<CategoryDto> findAllCategories() {
+        return session.selectList(namespace + "findAllCategories");
+    }
+
+
 //
 //    //특정 MajorId에 해당하는 모든 Middle카테고리를 List로 가져오기
 //    @Override
@@ -36,22 +59,17 @@ public class CategoryDaoImpl implements CategoryDao {
 //        return session.selectList(namespace + "findSmallCategoriesByMiddleId", middleCategoryId);
 //    }
 //
-//    // 대분류, 중분류, 소분류 상관없이 모든 카테고리 가져오기
-//    @Override
-//    public List<CategoryDto> findAllCategories() {
-//        return session.selectList(namespace + "findAllCategories");
-//    }
-//
+
 //    //소분류Id에 속한 모든 상품 가져오기
 //    @Override
 //    public List<ProductDto> findProductsBySmallId(int smallCategoryId){
 //        return session.selectList(namespace + "findProductsBySmallId", smallCategoryId);
 //    }
 //
-//    @Override
-//    public List<CategoryDto> findMajorMiddle(){
-//        return session.selectList(namespace + "findMajorMiddle");
-//    }
+    @Override
+    public List<CategoryDto> findMajorMiddle(){
+        return session.selectList(namespace + "findMajorMiddle");
+    }
 
 
     //select - 1 by categoryDto
@@ -157,6 +175,25 @@ public class CategoryDaoImpl implements CategoryDao {
 //    @Override
 //    public int countCategories() {
 //        return session.selectOne(namespace + "countCategory");
+
+
+    @Override
+    public int countMiddleCategory(int middleCategoryId) {
+        return session.selectOne(namespace + "countMiddleCategory", middleCategoryId);
+    }
+
+    @Override
+    public MiddleCategoryDto findMiddleCategoryById(int middleCategoryId) {
+        return session.selectOne(namespace + ".findMiddleCategoryById", middleCategoryId);
+    }
+
+    @Override
+    public List<MiddleCategoryDto> findMiddleCategoriesByMajorCategoryId(int majorCategoryId) {
+        return session.selectList(namespace + ".findMiddleCategoriesByMajorCategoryId", majorCategoryId);
+    }
+
+
+
     }
 
 

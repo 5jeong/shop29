@@ -46,6 +46,22 @@
     </select>
 
 
+    <!-- 대분류, 중분류, 소분류 함께 가져오기 -->
+    <select id="findAllCategories" resultMap="CategoryHierarchyResultMap">
+        SELECT
+            mc.major_category_id,
+            mc.major_category_name,
+            midc.middle_category_id,
+            midc.middle_category_name,
+            sc.small_category_id,
+            sc.small_category_name
+        FROM
+            majorcategory mc
+                LEFT JOIN middlecategory midc ON mc.major_category_id = midc.major_category_id
+                LEFT JOIN smallcategory sc ON midc.middle_category_id = sc.middle_category_id
+    </select>
+
+
 
 
 
@@ -115,19 +131,19 @@
 
 
 
+    <select id="getCountByMiddleCategory" resultType="int">
+        SELECT COUNT(*)
+        FROM products
+        WHERE middle_category_id = #{middleCategoryId}
+    </select>
 
 
 
-
-
-
-
-
-
-
-
-
-
+    <!-- 중분류만 가져오기 -->
+    <select id="findAllMiddleCategories" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT middle_category_id, major_category_id, middle_category_name
+        FROM middlecategory
+    </select>
 
 
 
@@ -161,6 +177,33 @@
         JOIN majorcategory as major
         ON middle.major_category_id = major.major_category_id
     </select>
+
+
+
+    <!-- 중분류 ID로 중분류 찾기 -->
+    <select id="findMiddleCategoryById" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT
+            middle_category_id,
+            major_category_id,
+            middle_category_name
+        FROM
+            middle_category
+        WHERE
+            middle_category_id = #{middleCategoryId}
+    </select>
+
+    <!-- 대분류 ID로 중분류들 찾기 -->
+    <select id="findMiddleCategoriesByMajorCategoryId" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+        SELECT
+            middle_category_id,
+            major_category_id,
+            middle_category_name
+        FROM
+            middle_category
+        WHERE
+            major_category_id = #{majorCategoryId}
+    </select>
+
 
 
 

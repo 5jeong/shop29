@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop Main Page</title>
+</head>
+<body>
+
+<div id="menu">
+    <ul>
+        <li id="logo">MyShop</li>
+        <li><a th:href="@{/}">Home</a></li>
+        <!-- Major Category를 반복하여 출력 -->
+        <li th:each="majorCategory : ${majorToMiddleMap.keySet()}">
+            <span th:text="${majorCategory.majorCategoryName}">Major Category Name</span>
+            <!-- 해당 Major Category에 속한 Middle Category들을 반복하여 출력 -->
+            <ul>
+                <li th:each="middleCategory : ${majorToMiddleMap.get(majorCategory)}">
+                    <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
+                       th:text="${middleCategory.middleCategoryName}">Middle Category Name</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Shop Main Page</title>-->
+<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
+<!--</head>-->
+<!--<body>-->
+
+<!--&lt;!&ndash; 대분류 카테고리 나열 &ndash;&gt;-->
+<!--<div id="menu">-->
+<!--    <ul>-->
+<!--        <li id="logo">MyShop</li>-->
+<!--        <li><a th:href="@{/}">Home</a></li>-->
+<!--        &lt;!&ndash; MajorCategories를 사용해서 대분류 출력 &ndash;&gt;-->
+<!--        <li th:each="majorCategory : ${majorcategories}">-->
+<!--            <a th:href="@{/product/list(majorId=${majorCategory.majorCategoryId})}"-->
+<!--               th:text="${majorCategory.majorCategoryName}">Category Name</a>-->
+<!--        </li>-->
+<!--    </ul>-->
+<!--</div>-->
+
+
+
+<!--<div id="content">-->
+<!--    <h1>Welcome to MyShop</h1>-->
+<!--    <div class="categories">-->
+<!--        &lt;!&ndash; 중분류 리스트를 위한 div &ndash;&gt;-->
+<!--        <div id="middle-category-list"></div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    $(document).ready(function() {-->
+<!--        // MajorCategory 클릭 시 이벤트 처리-->
+<!--        $('.major-category').on('click', function(e) {-->
+<!--            e.preventDefault(); // 기본 링크 클릭 동작을 막음-->
+
+<!--            var majorId = $(this).data('major-id');-->
+
+<!--            // 중분류 리스트 초기화-->
+<!--            $('#middle-category-list').empty();-->
+
+<!--            // majormiddle 데이터에서 해당 대분류에 맞는 중분류를 찾기-->
+<!--            var majormiddle = /*[[${majormiddle}]]*/ [];-->
+
+<!--            var middleCategories = majormiddle.filter(function(category) {-->
+<!--                return category.majorCategory.majorCategoryId == majorId;-->
+<!--            });-->
+
+<!--            // 중분류 리스트 생성-->
+<!--            if (middleCategories.length > 0) {-->
+<!--                var ul = $('<ul></ul>');-->
+
+<!--                middleCategories.forEach(function(category) {-->
+<!--                    var li = $('<li></li>');-->
+<!--                    var a = $('<a></a>')-->
+<!--                        .attr('href', '/product/list?middleCategoryId=' + category.middleCategory.middleCategoryId)-->
+<!--                        .text(category.middleCategory.middleCategoryName);-->
+
+<!--                    li.append(a);-->
+<!--                    ul.append(li);-->
+<!--                });-->
+
+<!--                $('#middle-category-list').append(ul);-->
+<!--            } else {-->
+<!--                $('#middle-category-list').text('No subcategories available.');-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+
+
+
+
+<!--&lt;!&ndash;&lt;!&ndash; 대분류에 해당하는 중분류리스트 &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;<div id="content">&ndash;&gt;-->
+<!--&lt;!&ndash;    <h1>Welcome to MyShop</h1>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="categories">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="category" th:each="category : ${categories}">&ndash;&gt;-->
+<!--&lt;!&ndash;            &lt;!&ndash; 대분류 표시 &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            <h2 th:text="${category.majorCategory.majorCategoryName}">MajorCategory Name</h2>&ndash;&gt;-->
+<!--&lt;!&ndash;            <ul>&ndash;&gt;-->
+<!--&lt;!&ndash;                &lt;!&ndash; 중분류 표시 &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <li th:each="middleCategory : ${category.middleCategory}">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"&ndash;&gt;-->
+<!--&lt;!&ndash;                       th:text="${middleCategory.middleCategoryName}">MiddleCategory Name</a>&ndash;&gt;-->
+<!--&lt;!&ndash;                </li>&ndash;&gt;-->
+<!--&lt;!&ndash;            </ul>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+
+
+
+
+<!--</body>-->
+<!--</html>-->
