@@ -1,15 +1,13 @@
 package com.toy2.shop29.users.exceptionHandler;
 
-import com.toy2.shop29.users.domain.LoginFormDto;
-import com.toy2.shop29.users.exception.IncorrectPasswordException;
-import com.toy2.shop29.users.exception.UserAccountLockedException;
-import com.toy2.shop29.users.exception.UserNotFoundException;
+import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
+import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
+import com.toy2.shop29.users.exception.loginException.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Slf4j
 @ControllerAdvice("com.toy2.shop29.users.controller")

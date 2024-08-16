@@ -1,4 +1,4 @@
-package com.example.yourproject.exception;
+package com.toy2.shop29.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
