@@ -19,16 +19,16 @@
             `updated_id` -- 수정자 ID
         )
         VALUES(
-            #{qnaTypeId},
-            #{parentQnaTypeId},
-            #{name},
-            #{description},
-            #{isOrderIdActive},
-            #{isProductIdActive},
-            #{isActive},
-            #{createdId},
-            #{updatedId}
-        );
+                  #{qnaTypeId},
+                  #{parentQnaTypeId},
+                  #{name},
+                  #{description},
+                  #{isOrderIdActive},
+                  #{isProductIdActive},
+                  #{isActive},
+                  #{createdId},
+                  #{updatedId}
+              );
     </insert>
 
     <resultMap id="qnaTypeMap" type="com.toy2.shop29.qna.domain.QnaTypeDto">
@@ -61,18 +61,18 @@
     <!-- 문의타입 단건 조회 -->
     <select id="select" parameterType="map" resultMap="qnaTypeMap">
         SELECT
-            qt.*
-            <if test="withParent == true">
-                ,
-                pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
-                pqt.`name` AS p_name,
-                pqt.`description` AS p_description,
-                pqt.`is_active` AS p_is_active,
-                pqt.`created_time` AS p_created_time,
-                pqt.`created_id` AS p_created_id,
-                pqt.`updated_time` AS p_updated_time,
-                pqt.`updated_id` AS p_updated_id
-            </if>
+        qt.*
+        <if test="withParent == true">
+            ,
+            pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
+            pqt.`name` AS p_name,
+            pqt.`description` AS p_description,
+            pqt.`is_active` AS p_is_active,
+            pqt.`created_time` AS p_created_time,
+            pqt.`created_id` AS p_created_id,
+            pqt.`updated_time` AS p_updated_time,
+            pqt.`updated_id` AS p_updated_id
+        </if>
         FROM `QnaType` AS qt
         <if test="withParent == true">
             JOIN `ParentQnaType` AS pqt
@@ -91,18 +91,18 @@
     <!-- 문의타입 전체 조회 -->
     <select id="selectAll" resultMap="qnaTypeMap">
         SELECT
-            qt.*
-            <if test="withParent == true">
-                ,
-                pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
-                pqt.`name` AS p_name,
-                pqt.`description` AS p_description,
-                pqt.`is_active` AS p_is_active,
-                pqt.`created_time` AS p_created_time,
-                pqt.`created_id` AS p_created_id,
-                pqt.`updated_time` AS p_updated_time,
-                pqt.`updated_id` AS p_updated_id
-            </if>
+        qt.*
+        <if test="withParent == true">
+            ,
+            pqt.`parent_qna_type_id` AS p_parent_qna_type_id,
+            pqt.`name` AS p_name,
+            pqt.`description` AS p_description,
+            pqt.`is_active` AS p_is_active,
+            pqt.`created_time` AS p_created_time,
+            pqt.`created_id` AS p_created_id,
+            pqt.`updated_time` AS p_updated_time,
+            pqt.`updated_id` AS p_updated_id
+        </if>
         FROM `QnaType` AS qt
         <if test="withParent == true">
             JOIN `ParentQnaType` AS pqt

@@ -12,7 +12,7 @@ public class QnaPagingHandler {
     }
 
     public QnaPagingHandler(int TBC, int SBC, int BPC, int CP){
-        totalBoardCnt = TBC;
+        totalBoardCnt = TBC == 0 ? 1 : TBC;
         showBoardCnt = SBC;
         bottomPageCnt = BPC;
         curPage = CP;
@@ -42,6 +42,14 @@ public class QnaPagingHandler {
 
 
         lastPage = lastPage < lastLastPage ? lastPage : lastLastPage;
+    }
+
+    public int getLimit(){
+        return showBoardCnt;
+    }
+
+    public int getOffset(){
+        return showBoardCnt * (curPage - 1);
     }
 
     private int totalBoardCnt; // 전체 게시글 수

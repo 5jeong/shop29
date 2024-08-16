@@ -77,6 +77,11 @@ public class QnaDaoImpl implements QnaDao{
 //    }
 
     @Override
+    public int countByUserId(String userId) {
+        return session.selectOne(namespace + "countByUserId", userId);
+    }
+
+    @Override
     public int count() {
         return session.selectOne(namespace + "count");
     }

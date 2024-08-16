@@ -1,13 +1,12 @@
 package com.toy2.shop29.qna.repository;
 
-import com.toy2.shop29.qna.domain.AttachmentDto;
-import com.toy2.shop29.qna.domain.ParentQnaTypeDto;
-import com.toy2.shop29.qna.domain.QnaDto;
-import com.toy2.shop29.qna.domain.QnaTypeDto;
+import com.toy2.shop29.qna.domain.*;
 import com.toy2.shop29.qna.repository.attachment.AttachmentDao;
 import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.repository.qnatype.QnaTypeDao;
+import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +31,8 @@ public class AttachmentDaoTest {
     QnaTypeDao qnaTypeDao;
     @Autowired
     QnaDao qnaDao;
+    @Autowired
+    UserMapper userMapper;
 
     private String userId = "admin";
     private ParentQnaTypeDto sampleParentQnaType;
@@ -40,10 +41,26 @@ public class AttachmentDaoTest {
 
     @BeforeEach
     void setUp(){
+        userMapper.deleteUser(userId);
         parentQnaTypeDao.deleteAll();
         qnaTypeDao.deleteAll();
         attachmentDao.deleteAll();
         qnaDao.deleteAll();
+
+        UserRegisterDto userRegisterDto = new UserRegisterDto();
+        userRegisterDto.setUserId(userId);
+        userRegisterDto.setEmail("testuser@example.com");
+        userRegisterDto.setPassword("password123");
+        userRegisterDto.setUserName("손흥민");
+        userRegisterDto.setPostalCode("12345");
+        userRegisterDto.setAddressLine1("경기 화성시");
+        userRegisterDto.setAddressLine2("201호");
+        userRegisterDto.setAddressReference("");
+        userRegisterDto.setPhoneNumber("010-1234-9999");
+        userRegisterDto.setGender(1); // 1은 남자
+        userRegisterDto.setBirthDate("1990-02-12");
+        assertTrue(userMapper.insertUser(userRegisterDto) == 1);
+
 
         sampleParentQnaType = ParentQnaTypeDto.builder()
                 .parentQnaTypeId("parentQnaTypeId")
@@ -80,7 +97,8 @@ public class AttachmentDaoTest {
     void insert_1(){
         // 1단계 데이터 선택
         AttachmentDto dto = AttachmentDto.builder()
-                .qnaId(sampleQna.getQnaId())
+                .tableId(sampleQna.getQnaId())
+                .tableName(AttachmentTableName.QNA)
                 .fileName("fileName")
                 .filePath("filePath")
                 .size(1000)
@@ -107,12 +125,12 @@ public class AttachmentDaoTest {
         int size = 5;
         for(int i = 0; i < size; i++){
             AttachmentDto dto = AttachmentDto.builder()
-                    .qnaId(sampleQna.getQnaId())
+                    .tableId(sampleQna.getQnaId())
+                    .tableName(AttachmentTableName.QNA)
                     .fileName("fileName")
                     .filePath("filePath")
                     .size(1000)
                     .extension("jpg")
-                    .isActive(true)
                     .createdId(userId)
                     .updatedId(userId)
                     .build();
@@ -129,12 +147,41 @@ public class AttachmentDaoTest {
         assertTrue(selectedList.size() == size);
     }
 
+    @DisplayName("첨부파일 이름으로 조회 - 동작 테스트")
+    @Test
+    void seletByFileName(){
+        // 1단계 데이터 선택 - 파일이름이 다른 레코드 2건 추가
+        String[] fileNames = {"fileName1", "fileName2"};
+        for(String fileName : fileNames){
+            AttachmentDto dto = AttachmentDto.builder()
+                    .tableId(sampleQna.getQnaId())
+                    .tableName(AttachmentTableName.QNA)
+                    .fileName(fileName)
+                    .filePath("filePath")
+                    .size(1000)
+                    .extension("jpg")
+                    .isActive(true)
+                    .createdId(userId)
+                    .updatedId(userId)
+                    .build();
+            attachmentDao.insert(dto);
+        }
+
+        // 2단계 데이터 처리
+        AttachmentDto selectedDto = attachmentDao.selectByFileName(fileNames[0]);
+
+        // 3단계 검증
+        assertTrue(selectedDto != null);
+        assertTrue(selectedDto.getFileName().equals(fileNames[0]));
+    }
+
     @DisplayName("첨부파일 수정 동작 테스트")
     @Test
     void update_1(){
         // 1단계 데이터 선택
         AttachmentDto dto = AttachmentDto.builder()
-                .qnaId(sampleQna.getQnaId())
+                .tableId(sampleQna.getQnaId())
+                .tableName(AttachmentTableName.QNA)
                 .fileName("fileName")
                 .filePath("filePath")
                 .size(1000)
@@ -163,9 +210,12 @@ public class AttachmentDaoTest {
         // 1-1. 첨부파일 여러건 추가
         List<AttachmentDto> list = new ArrayList<>();
         int size = 5;
+        // 파일 이름 다르게
+        // select order by 추가 여부 확인 -> select 순서 및 요소 일치여부 확인
         for(int i = 0; i < size; i++){
             AttachmentDto dto = AttachmentDto.builder()
-                    .qnaId(sampleQna.getQnaId())
+                    .tableId(sampleQna.getQnaId())
+                    .tableName(AttachmentTableName.QNA)
                     .fileName("fileName")
                     .filePath("filePath")
                     .size(1000)
