@@ -22,6 +22,19 @@
         FROM CurrentOrderItem
     </select>
 
+    <!--주문 내역 모든 내역 조회-->
+    <select id="countOrderHistory" resultType="int">
+        SELECT count(*)
+        FROM OrderHistory
+    </select>
+
+    <!--주문 내역 상품 모든 내역 조회-->
+    <select id="countOrderHistoryItem" resultType="int">
+        SELECT count(*)
+        FROM OrderHistoryItem
+    </select>
+
+
     <!--유저 주문 처리 상품 내역 조회-->
     <select id="countUserCurrentOrderItemById" resultType="int">
         SELECT count(*)
@@ -108,6 +121,18 @@
         DELETE
         FROM CurrentOrderItem
         WHERE order_id IN (SELECT order_id FROM CurrentOrder WHERE user_id = #{userId})
+    </delete>
+
+    <!--주문 처리 아이템 전체 삭제-->
+    <delete id="deleteAllOrderHistory">
+        DELETE
+        FROM OrderHistory;
+    </delete>
+
+    <!--주문 처리 아이템 전체 삭제-->
+    <delete id="deleteAllOrderHistoryItem">
+        DELETE
+        FROM OrderHistoryItem;
     </delete>
 
     <!--    주문 완료 시 주문 처리 삭제-->

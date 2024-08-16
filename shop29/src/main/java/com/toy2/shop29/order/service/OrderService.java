@@ -59,4 +59,20 @@ public interface OrderService {
     int countUserOrderHistoryItem(String userId, String tid) throws Exception;
 
     List<OrderItemDTO> selectUserOrderHistoryItem (String userId, String tid) throws Exception;
+
+    int deleteAllCurrentOrder() throws Exception;
+
+    int deleteAllCurrentOrderItem() throws Exception;
+
+    int deleteAllOrderHistory() throws Exception;
+
+    int deleteAllOrderHistoryItem() throws Exception;
+
+    int countOrderHistory() throws Exception;
+
+    int countOrderHistoryItem() throws Exception;
+
+    int countCurrentOrder() throws Exception;
+
+    int countCurrentOrderItem() throws Exception;
 }

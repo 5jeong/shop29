@@ -20,6 +20,16 @@ public class OrderDaoImpl implements OrderDao {
     private static String namespace = "com.toy2.shop29.order.dao.OrderDaoMapper.";
 
     @Override
+    public int countOrderHistory() throws Exception {
+        return session.selectOne(namespace + "countOrderHistory");
+    }
+
+    @Override
+    public int countOrderHistoryItem() throws Exception {
+        return session.selectOne(namespace + "countOrderHistoryItem");
+    }
+
+    @Override
     public List<CurrentOrderDTO> getCurrentOrderLists() throws Exception {
         return session.selectList(namespace + "getCurrentOrderLists");
     }
@@ -244,5 +254,15 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public Long countProduct(Long productId) throws Exception {
         return session.selectOne(namespace + "countProduct", productId);
+    }
+
+    @Override
+    public int deleteAllOrderHistory() throws Exception {
+        return session.delete(namespace + "deleteAllOrderHistory");
+    }
+
+    @Override
+    public int deleteAllOrderHistoryItem() throws Exception {
+        return session.delete(namespace + "deleteAllOrderHistoryItem");
     }
 }

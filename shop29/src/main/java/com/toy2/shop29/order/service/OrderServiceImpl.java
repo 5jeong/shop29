@@ -25,6 +25,46 @@ public class OrderServiceImpl implements OrderService {
         this.cartService = cartService;
     }
 
+    @Override
+    public int countCurrentOrder() throws Exception {
+        return orderDao.countCurrentOrder();
+    }
+
+    @Override
+    public int countCurrentOrderItem() throws Exception {
+        return orderDao.countCurrentOrderItem();
+    }
+
+    @Override
+    public int countOrderHistory() throws Exception {
+        return orderDao.countOrderHistory();
+    }
+
+    @Override
+    public int countOrderHistoryItem() throws Exception {
+        return orderDao.countOrderHistoryItem();
+    }
+
+
+    @Override
+    public int deleteAllOrderHistory() throws Exception {
+        return orderDao.deleteAllOrderHistory();
+    }
+
+    @Override
+    public int deleteAllOrderHistoryItem() throws Exception {
+        return orderDao.deleteAllOrderHistoryItem();
+    }
+
+    @Override
+    public int deleteAllCurrentOrderItem() throws Exception {
+        return orderDao.deleteAllCurrentOrderItem();
+    }
+
+    @Override
+    public int deleteAllCurrentOrder() throws Exception {
+        return orderDao.deleteAllCurrentOrder();
+    }
 
     @Override
     public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
