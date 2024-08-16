@@ -6,6 +6,8 @@ import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.repository.qnaasnwer.QnaAnswerDao;
 import com.toy2.shop29.qna.repository.qnatype.QnaTypeDao;
+import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,8 @@ public class QnaDaoTest {
     private QnaAnswerDao qnaAnswerDao;
     @Autowired
     private AttachmentDao attachmentDao;
+    @Autowired
+    private UserMapper userMapper;
 
     private String USER_ID = "admin";
     private ParentQnaTypeDto sampleParentQnaType;
@@ -67,6 +71,22 @@ public class QnaDaoTest {
         attachmentDao.deleteAll();
         qnaAnswerDao.deleteAll();
         qnaDao.deleteAll();
+
+        userMapper.deleteUser(USER_ID);
+        UserRegisterDto userRegisterDto = new UserRegisterDto();
+        userRegisterDto.setUserId(USER_ID);
+        userRegisterDto.setEmail("testuser@example.com");
+        userRegisterDto.setPassword("password123");
+        userRegisterDto.setUserName("손흥민");
+        userRegisterDto.setPostalCode("12345");
+        userRegisterDto.setAddressLine1("경기 화성시");
+        userRegisterDto.setAddressLine2("201호");
+        userRegisterDto.setAddressReference("");
+        userRegisterDto.setPhoneNumber("010-1234-9999");
+        userRegisterDto.setGender(1); // 1은 남자
+        userRegisterDto.setBirthDate("1990-02-12");
+        assertTrue(userMapper.insertUser(userRegisterDto) == 1);
+
         setUpQnaType();
     }
 
@@ -110,7 +130,8 @@ public class QnaDaoTest {
             qnaAnswerDao.insert(qnaAnswerDto);
 
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .qnaId(dto.getQnaId())
+                    .tableId(dto.getQnaId())
+                    .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")
                     .size(100)
@@ -143,9 +164,9 @@ public class QnaDaoTest {
         }
     }
 
-    @DisplayName("selectAllWithFilter 기능 테스트")
+    @DisplayName("selectAllWith 기능 테스트 - 답변과 첨부파일이 없는 경우")
     @Test
-    void selectAllWithFilter(){
+    void selectAllWith_2(){
         // 1단계 데이터 선택
         int size = 10;
         List<QnaDto> list = new ArrayList<>(size);
@@ -153,22 +174,14 @@ public class QnaDaoTest {
             QnaDto dto = createSampleDto(USER_ID, sampleQnaType.getQnaTypeId());
             list.add(dto);
             qnaDao.insert(dto);
-
-            QnaAnswerDto qnaAnswerDto = QnaAnswerDto.builder()
-                    .adminId(USER_ID)
-                    .qnaId(dto.getQnaId())
-                    .content("답변")
-                    .createdId(USER_ID)
-                    .updatedId(USER_ID)
-                    .build();
-            qnaAnswerDao.insert(qnaAnswerDto);
         }
 
         // 2단계 데이터 처리
         int limit = 4;
         int offset = 3;
         boolean isActive = true;
-        List<QnaDto> selectedList = qnaDao.selectAllWithFilter(limit, offset, null, null, isActive);
+        String userId = USER_ID;
+        List<QnaDto> selectedList = qnaDao.selectAllWith(userId, limit, offset, isActive);
 
         // 3단계 검증
         assertTrue(selectedList != null);
@@ -176,13 +189,53 @@ public class QnaDaoTest {
         int baseQnaId = list.get(0).getQnaId();
         for(int i=0; i<selectedList.size(); i++){
             QnaDto selectedDto = selectedList.get(i);
-            assertTrue(selectedDto.getQnaId().equals(baseQnaId + offset + i));
+            assertTrue(selectedDto.getUserId().equals(userId));
             assertTrue(selectedDto.getQnaTypeId().equals(sampleQnaType.getQnaTypeId()));
-            assertTrue(selectedDto.getUser() != null);
-            assertTrue(selectedDto.getQnaAnswer() != null);
-            assertTrue(selectedDto.getQnaType() != null);
+            assertTrue(selectedDto.getQnaAnswer() == null);
+            assertTrue(selectedDto.getAttachments().size() == 0);
         }
     }
+
+//    @DisplayName("selectAllWithFilter 기능 테스트")
+//    @Test
+//    void selectAllWithFilter(){
+//        // 1단계 데이터 선택
+//        int size = 10;
+//        List<QnaDto> list = new ArrayList<>(size);
+//        for(int i=0; i<size; i++){
+//            QnaDto dto = createSampleDto(USER_ID, sampleQnaType.getQnaTypeId());
+//            list.add(dto);
+//            qnaDao.insert(dto);
+//
+//            QnaAnswerDto qnaAnswerDto = QnaAnswerDto.builder()
+//                    .adminId(USER_ID)
+//                    .qnaId(dto.getQnaId())
+//                    .content("답변")
+//                    .createdId(USER_ID)
+//                    .updatedId(USER_ID)
+//                    .build();
+//            qnaAnswerDao.insert(qnaAnswerDto);
+//        }
+//
+//        // 2단계 데이터 처리
+//        int limit = 4;
+//        int offset = 3;
+//        boolean isActive = true;
+//        List<QnaDto> selectedList = qnaDao.selectAllWithFilter(limit, offset, null, null, isActive);
+//
+//        // 3단계 검증
+//        assertTrue(selectedList != null);
+//        assertTrue(selectedList.size() == limit);
+//        int baseQnaId = list.get(0).getQnaId();
+//        for(int i=0; i<selectedList.size(); i++){
+//            QnaDto selectedDto = selectedList.get(i);
+//            assertTrue(selectedDto.getQnaId().equals(baseQnaId + offset + i));
+//            assertTrue(selectedDto.getQnaTypeId().equals(sampleQnaType.getQnaTypeId()));
+//            assertTrue(selectedDto.getUser() != null);
+//            assertTrue(selectedDto.getQnaAnswer() != null);
+//            assertTrue(selectedDto.getQnaType() != null);
+//        }
+//    }
 
     @DisplayName("selectWith 기능 테스트")
     @Test
@@ -203,7 +256,8 @@ public class QnaDaoTest {
         int attachmentSize = 2;
         for(int i = 0; i < attachmentSize; i++){
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .qnaId(dto.getQnaId())
+                    .tableId(dto.getQnaId())
+                    .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")
                     .size(100)

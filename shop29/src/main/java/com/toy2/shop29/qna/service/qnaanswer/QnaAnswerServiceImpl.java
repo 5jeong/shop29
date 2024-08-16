@@ -1,30 +1,32 @@
 package com.toy2.shop29.qna.service.qnaanswer;
 
 import com.toy2.shop29.qna.domain.QnaAnswerDto;
-import com.toy2.shop29.qna.domain.UserForQnaDto;
-import com.toy2.shop29.qna.repository.UserDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.repository.qnaasnwer.QnaAnswerDao;
+import com.toy2.shop29.users.domain.UserDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class QnaAnswerServiceImpl implements QnaAnswerService {
 
     QnaAnswerDao qnaAnswerDao;
     QnaDao qnaDao;
-    UserDao userDao;
+    UserMapper userMapper;
     private final String ROLE_ADMIN = "관리자";
 
-    public QnaAnswerServiceImpl(QnaAnswerDao qnaAnswerDao, QnaDao qnaDao, UserDao userDao) {
+    public QnaAnswerServiceImpl(QnaAnswerDao qnaAnswerDao, QnaDao qnaDao, UserMapper userMapper) {
         this.qnaAnswerDao = qnaAnswerDao;
         this.qnaDao = qnaDao;
-        this.userDao = userDao;
+        this.userMapper = userMapper;
     }
 
+    @Transactional
     @Override
-    public void createQnaAnswer(int qnaId, String adminId, String answerContent) {
+    public void createQnaAnswer(int qnaId, String adminId, String answerContent) throws RuntimeException {
         // 1. adminId에 해당하는 계정의 권한이 "관리자"가 아닐 경우, 권한 없음
-        UserForQnaDto user = userDao.select(adminId);
+        UserDto user = userMapper.findById(adminId);
         if(!user.getUserRole().equals(ROLE_ADMIN)){
             throw new IllegalArgumentException("권한이 없습니다.");
         }
@@ -50,10 +52,11 @@ public class QnaAnswerServiceImpl implements QnaAnswerService {
         qnaAnswerDao.insert(qnaAnswerDto);
     }
 
+    @Transactional
     @Override
-    public void updateQnaAnswer(int qnaAnswerId, String adminId, String answerContent) {
+    public void updateQnaAnswer(int qnaAnswerId, String adminId, String answerContent) throws RuntimeException {
         // 1. adminId에 해당하는 계정의 권한이 "관리자"가 아닐 경우, 권한 없음
-        if(!userDao.select(adminId).getUserRole().equals(ROLE_ADMIN)){
+        if(!userMapper.findById(adminId).getUserRole().equals(ROLE_ADMIN)){
             throw new IllegalArgumentException("권한이 없습니다.");
         }
 
@@ -74,10 +77,11 @@ public class QnaAnswerServiceImpl implements QnaAnswerService {
         qnaAnswerDao.update(qnaAnswerDto);
     }
 
+    @Transactional
     @Override
-    public void deleteQnaAnswer(int qnaAnswerId, String adminId) {
+    public void deleteQnaAnswer(int qnaAnswerId, String adminId) throws RuntimeException{
         // 1. adminId에 해당하는 계정의 권한이 "관리자"가 아닐 경우, 권한 없음
-        if(!userDao.select(adminId).getUserRole().equals(ROLE_ADMIN)){
+        if(!userMapper.findById(adminId).getUserRole().equals(ROLE_ADMIN)){
             throw new IllegalArgumentException("권한이 없습니다.");
         }
 

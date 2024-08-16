@@ -93,5 +93,11 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!-- 테스트용. 작성자 : 김정민(24.08.16) -->
+    <update id="updateUserRoleForTest" parameterType="map">
+        UPDATE user
+        SET `user_role` = #{userRole}
+        WHERE `user_id` = #{userId}
+    </update>
 
 </mapper>

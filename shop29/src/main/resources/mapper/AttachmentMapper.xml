@@ -7,7 +7,8 @@
     <!-- CREATE -->
     <insert id="insert" parameterType="com.toy2.shop29.qna.domain.AttachmentDto" useGeneratedKeys="true" keyProperty="attachmentId">
         INSERT INTO `Attachment`(
-            `qna_id`, -- 문의 ID
+            `table_id`, -- 관련 테이블 레코드 ID
+            `table_name`, -- 관련 테이블 이름
             `file_name`, -- 파일명
             `file_path`, -- 파일 경로
             `width`, -- 가로`
@@ -18,42 +19,45 @@
             `updated_id` -- 수정자 ID
         )
         VALUES(
-            #{qnaId},
-            #{fileName},
-            #{filePath},
-            #{width},
-            #{height},
-            #{size},
-            #{extension},
-            #{createdId},
-            #{updatedId}
-        );
+                  #{tableId},
+                  #{tableName},
+                  #{fileName},
+                  #{filePath},
+                  #{width},
+                  #{height},
+                  #{size},
+                  #{extension},
+                  #{createdId},
+                  #{updatedId}
+              );
     </insert>
 
     <insert id="insertList" parameterType="java.util.List">
         INSERT INTO `Attachment`(
-            `qna_id`, -- 문의 ID
-            `file_name`, -- 파일명
-            `file_path`, -- 파일 경로
-            `width`, -- 가로`
-            `height`, -- 세로
-            `size`, -- 파일 크기
-            `extension`, -- 확장자
-            `created_id`, -- 생성자 ID
-            `updated_id` -- 수정자 ID
+        `table_id`, -- 관련 테이블 레코드 ID
+        `table_name`, -- 관련 테이블 이름
+        `file_name`, -- 파일명
+        `file_path`, -- 파일 경로
+        `width`, -- 가로`
+        `height`, -- 세로
+        `size`, -- 파일 크기
+        `extension`, -- 확장자
+        `created_id`, -- 생성자 ID
+        `updated_id` -- 수정자 ID
         )
         VALUES
         <foreach collection="list" item="item" separator=",">
             (
-                #{item.qnaId},
-                #{item.fileName},
-                #{item.filePath},
-                #{item.width},
-                #{item.height},
-                #{item.size},
-                #{item.extension},
-                #{item.createdId},
-                #{item.updatedId}
+            #{item.tableId},
+            #{item.tableName},
+            #{item.fileName},
+            #{item.filePath},
+            #{item.width},
+            #{item.height},
+            #{item.size},
+            #{item.extension},
+            #{item.createdId},
+            #{item.updatedId}
             )
         </foreach>
     </insert>
@@ -61,34 +65,40 @@
     <!-- READ -->
     <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.AttachmentDto">
         SELECT
-            *
+        *
         FROM `Attachment`
         WHERE `attachment_id` = #{attachmentId}
         <if test="isActive != null">
             AND `is_active` = #{isActive}
         </if>
-        ORDER BY `attachment_id` DESC;
+    </select>
+
+    <select id="selectByFileName" parameterType="String" resultType="com.toy2.shop29.qna.domain.AttachmentDto">
+        SELECT
+            *
+        FROM `Attachment`
+        WHERE `file_name` = #{fileName}
     </select>
 
     <select id="selectAll" parameterType="boolean" resultType="com.toy2.shop29.qna.domain.AttachmentDto">
         SELECT
-            *
+        *
         FROM `Attachment`
         <if test="isActive != null">
             WHERE `is_active` = #{isActive}
         </if>
-        ORDER BY `attachment_id` DESC;
+        ORDER BY `attachment_id`;
     </select>
 
     <select id="selectAllBy" parameterType="map" resultType="com.toy2.shop29.qna.domain.AttachmentDto">
         SELECT
-            *
+        *
         FROM `Attachment`
-        WHERE `qna_id` = #{qnaId}
+        WHERE `table_id` = #{tableId}
         <if test="isActive != null">
             AND `is_active` = #{isActive}
         </if>
-        ORDER BY `attachment_id` DESC;
+        ORDER BY `attachment_id`;
     </select>
 
     <select id="count" resultType="int">
@@ -101,7 +111,8 @@
     <update id="update" parameterType="com.toy2.shop29.qna.domain.AttachmentDto">
         UPDATE `Attachment`
         SET
-            `qna_id` = #{qnaId},
+            `table_id` = #{tableId},
+            `table_name` = #{tableName},
             `file_name` = #{fileName},
             `file_path` = #{filePath},
             `width` = #{width},
@@ -118,11 +129,11 @@
     <update id="softDeleteList" parameterType="java.util.List">
         UPDATE `Attachment`
         SET
-            `is_active` = false
+        `is_active` = false
         WHERE `attachment_id` IN (
-            <foreach collection="list" item="item" separator=",">
-                #{item}
-            </foreach>
+        <foreach collection="list" item="item" separator=",">
+            #{item}
+        </foreach>
         );
     </update>
 

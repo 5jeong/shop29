@@ -1,6 +1,7 @@
 package com.toy2.shop29.qna.repository.attachment;
 
 import com.toy2.shop29.qna.domain.AttachmentDto;
+import com.toy2.shop29.qna.domain.AttachmentTableName;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
@@ -47,14 +48,20 @@ public class AttachmentDaoImpl implements AttachmentDao{
     }
 
     @Override
+    public AttachmentDto selectByFileName(String fileName) throws DataAccessException {
+        return session.selectOne(namespace + "selectByFileName", fileName);
+    }
+
+    @Override
     public List<AttachmentDto> selectAll(Boolean isActive) throws DataAccessException {
         return session.selectList(namespace + "selectAll", isActive);
     }
 
     @Override
-    public List<AttachmentDto> selectAllBy(int qnaId, Boolean isActive) throws DataAccessException {
+    public List<AttachmentDto> selectAllBy(int tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException {
         Map<String, Object> map = new HashMap<>();
-        map.put("qnaId", qnaId);
+        map.put("tableId", tableId);
+        map.put("tableName", tableName);
         map.put("isActive", isActive);
 
         return session.selectList(namespace + "selectAllBy", map);

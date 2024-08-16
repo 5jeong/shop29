@@ -13,29 +13,29 @@
             `created_id`, -- 생성자 ID
             `updated_id` -- 수정자 ID
         )VALUES (
-            #{adminId},
-            #{qnaId},
-            #{content},
-            #{createdId},
-            #{updatedId}
-        );
+                    #{adminId},
+                    #{qnaId},
+                    #{content},
+                    #{createdId},
+                    #{updatedId}
+                );
     </insert>
 
     <!-- READ -->
     <select id="selectBy" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
         SELECT
-            *
+        *
         FROM `QnaAnswer`
         WHERE
-            `qna_id` = #{qnaId}
-            <if test="isDeleted != null">
-                AND `is_deleted` = #{isDeleted}
-            </if>
+        `qna_id` = #{qnaId}
+        <if test="isDeleted != null">
+            AND `is_deleted` = #{isDeleted}
+        </if>
     </select>
 
     <select id="select" parameterType="map" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
         SELECT
-            *
+        *
         FROM `QnaAnswer`
         WHERE `qna_answer_id` = #{qnaAnswerId}
         <if test="isDeleted != null">
@@ -45,7 +45,7 @@
 
     <select id="selectAll" parameterType="boolean" resultType="com.toy2.shop29.qna.domain.QnaAnswerDto">
         SELECT
-            *
+        *
         FROM `QnaAnswer`
         <if test="isDeleted != null">
             WHERE `is_deleted` = #{isDeleted}

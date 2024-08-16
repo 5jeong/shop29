@@ -1,28 +1,29 @@
 package com.toy2.shop29.qna.service;
 
-import com.toy2.shop29.qna.domain.AttachmentDto;
-import com.toy2.shop29.qna.domain.ParentQnaTypeDto;
-import com.toy2.shop29.qna.domain.QnaDto;
-import com.toy2.shop29.qna.domain.QnaTypeDto;
+import com.toy2.shop29.qna.domain.*;
 import com.toy2.shop29.qna.repository.attachment.AttachmentDao;
 import com.toy2.shop29.qna.repository.parentqnatype.ParentQnaTypeDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.repository.qnatype.QnaTypeDao;
 import com.toy2.shop29.qna.service.attachment.AttachmentService;
 import com.toy2.shop29.qna.util.FileUploadHandler;
+import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.mapper.UserMapper;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,43 +46,66 @@ public class AttachmentServiceTest {
     AttachmentDao attachmentDao;
     @Autowired
     AttachmentService attachmentService;
+    @Autowired
+    UserMapper userMapper;
 
     // 강제로 IOException 을 발생시켜, 롤백 처리를 테스트하기 위함
     @SpyBean
     FileUploadHandler fileUploadHandler;
 
-    private final String TEST_FILE_NAME = "sample-img.PNG";
-    private final String TEST_FILE_PATH = "static/test/";
+    @Value("${file.upload.test-file-name}")
+    private String TEST_FILE_NAME;
+    @Value("${file.upload.test-file-path}")
+    private String TEST_FILE_PATH;
+    @Value("${file.upload.file-path}")
+    private String FILE_PATH;
 
     private QnaDto qnaDto;
     private String ADMIN_ID = "admin";
 
     /*
         * 테스트 시나리오
-        - createAttachments(int qnaId, List<File> files) 메서드 테스트
-            1. 성공 - 파일 저장 성공 & DB에 저장 성공
-            2. 예외 - files가 null이거나, 비어있을 경우
-            3. 예외 - qnaId에 해당하는 문의글이 존재하지 않을 경우
-            4. 롤백 & 예외 - 파일 저장 중 예외 발생 시, 기 저장된 파일들 삭제
-        - deleteAttachmentsBy(int qnaId) 메서드 테스트
-            1. 성공 - 파일 삭제 성공 & DB 테이블 SoftDelete 성공 & 백업파일 삭제 성공
-            2. 예외 - qnaId에 해당하는 문의글이 존재하지 않을 경우
-            3. 롤백 & 예외 - 백업파일 생성 중 예외 발생시
-            4. 파일 복구 & 예외 - 첨부파일 삭제 중 예외 발생시, 백업파일을 사용하여 파일 복구
+        - saveMultipartFile(MultipartFile multipartFile)
+            1) 성공 - 파일 저장소에 파일 저장
+            2) 예외 - MultipartFile 이 null이거나 비어있다면 예외
+        - createAttachments(String userId, int tableId, AttachmentTableName tableName, List<String> attachmentNames)
+            1) 성공 - 첨부파일 테이블에 여러건 저장
+            2) 성공 - 첨부파일 이름 리스트가 비어있을 경우, 종료
+            3) 첨부파일이 파일 저장소에 없을 경우, 하당 파일은 무시
+            4) 예외 - 첨부파일 이름이 동일한 레코드가 첨부파일 테이블에 있을 경우
+            5) 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드가 없을 경우
+            6) 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드의 소유자가 본인이 아닌 경우
+        - deleteAttachmentsBy(String userId, int tableId, AttachmentTableName tableName)
+            1) 성공 - 첨부파일 여러건 삭제
+            (미완료)2) 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드가 없을 경우
+            (미완료)3) 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드의 소유자가 본인이 아닌 경우
+            (미완료)4) 롤백 & 예외 - 테이블 레코드 생성 중 예외 발생시
      */
 
-    @BeforeEach
-    void before() throws IOException {
-        // DB 테이블 데이터 초기화
-        attachmentDao.deleteAll();
-        qnaDao.deleteAll();
+    @PostConstruct
+    void init(){
         qnaTypeDao.deleteAll();
+        assertTrue(qnaTypeDao.count() == 0);
         parentQnaTypeDao.deleteAll();
+        assertTrue(parentQnaTypeDao.count() == 0);
+        qnaDao.deleteAll();
+        assertTrue(qnaDao.count() == 0);
 
-        // 파일 저장소 초기화
-        fileUploadHandler.deleteAllFiles();
+        userMapper.deleteUser(ADMIN_ID);
+        UserRegisterDto userRegisterDto = new UserRegisterDto();
+        userRegisterDto.setUserId(ADMIN_ID);
+        userRegisterDto.setEmail("testuser@example.com");
+        userRegisterDto.setPassword("password123");
+        userRegisterDto.setUserName("손흥민");
+        userRegisterDto.setPostalCode("12345");
+        userRegisterDto.setAddressLine1("경기 화성시");
+        userRegisterDto.setAddressLine2("201호");
+        userRegisterDto.setAddressReference("");
+        userRegisterDto.setPhoneNumber("010-1234-9999");
+        userRegisterDto.setGender(1); // 1은 남자
+        userRegisterDto.setBirthDate("1990-02-12");
+        assertTrue(userMapper.insertUser(userRegisterDto) == 1);
 
-        // 테스트 데이터 생성
         // 1. 부모 문의유형 등록
         ParentQnaTypeDto parentQnaTypeDto = ParentQnaTypeDto.builder()
                 .parentQnaTypeId("PARENT_QNA_TYPE_1")
@@ -117,246 +141,238 @@ public class AttachmentServiceTest {
         qnaDto = qDto;
     }
 
-    File createTestFile() {
-        return Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+    @BeforeEach
+    void before() throws IOException {
+        // 첨부파일 테이블 초기화
+        attachmentDao.deleteAll();
+        assertTrue(attachmentDao.count() == 0);
+
+        // 파일 저장소 초기화
+        fileUploadHandler.deleteAllFiles();
+        File[] fileArr = Paths.get(FILE_PATH).toFile().listFiles();
+        assertTrue(fileArr.length == 0);
     }
 
-    @DisplayName("첨부파일 여러건 저장 - 성공 - 파일 저장 & DB에 성공")
+    @DisplayName("파일 저장소에 파일 저장 - 성공")
     @Test
-    void createAttachments_1() throws IOException {
-        // 1단계 데이터 선택
-        // 1-1. qnaId에 해당하는 문의글 생성 -> init()에서 수행
-        // 1-2. 첨부파일에 해당하는 File 리스트 생성
-        List<File> files = new LinkedList<>();
-        int fileCount = 2;
-        for(int i = 0; i < fileCount; i++){
-            files.add(createTestFile());
-        }
+    void saveMultipartFile_1() throws IOException {
+        // 1단계 데이터 선택 -> MultipartFile 생성
+        File file = createTestFile();
+        MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "image/png", Files.readAllBytes(file.toPath()));
 
-        // 2단계 데이터 처리 -> 첨부파일들 저장
-        attachmentService.createAttachments(qnaDto.getQnaId(), files);
+        // 2단계 데이터 처리 -> 파일 저장
+        String savedFileName = attachmentService.saveMultipartFile(multipartFile);
 
         // 3단계 검증
-        // 3-1. DB의 Attachment 테이블에 데이터가 저장되었는지 확인
-        List<AttachmentDto> savedAttachments = attachmentDao.selectAll(null);
-        assertTrue(savedAttachments != null);
-        assertTrue(savedAttachments.size() == files.size());
+        // 3-1. 파일 저장소에 파일이 저장되었는지 확인
+        assertTrue(savedFileName != null);
+        File foundFile = fileUploadHandler.getFile(savedFileName);
+        assertTrue(foundFile != null);
+        assertTrue(foundFile.exists());
+    }
 
-        // 3-2. Attachment 레코드에 첨부파일 메타정보가 등록되었는지 확인
-        for(AttachmentDto attachmentDto : savedAttachments){
-            // 문의글 ID 확인
-            assertTrue(attachmentDto.getQnaId().equals(qnaDto.getQnaId()));
-            // 첨부파일 이름 동록 여부 확인
-            assertTrue(attachmentDto.getFileName() != null);
-            // 첨부파일 사이즈, 너비, 높이, 확장자, 파일경로 확인
+    @DisplayName("파일 저장소에 파일 저장 - 예외 - MultipartFile 이 null이거나 비어있다면 예외")
+    @Test
+    void saveMultipartFile_2(){
+        // 1단계 데이터 선택 -> MultipartFile 생성
+        MultipartFile multipartFile = new MockMultipartFile("file", new byte[0]);
+
+        // 2단계 데이터 처리 & 3단계 검증 -> 예외 확인
+        assertThrows(RuntimeException.class, () -> {
+            attachmentService.saveMultipartFile(multipartFile);
+        });
+    }
+
+    @DisplayName("첨부파일 여러건 저장 - 성공 - 첨부파일 테이블에 여러건 저장")
+    @Test
+    void createAttachments_1() throws IOException {
+        // given -> 첨부파일 저장소에 2개 파일 저장
+        File file = createTestFile();
+        String contentType = "image/png";
+        int fileCnt = 2;
+        List<String> savedFileNames = new LinkedList<>();
+        for(int i = 0; i < fileCnt; i++){
+            MultipartFile multipartFile = new MockMultipartFile(
+                    file.getName(),
+                    file.getName(), contentType,
+                    Files.readAllBytes(file.toPath()));
+            String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+            assertTrue(savedFileName != null);
+            savedFileNames.add(savedFileName);
+        }
+
+        // when
+        attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
+
+        // then -> 저장된 레코드의 속성이 채워졌는지 확인
+        List<AttachmentDto> savedAttachments = attachmentDao.selectAllBy(qnaDto.getQnaId(), AttachmentTableName.QNA, true);
+        assertTrue(savedAttachments != null);
+        assertTrue(savedAttachments.size() == fileCnt);
+        for(int i = 0; i < savedAttachments.size(); i++){
+            AttachmentDto attachmentDto = savedAttachments.get(i);
+            assertTrue(attachmentDto.getFileName().equals(savedFileNames.get(i)));
             assertTrue(attachmentDto.getSize() > 0);
             assertTrue(attachmentDto.getWidth() > 0);
             assertTrue(attachmentDto.getHeight() > 0);
             assertTrue(fileUploadHandler.getExtension(TEST_FILE_NAME).equalsIgnoreCase(attachmentDto.getExtension()));
             assertTrue(attachmentDto.getFilePath() != null);
         }
+    }
 
-        // 3-3. 파일 저장소에 파일이 저장되었는지 확인
-        for(AttachmentDto attachmentDto : savedAttachments){
-            File foundFile = fileUploadHandler.getFile(attachmentDto.getFileName());
-            assertTrue(foundFile != null);
-            assertTrue(foundFile.exists());
+    @DisplayName("첨부파일 여러건 저장 - 성공 - 첨부파일 이름 리스트가 비어있을 경우, 종료")
+    @Test
+    void createAttachments_2() throws IOException {
+        // given -> 빈 리스트 생성
+        List<MultipartFile> multipartFiles = new LinkedList<>();
+
+        // when
+        attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, null);
+
+        // then
+        List<AttachmentDto> savedAttachments = attachmentDao.selectAllBy(qnaDto.getQnaId(), AttachmentTableName.QNA, true);
+        assertTrue(savedAttachments.size() == multipartFiles.size());
+    }
+
+    @DisplayName("첨부파일 여러건 저장 - 성공 - 첨부파일이 파일 저장소에 없을 경우, 하당 파일은 무시")
+    @Test
+    void createAttachments_3() throws IOException, InterruptedException {
+        // given -> 첨부파일 저장소에 2개 파일 저장 & 존재하지 않는 파일명 생성
+        File file = createTestFile();
+        String contentType = "image/png";
+        int fileCnt = 2;
+        List<String> savedFileNames = new LinkedList<>();
+        for(int i = 0; i < fileCnt; i++){
+            MultipartFile multipartFile = new MockMultipartFile(
+                    file.getName(),
+                    file.getName(), contentType,
+                    Files.readAllBytes(file.toPath()));
+            // 동일한 시간에 동일한 파일명으로 파일 생성시, 파일명 중복
+            // 파일 생성 시차를 두어, 파일명 중복 방지
+            Thread.sleep(100);
+            String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+            assertTrue(savedFileName != null);
+            savedFileNames.add(savedFileName);
         }
+        String notExistFileName = "notExistFileName";
+        assertTrue(fileUploadHandler.getFile(notExistFileName) == null);
+        savedFileNames.add(notExistFileName);
+
+        // when
+        attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
+
+        // then -> 파일이 실제 파일 저장소에 있는 경우의 건만 테이블 레코드로 저장됨
+        List<AttachmentDto> savedAttachments = attachmentDao.selectAllBy(qnaDto.getQnaId(), AttachmentTableName.QNA, true);
+        assertTrue(savedAttachments.size() == fileCnt);
     }
 
-    @DisplayName("첨부파일 여러건 저장 - 예외 - files가 null이거나, 비어있을 경우")
-    @Test
-    void createAttachments_2(){
-        // 1단계 데이터 선택
-        final List<File> files_1 = null;
-
-        // 2단계 데이터 처리 & 3단계 검증
-        assertThrows(IllegalArgumentException.class, () -> {
-            attachmentService.createAttachments(qnaDto.getQnaId(), files_1);
-        });
-
-        // 1단계 데이터 선택
-        final List<File> files_2 = new LinkedList<>();
-
-        // 2단계 데이터 처리 & 3단계 검증
-        assertThrows(IllegalArgumentException.class, () -> {
-            attachmentService.createAttachments(qnaDto.getQnaId(), files_2);
-        });
-    }
-
-    @DisplayName("첨부파일 여러건 저장 - 예외 - qnaId에 해당하는 문의글이 존재하지 않을 경우")
-    @Test
-    void createAttachments_3(){
-        // 1단계 데이터 선택 -> 존재하지 않는 qnaId 지정
-        int qnaId = 9999;
-        assertTrue(qnaDao.select(qnaId, false) == null);
-        List<File> files = new LinkedList<>();
-        files.add(createTestFile());
-
-        // 2단계 데이터 처리 & 3단계 검증
-        assertThrows(IllegalArgumentException.class, () -> {
-            attachmentService.createAttachments(qnaId, files);
-        });
-    }
-
-    @DisplayName("첨부파일 여러건 저장 - 롤백 & 예외 - 파일 저장 중 예외 발생 시, 트랜잭션 롤백 및 '앞서 저장된 첨부파일' 삭제")
+    @DisplayName("첨부파일 여러건 저장 - 예외 - 첨부파일 이름이 동일한 레코드가 첨부파일 테이블에 있을 경우")
     @Test
     void createAttachments_4() throws IOException {
-        // 1단계 데이터 선택
-        // 1-1. 트랜잭션 시작 전 데이터 저장 -> 테이블 레코드 및 파일 저장소에 파일 저장
-        for(int i = 0; i < 2; i++){
-            File file = createTestFile();
-            attachmentService.createAttachments(qnaDto.getQnaId(), List.of(file));
-        }
-        // 1-1-1. Attachment 테이블에 레코드들 기록
-        List<AttachmentDto> beforeAttachments = attachmentDao.selectAll(null);
-        // 1-1-2. 파일 저장소의 파일목록 기록
-        File[] beforeFileArr = Paths.get(FileUploadHandler.FILE_PATH).toFile().listFiles();
-        // 1-2. 트랜잭션에서 사용될 첨부파일 리스트 생성
-        List<File> files = new LinkedList<>();
-        files.add(createTestFile());
-        files.add(createTestFile());
+        // given
+        // 1. 첨부파일 저장소에 파일 저장
+        File file = createTestFile();
+        String contentType = "image/png";
+        List<String> savedFileNames = new LinkedList<>();
 
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), contentType, Files.readAllBytes(file.toPath()));
+        String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+        assertTrue(savedFileName != null);
+        savedFileNames.add(savedFileName);
 
-        // 2단계 데이터 처리
-        // 2-1. 일부 파일들을 저장한 이후 예외를 발생시켜,
-        // 예외발생 시 앞서 저장된 파일들이 삭제되는지 확인하기 위함
-        final int[] callCnt = {0}; // 메서드 호출 횟수
-        doAnswer(invocation -> {
-            callCnt[0]++; // 메서드 호출 횟수 카운트
+        // 2. 첨부파일 테이블에 레코드 저장
+        attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
 
-            File file = invocation.getArgument(0); // 첫번째 매개변수
-            String fileName = invocation.getArgument(1); // 두번째 매개변수
-
-            if(callCnt[0] >= files.size()){ // 마지막 호출 시 예외 발생
-                throw new IOException("파일 저장 중 예외 발생");
-            }else{
-                // 마지막 호출이 아니라면, 파일을 정상적으로 저장
-                return fileUploadHandler.saveFile(file, fileName);
-            }
-            // fileUploadHandelr 객체의 saveFile() 메서드가 호출될 때, doAnswer() 메서드가 동작함
-        }).when(fileUploadHandler).saveFile(any(File.class), anyString());
-
-        // 2-2. 첨부파일 저장 메서드 호출 및 예외 발생 여부 확인
-        assertThrows(IOException.class, () -> {
-            attachmentService.createAttachments(qnaDto.getQnaId(), files);
-        });
-
-        // 3단계 검증
-        // 3-1. DB에 저장된 레코드가 롤백되었는지 확인
-        List<AttachmentDto> seletedAttachments = attachmentDao.selectAll(null);
-        // 3-1-1. 테이블의 기존 레코드 수와 동일한지 확인
-        assertTrue(seletedAttachments.size() == beforeAttachments.size());
-        // 3-1-2. 기존 레코드들이 모두 존재하는지 확인
-        for(AttachmentDto attachmentDto : beforeAttachments){
-            boolean isExist = false;
-            for(AttachmentDto selectedAttachment : seletedAttachments){
-                if(attachmentDto.getAttachmentId().equals(selectedAttachment.getAttachmentId())){
-                    isExist = true;
-                    break;
-                }
-            }
-            assertTrue(isExist);
-        }
-
-        // 3-2. 파일 저장소의 파일목록이 이전과 동일한지 확인
-        File[] afterFileArr = Paths.get(FileUploadHandler.FILE_PATH).toFile().listFiles();
-        assertTrue(beforeFileArr.length == afterFileArr.length); // 파일 수가 동일한지 확인
-        for(File beforeFile : beforeFileArr){ // 이전 파일목록의 파일명이, 이후 파일목록에 존재하는지 확인
-            boolean isExist = false;
-            for(File afterFile : afterFileArr){
-                if(beforeFile.getName().equals(afterFile.getName())){
-                    isExist = true;
-                    break;
-                }
-            }
-            assertTrue(isExist);
-        }
-    }
-
-    // 1. 성공 - 파일 삭제 성공 & DB 테이블 SoftDelete 성공 & 백업파일 삭제 성공
-    @DisplayName("문의ID에 해당하는 첨부파일들 삭제 - 성공 - 파일 삭제 성공 & DB 테이블 SoftDelete 성공 & 백업파일 삭제 성공")
-    @Test
-    void deleteAttachmentsBy_1(){
-        // 1단계 데이터 선택
-        // 2단계 데이터 처리
-        // 3단계 검증
-    }
-
-    // 2. 예외 - qnaId에 해당하는 문의글이 존재하지 않을 경우
-    @DisplayName("문의ID에 해당하는 첨부파일들 삭제 - 예외 - qnaId에 해당하는 문의글이 존재하지 않을 경우")
-    @Test
-    void deleteAttachmentsBy_2(){
-        // 1단계 데이터 선택 -> 존재하지 않는 qnaId 지정
-        int qnaId = 9999;
-        assertTrue(qnaDao.select(qnaId, false) == null);
-        List<File> files = new LinkedList<>();
-        files.add(createTestFile());
-
-        // 2단계 데이터 처리 & 3단계 검증
-        assertThrows(IllegalArgumentException.class, () -> {
-            attachmentService.deleteAttachmentsBy(qnaId);
+        // when -> 동일한 이름의 파일을 첨부파일 테이블에 다시 저장
+        // then -> 예외발생
+        assertThrows(RuntimeException.class, () -> {
+            attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
         });
     }
 
-    // 3. 롤백 & 예외 - 백업파일 생성 중 예외 발생시
-    @DisplayName("문의ID에 해당하는 첨부파일들 삭제 - 롤백 & 예외 - 백업파일 생성 중 예외 발생시")
+    @DisplayName("첨부파일 여러건 저장 - 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드가 없을 경우")
     @Test
-    void deleteAttachmentsBy_3() throws IOException {
-        // 1단계 데이터 선택
-        // 1-1. 테이블 첨부파일 레코드 등록 및 파일 저장소에 파일 저장
-        for(int i = 0; i < 2; i++){
-            File file = createTestFile();
-            attachmentService.createAttachments(qnaDto.getQnaId(), List.of(file));
-        }
-        // 1-2. Attachment 테이블에 레코드 조회
-        List<AttachmentDto> attachmentDtos = attachmentDao.selectAll(null);
-        // 1-3. 파일 저장소의 파일목록 조회
-        File[] beforefileArr = Paths.get(FileUploadHandler.FILE_PATH).toFile().listFiles();
+    void createAttachments_5() throws IOException {
+        // given
+        // 1. 첨부파일 저장소에 파일 저장
+        File file = createTestFile();
+        String contentType = "image/png";
+        List<String> savedFileNames = new LinkedList<>();
 
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), contentType, Files.readAllBytes(file.toPath()));
+        String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+        assertTrue(savedFileName != null);
+        savedFileNames.add(savedFileName);
 
-        // 2단계 데이터 처리
-        // 2-1. 백업파일 생성 중 예외 발생하도록 설정
-        doThrow(new IOException("백업파일 생성 중 예외 발생"))
-                .when(fileUploadHandler).copyFile(any(File.class));
-        // 2-2. 첨부파일 삭제 메서드 호출 및 예외 발생 여부 확인
-        assertThrows(IOException.class, () -> {
-            attachmentService.deleteAttachmentsBy(qnaDto.getQnaId());
+        // 2. 존재하지 않는 tableId 지정
+        int notExistTableId = 9999;
+        assertTrue(qnaDao.select(notExistTableId, null) == null);
+
+        // when -> 존재하지 않는 tableId 와 첨부파일 레코드 연결
+        // then -> 예외발생
+        assertThrows(RuntimeException.class, () -> {
+            attachmentService.createAttachments(ADMIN_ID, notExistTableId, AttachmentTableName.QNA, savedFileNames);
         });
-
-        // 3단계 검증
-        // 3-1. DB 테이블 롤백 확인
-        List<AttachmentDto> selectedAttachments = attachmentDao.selectAll(true);
-        assertTrue(selectedAttachments.size() == attachmentDtos.size());
-        // 3-2. 파일 저장소의 파일목록 확인
-        File[] afterFileArr = Paths.get(FileUploadHandler.FILE_PATH).toFile().listFiles();
-        assertTrue(beforefileArr.length == afterFileArr.length);
-        for(File beforeFile : beforefileArr){
-            boolean isExist = false;
-            for(File afterFile : afterFileArr){
-                if(beforeFile.getName().equals(afterFile.getName())){
-                    isExist = true;
-                    break;
-                }
-            }
-            assertTrue(isExist);
-        }
     }
 
-    // 4. 파일 복구 & 예외 - 첨부파일 삭제 중 예외 발생시, 백업파일을 사용하여 파일 복구
-    @DisplayName("문의ID에 해당하는 첨부파일들 삭제 - 파일 복구 & 예외 - 첨부파일 삭제 중 예외 발생시, 백업파일을 사용하여 파일 복구")
+    @DisplayName("첨부파일 여러건 저장 - 예외 - tableName에 해당하는 테이블에서 tableId에 해당하는 레코드의 소유자가 본인이 아닌 경우")
     @Test
-    void deleteAttachmentsBy_4(){
-        // 1단계 데이터 선택
-        // 2단계 데이터 처리
-        // 3단계 검증
+    void createAttachments_6() throws IOException {
+        // given
+        // 1. 첨부파일 저장소에 파일 저장
+        File file = createTestFile();
+        String contentType = "image/png";
+        List<String> savedFileNames = new LinkedList<>();
+
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(), contentType, Files.readAllBytes(file.toPath()));
+        String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+        assertTrue(savedFileName != null);
+        savedFileNames.add(savedFileName);
+
+        // 2. 대상 테이블 레코드의 소유자와 다른 userId 지정
+        String notOwnerUserId = "notOwner";
+        assertTrue(!qnaDto.getUserId().equals(notOwnerUserId));
+
+        // when -> 존재하지 않는 tableId 와 첨부파일 레코드 연결
+        // then -> 예외발생
+        assertThrows(RuntimeException.class, () -> {
+            attachmentService.createAttachments(notOwnerUserId, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
+        });
     }
 
+    @DisplayName("첨부파일 여러건 삭제 - 성공 - 첨부파일 여러건 삭제")
+    @Test
+    void deleteAttachmentsBy_1() throws IOException {
+        // given -> 첨부파일 저장소에 2개 파일 저장 & 첨부파일 테이블에 2개 레코드 저장
+        File file = createTestFile();
+        String contentType = "image/png";
+        int fileCnt = 2;
+        List<String> savedFileNames = new LinkedList<>();
+        for(int i = 0; i < fileCnt; i++){
+            MultipartFile multipartFile = new MockMultipartFile(
+                    file.getName(),
+                    file.getName(), contentType,
+                    Files.readAllBytes(file.toPath()));
+            String savedFileName = attachmentService.saveMultipartFile(multipartFile);
+            assertTrue(savedFileName != null);
+            savedFileNames.add(savedFileName);
+        }
+        attachmentService.createAttachments(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
 
+        // when
+        attachmentService.deleteAttachmentsBy(ADMIN_ID, qnaDto.getQnaId(), AttachmentTableName.QNA);
 
+        // then -> 첨부파일 테이블 레코드 삭제 확인
+        List<AttachmentDto> savedAttachments = attachmentDao.selectAllBy(qnaDto.getQnaId(), AttachmentTableName.QNA, true);
+        assertTrue(savedAttachments.size() == 0);
+    }
+
+    File createTestFile() {
+        return Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+    }
     private AttachmentDto createSampleAttachmentDto() {
         AttachmentDto attachmentDto = AttachmentDto.builder()
-                .qnaId(qnaDto.getQnaId())
+                .tableId(qnaDto.getQnaId())
+                .tableName(AttachmentTableName.QNA)
                 .fileName("test-file.PNG")
                 .size(1000)
                 .width(100)
