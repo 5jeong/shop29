@@ -4,102 +4,27 @@
     <meta charset="UTF-8">
     <title>공지사항 수정</title>
     <link rel="stylesheet" href="/css/main.css">
-    <style>
-        /* 기본 스타일 설정 */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        form {
-            margin: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        textarea {
-            resize: vertical;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .link {
-            display: inline-block;
-            margin-top: 10px;
-            color: #007bff;
-            text-decoration: none;
-            font-size: 16px;
-        }
-
-        .link:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
+<h1>공지사항 수정</h1>
+<form action="/board/edit" method="post">
+    <!-- 수정할 공지사항의 ID를 숨겨서 전송 -->
+    <input type="hidden" name="noticeId" th:value="${board.noticeId}"/>
 
-<div class="container">
-    <h1>공지사항 수정</h1>
-    <form action="/board/edit" method="post">
-        <!-- 수정할 공지사항의 ID를 숨겨서 전송 -->
-        <input type="hidden" name="noticeId" th:value="${board.noticeId}"/>
+    <!-- 제목 입력 필드 -->
+    <label for="title">제목:</label>
+    <input type="text" id="title" name="noticeTitle" th:value="${board.noticeTitle}" required/>
+    <br>
 
-        <!-- 제목 입력 필드 -->
-        <label for="title">제목:</label>
-        <input type="text" id="title" name="noticeTitle" th:value="${board.noticeTitle}" required/>
+    <!-- 내용 입력 필드 -->
+    <label for="content">내용:</label>
+    <textarea id="content" name="noticeContent" rows="10" required th:text="${board.noticeContent}"></textarea>
+    <br>
 
-        <!-- 내용 입력 필드 -->
-        <label for="content">내용:</label>
-        <textarea id="content" name="noticeContent" rows="10" required th:text="${board.noticeContent}"></textarea>
+    <button type="submit">수정 완료</button>
+</form>
 
-    <!-- 수정 완료 버튼 -->
-        <button type="submit">수정 완료</button>
-    </form>
-
-    <!-- 목록 페이지로 돌아가기 링크 -->
-    <a href="/board/list" class="link">목록으로 돌아가기</a>
-</div>
-
+<!-- 목록 페이지로 돌아가기 링크 -->
+<a href="/board/list">목록으로 돌아가기</a>
 </body>
 </html>
