@@ -83,6 +83,22 @@
             notice_modification_time = now()
         where notice_id = #{noticeId}
     </update>
+    <!-- 상단 고정 공지사항 목록을 가져오는 쿼리 -->
+    <select id="selectFixedNotices" resultType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        SELECT notice_id,
+               notice_title,
+               notice_content,
+               notice_creator_id,
+               notice_modifier_id,
+               notice_creation_time,
+               notice_modification_time,
+               top_fixed,
+               top_fixed_priority
+        FROM Notice
+        WHERE top_fixed = 1
+        ORDER BY top_fixed_priority ASC
+    </select>
+
 
 
 </mapper>

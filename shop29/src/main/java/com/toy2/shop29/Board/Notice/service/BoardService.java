@@ -16,7 +16,9 @@ public interface BoardService {
 
     BoardDto read(Integer noticeId);
 
-    List<BoardDto> getPage(Map map);
+    List<BoardDto> getPage(Map<String, Object> map);
 
     int modify(BoardDto boardDto);
+    // 상단 고정 공지사항 목록을 가져오는 메서드
+    List<BoardDto> getFixedNotices();
 }

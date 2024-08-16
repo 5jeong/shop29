@@ -11,8 +11,9 @@ import java.util.Map;
 
 @Service
 public class BoardServiceImpl implements BoardService {
-@Autowired
-BoardDao boardDao;
+
+    @Autowired
+    private BoardDao boardDao;
 
     @Override
     public int getCount() {
@@ -22,12 +23,14 @@ BoardDao boardDao;
     @Override
     @Transactional
     public int remove(Integer noticeId, String noticeCreatorId) {
+        int result = boardDao.delete(noticeId, noticeCreatorId);
         return boardDao.delete(noticeId, noticeCreatorId);
     }
 
     @Override
     @Transactional
     public int write(BoardDto boardDto) {
+        // 게시물 삽입
         return boardDao.insert(boardDto);
     }
 
@@ -42,7 +45,10 @@ BoardDao boardDao;
     }
 
     @Override
-    public List<BoardDto> getPage(Map map) {
+    public List<BoardDto> getPage(Map<String, Object> map) {
+        // 페이지 처리를 위한 게시물 목록 가져오기
+        // 여기서 notice_number 만들어서 list 값에 다시 할당
+        // offset, pageSize, pageNo
         return boardDao.selectPage(map);
     }
 
@@ -51,4 +57,11 @@ BoardDao boardDao;
     public int modify(BoardDto boardDto) {
         return boardDao.update(boardDto);
     }
+    // 상단 고정된 공지사항을 가져오는 메서드 추가
+    @Override
+    public List<BoardDto> getFixedNotices() {
+        return boardDao.selectFixedNotices();
+    }
+
+
 }

@@ -38,22 +38,27 @@ public class BoardController {
                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                        Model m, HttpServletRequest request) {
 
-        if(currentPage==null) currentPage=1;
-        if(pageSize==null) pageSize=10;
+        if(currentPage == null) currentPage = 1;
+        if(pageSize == null) pageSize = 10;
 
         try {
-            int totalCnt= boardService.getCount();
-            PageHandler pageHandler = new PageHandler(totalCnt, currentPage, pageSize);
+            // 상단 고정 공지사항 가져오기
+            List<BoardDto> fixedNotices = boardService.getFixedNotices(); // topFixed == true인 공지사항
 
+            // 일반 공지사항 가져오기
+            int totalCnt = boardService.getCount();
+            PageHandler pageHandler = new PageHandler(totalCnt, currentPage, pageSize);
 
             Map<String, Object> map = new HashMap<>();
             map.put("offset", (currentPage - 1) * pageSize);
             map.put("pageSize", pageSize);
 
-            List<BoardDto> list = boardService.getPage(map);
+            List<BoardDto> list = boardService.getPage(map); // 일반 공지사항
 
-            m.addAttribute("list", list);
-            m.addAttribute("ph", pageHandler);
+            // 뷰로 데이터 전달
+            m.addAttribute("fixedNotices", fixedNotices); // 상단 고정 공지사항
+            m.addAttribute("list", list);                 // 일반 공지사항
+            m.addAttribute("ph", pageHandler);            // 페이지 핸들러
             m.addAttribute("totalCnt", totalCnt);
 
         } catch (Exception e) {
@@ -107,6 +112,4 @@ public class BoardController {
         int deleteResult = boardService.remove(noticeId, noticeCreatorId);
         return "redirect:/board/list";
     }
-
-
 }
