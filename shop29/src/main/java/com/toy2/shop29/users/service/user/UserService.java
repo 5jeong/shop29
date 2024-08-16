@@ -1,4 +1,4 @@
-package com.toy2.shop29.users.service;
+package com.toy2.shop29.users.service.user;
 
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
@@ -22,4 +22,12 @@ public interface UserService {
     int deleteUser(String userId);
 
     void validateDuplicatedInfo(UserRegisterDto userRegisterDto, BindingResult bindingResult);
+
+    int updatePassword(String userId, String tempPassword);
+
+    boolean isUserIdDuplicated(String userId);
+
+    boolean isEmailDuplicated(String email);
+
+    boolean isPhoneNumberDuplicated(String phoneNumber);
 }

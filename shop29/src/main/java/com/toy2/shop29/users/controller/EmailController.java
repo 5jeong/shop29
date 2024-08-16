@@ -1,6 +1,6 @@
 package com.toy2.shop29.users.controller;
 
-import com.toy2.shop29.users.service.EmailVerificationService;
+import com.toy2.shop29.users.service.email.EmailVerificationService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,16 @@ public class EmailController {
 
     @PostMapping("/sendVerificationCode")
     public ResponseEntity<Map<String, Boolean>> sendVerificationCode(@RequestParam String email) {
-        emailVerificationService.sendVerificationCode(email);
+        emailVerificationService.generateVerificationCode(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("success", true);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/sendTempPassword")
+    public ResponseEntity<Map<String, Boolean>> sendTempPassword(@RequestParam String userId,
+                                                                 @RequestParam String email) {
+        emailVerificationService.generateTempPassword(userId, email);
         Map<String, Boolean> response = new HashMap<>();
         response.put("success", true);
         return ResponseEntity.ok(response);

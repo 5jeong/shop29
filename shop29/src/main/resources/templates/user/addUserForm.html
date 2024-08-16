@@ -91,13 +91,16 @@
         </div>
         <div>
             <label for="name">전화번호</label>
-            <input type="text" id="phoneNumber" th:field="*{phoneNumber}"
-                   class="form-control" th:errorclass="field-error" placeholder="전화번호 입력 ex) OOO-OOOO-OOOO">
+            <div class="input-group">
+                <input type="text" id="phoneNumber" th:field="*{phoneNumber}"
+                       class="form-control" th:errorclass="field-error" placeholder="전화번호 입력 ex) OOO-OOOO-OOOO">
+                <button type="button" class="btn btn-outline-secondary" onclick="checkUserPhoneNumber()">중복 체크</button>
+            </div>
             <div class="field-error" th:errors="*{phoneNumber}"></div>
         </div>
         <div>
             <label for="birthDate">생년월일</label>
-            <input type="text" id="birthDate" th:field="*{birthDate}"
+            <input type="date" id="birthDate" th:field="*{birthDate}"
                    class="form-control" th:errorclass="field-error" placeholder="생년월일 입력 ex) 1990-03-21">
             <div class="field-error" th:errors="*{birthDate}"></div>
         </div>
@@ -123,13 +126,12 @@
         <div>
             <label for="sample6_postcode">기본주소</label>
             <div class="input-group">
-                <input type="text" id="sample6_postcode"  class="form-control" placeholder="우편번호">
-                <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기
-                </button>
+                <input type="text" id="sample6_postcode" th:field="*{postalCode}" class="form-control" placeholder="우편번호">
+                <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
             </div>
-            <input type="text" id="sample6_address"  class="form-control mt-2" placeholder="주소">
-            <input type="text" id="sample6_detailAddress" class="form-control mt-2" placeholder="상세주소">
-            <input type="text" id="sample6_extraAddress" class="form-control mt-2" placeholder="참고항목">
+            <input type="text" id="sample6_address" th:field="*{addressLine1}" class="form-control mt-2" placeholder="주소">
+            <input type="text" id="sample6_detailAddress" th:field="*{addressLine2}" class="form-control mt-2" placeholder="상세주소">
+            <input type="text" id="sample6_extraAddress" th:field="*{addressReference}" class="form-control mt-2" placeholder="참고항목">
         </div>
 
         <div>
@@ -214,6 +216,26 @@
             .catch(error => console.error('Error:', error));
     }
 
+    function checkUserPhoneNumber() {
+        const phoneNumber = document.getElementById('phoneNumber').value;
+
+        // 전화번호 유효성 검사
+        if (!/^\d{3}-\d{4}-\d{4}$/.test(phoneNumber)) {
+            alert("전화번호 형식이 올바르지 않습니다. ex) 010-1234-5678");
+            return false;
+        }
+        fetch('/user/checkUserPhoneNumber?phoneNumber=' + encodeURIComponent(phoneNumber))
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    alert('동일한 번호로 가입된 계정이 있습니다.');
+                } else {
+                    alert('사용 가능한 번호입니다.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function sendVerificationEmail() {
         const email = document.getElementById('email').value;
 
@@ -291,7 +313,7 @@
     }
 
     function validateForm() {
-        var message='';
+        var message = '';
         const userId = document.getElementById('userId').value;
         const password = document.getElementById('password').value;
         const userName = document.getElementById('name').value;
@@ -316,11 +338,6 @@
             return false;
         }
 
-        // 전화번호 유효성 검사
-        if (!/^\d{3}-\d{4}-\d{4}$/.test(phoneNumber)) {
-            alert("전화번호 형식이 올바르지 않습니다. ex) 010-1234-5678");
-            return false;
-        }
 
         // 생년월일 유효성 검사
         if (!/^(19[0-9][0-9]|20[0-1][0-9])-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(birthDate)) {

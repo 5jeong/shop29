@@ -75,7 +75,7 @@ class UserMapperTest {
     @Test
     void signup_test() {
 
-        //테스트 유저 삭제
+        //테스트 유저 삭제 -> 삭제전과 후에도 비교해야됌
         userMapper.deleteUser(userRegisterDto.getUserId());
 
         int beforeInsertUserCnt = userMapper.userCount();
@@ -139,14 +139,12 @@ class UserMapperTest {
 
         // 업데이트 후 데이터 확인
         UserDto updatedUser = userMapper.findById("testUser");
-        System.out.println("updatedUser = " + updatedUser);
 
-        System.out.println("updatedUser.getBirthDate() = " + updatedUser.getBirthDate());
-        assertThat(updatedUser.getUserName()).isEqualTo("Updated Name");
-        assertThat(updatedUser.getPassword()).isEqualTo("UpdatedPassword123");
-        assertThat(updatedUser.getPhoneNumber()).isEqualTo("010-9876-5432");
-        assertThat(updatedUser.getEmail()).isEqualTo("updated@example.com");
-        assertThat(updatedUser.getBirthDate()).isEqualTo("1990-04-14");
+        assertThat(updatedUser.getUserName()).isEqualTo(userUpdateDto.getUserName());
+        assertThat(updatedUser.getPassword()).isEqualTo(userUpdateDto.getPassword());
+        assertThat(updatedUser.getPhoneNumber()).isEqualTo(userUpdateDto.getPhoneNumber());
+        assertThat(updatedUser.getEmail()).isEqualTo(userUpdateDto.getEmail());
+        assertThat(updatedUser.getBirthDate()).isEqualTo(userUpdateDto.getBirthDate());
 
         // 수정되지 않은 필드 확인
         assertThat(updatedUser.getGender()).isEqualTo(userRegisterDto.getGender());

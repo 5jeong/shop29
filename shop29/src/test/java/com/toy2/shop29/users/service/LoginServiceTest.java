@@ -5,10 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
-import com.toy2.shop29.users.exception.IncorrectPasswordException;
-import com.toy2.shop29.users.exception.UserAccountLockedException;
-import com.toy2.shop29.users.exception.UserNotFoundException;
-import javax.security.auth.login.AccountLockedException;
+import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
+import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
+import com.toy2.shop29.users.exception.loginException.UserNotFoundException;
+import com.toy2.shop29.users.service.login.LoginService;
+import com.toy2.shop29.users.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @SpringBootTest
 class LoginServiceTest {
-
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
     @Autowired
     private LoginService loginService;
     private UserRegisterDto userRegisterDto;
@@ -65,9 +65,10 @@ class LoginServiceTest {
         assertThat(loginUser).isEqualTo(user);
     }
 
+
     @DisplayName("아이디를 잘못 입력한 경우 테스트")
     @Test
-    void invalidId() {
+    void invalidId2() {
         // given: 존재하지 않는 아이디, 잘못된 패스워드로 로그인 시도
         String invalidUserId = "wrongUserId";
         String password = "password123";

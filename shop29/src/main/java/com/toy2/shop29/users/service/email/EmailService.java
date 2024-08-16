@@ -1,4 +1,4 @@
-package com.toy2.shop29.users.service;
+package com.toy2.shop29.users.service.email;
 
 import com.toy2.shop29.users.domain.EmailDto;
 import lombok.RequiredArgsConstructor;
