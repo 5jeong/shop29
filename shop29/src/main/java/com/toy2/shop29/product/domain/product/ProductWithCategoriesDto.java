@@ -8,7 +8,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class ProductWithCategoriesDto {
-    //Major Middle Small의 이름만 가져옴
     private int productId;
     private String productName;
     private int price;
@@ -19,11 +18,17 @@ public class ProductWithCategoriesDto {
     private String majorCategoryName;
     private String middleCategoryName;
     private String smallCategoryName;
+    private int majorCategoryId;  // 변경: String -> int
+    private int middleCategoryId; // 변경: String -> int
+    private int smallCategoryId;  // 변경: String -> int
     private int brandId;
+    private String brandName;
     private Date startDate;
     private Date createdDate;
     private String createdId;
     private Date updatedDate;
     private String updatedId;
 
+    // Getter and Setter methods
+    // ...
 }

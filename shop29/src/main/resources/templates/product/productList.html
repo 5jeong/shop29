@@ -72,14 +72,16 @@
             <td th:text="${productDto.brandId}"></td>
             <td th:text="${productDto.saleRatio}"></td>
             <td th:text="${productDto.price}"></td>
-            <!-- 할인율과 정가로 할인가 계산 -->
-            <td th:text="${#numbers.formatDecimal(productDto.price * (1 - productDto.saleRatio / 100), 1, 2)}"></td>
+            <!-- 할인율과 정가로 할인가 계산, 백원단위까지 표기 -->
+            <td th:text="${(productDto.price * (1 - productDto.saleRatio / 100)).intValue() - ((productDto.price * (1 - productDto.saleRatio / 100)).intValue() % 100)}"></td>
             <td th:text="${productDto.rating}"></td>
         </tr>
         </tbody>
-
-
     </table>
+</div>
+
+
+
     <div>
         <!-- 이전 페이지 링크 -->
         <a th:if="${pageHandler != null and pageHandler.showPrev}"
