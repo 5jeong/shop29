@@ -2,6 +2,7 @@ package com.toy2.shop29.cart.service;
 
 import com.toy2.shop29.cart.dao.CartDao;
 import com.toy2.shop29.cart.domain.response.CartDto;
+import com.toy2.shop29.cart.exception.CartNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +79,11 @@ public class CartServiceImpl implements CartService {
     public void addProductToCart(String userId, Long productId, Long quantity, int isUser) throws Exception {
         ensureUserCartExists(userId, isUser);
 
+        ProductDto isExistProduct = productDao.select(productId.intValue());
+        if (isExistProduct == null) {
+            throw new CartNotFoundException("상품 번호" + productId + "를 찾을 수 없음");
+        }
+
         // 해당 유저의 장바구니에서 상품을 가져옴
         CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId);
 
@@ -111,8 +117,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public int updateProductQuantity(String userId, Long productId, Long quantity) throws Exception {
-        if (false) {
-            throw new IllegalArgumentException("존재하지 않는 상품 ID");
+        ProductDto isExistProduct = productDao.select(productId.intValue());
+        if (isExistProduct == null) {
+            throw new CartNotFoundException("상품 번호" + productId + "를 찾을 수 없음");
         }
 
         // application.properties
