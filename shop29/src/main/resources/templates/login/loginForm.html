@@ -1,3 +1,5 @@
+<div th:insert="fragments/header :: header"></div>
+
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,11 +10,11 @@
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f2f2f2;
             color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .container {
@@ -22,6 +24,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease-in-out;
+            margin: auto;
         }
 
         .container:hover {
@@ -96,25 +99,23 @@
             color: #0056b3;
         }
 
+        .footer {
+            margin-top: auto; /* footer를 화면 하단에 위치시킴 */
+        }
+
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="text-center">
         <h2>로그인</h2>
     </div>
     <form th:action th:object="${loginForm}" method="post">
-<!--        <input type="hidden" name="redirectURI" th:value="${param.redirectURI}"/>-->
 
-        <!-- 기존의 폼 요소들 -->
         <div th:if="${loginError != null}">
             <p class="field-error" th:text="${loginError}"></p>
         </div>
-
-<!--        <div th:if="${#fields.hasGlobalErrors()}">-->
-<!--            <p class="field-error" th:each="err : ${#fields.globalErrors()}"-->
-<!--               th:text="${err}">전체 오류 메시지</p>-->
-<!--        </div>-->
 
         <div class="mb-3">
             <input type="text" id="userId" th:field="*{userId}" class="form-control" placeholder="아이디를 입력해주세요."
@@ -139,6 +140,7 @@
     </form>
 
 </div>
+
 <script>
     document.querySelector('.toggle-password').addEventListener('click', function () {
         const passwordInput = document.getElementById('password');
