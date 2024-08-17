@@ -4,7 +4,7 @@ import com.toy2.shop29.cart.dao.CartDao;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.exception.CartNotFoundException;
 import com.toy2.shop29.cart.exception.ProductNotFoundException;
-import com.toy2.shop29.product.dao.ProductDao;
+import com.toy2.shop29.product.dao.product.ProductDao;
 import com.toy2.shop29.product.domain.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
