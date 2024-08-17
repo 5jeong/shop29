@@ -3,9 +3,12 @@ package com.toy2.shop29.product.controller;
 import com.toy2.shop29.product.domain.PageHandler;
 import com.toy2.shop29.product.domain.category.MiddleCategoryDto;
 import com.toy2.shop29.product.domain.category.SmallCategoryDto;
+import com.toy2.shop29.product.domain.option.ProductOptionDto;
+import com.toy2.shop29.product.domain.option.ProductOptionValueDto;
 import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
 import com.toy2.shop29.product.domain.product.ProductWithMiddleSmallDto;
 import com.toy2.shop29.product.service.category.CategoryService;
+import com.toy2.shop29.product.service.option.OptionService;
 import com.toy2.shop29.product.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +33,9 @@ public class ProductController {
     private CategoryService categoryService;
 
 
+    @Autowired
+    private OptionService optionService;
+
     // 상품 상세 페이지 이동
     @GetMapping("/{productId}")
     public String getProductDetail(@PathVariable("productId") int productId, Model model) {
@@ -44,6 +50,13 @@ public class ProductController {
             e.printStackTrace();
             System.out.println(e);
         }
+
+        // 옵션 관련 로직
+        List<ProductOptionDto> productOptions = optionService.getProductOptions(productId);
+        List<ProductOptionValueDto> productOptionValues = optionService.getProductOptionValues(productId);
+        model.addAttribute("productOptions", productOptions);
+        model.addAttribute("productOptionValues", productOptionValues);
+
 
 
         ProductWithCategoriesDto product = productService.getProductWithCategories(productId);

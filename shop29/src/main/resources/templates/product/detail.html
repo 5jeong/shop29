@@ -24,11 +24,35 @@
 <p>상품 사이즈 측정 표: <span th:text="${product.sizeTable != null ? product.sizeTable : ''}">상품 사이즈 측정 표</span></p>
 
 
-<!-- 옵션 선택 버튼 -->
-<form>
-    <input type="hidden" name="Option">
-    <button type="submit">옵션</button>
-</form>
+
+
+
+
+
+ <!-- 옵션 키와 해당 옵션 값들 나열 -->
+<div th:each="option : ${productOptions}">
+    <!-- 옵션 키 이름을 표시하는 영역 -->
+    <h3 th:text="${option.optionKeyName}">옵션 키 이름</h3>
+
+    <!-- 옵션 값들을 나열하는 영역 -->
+    <ul>
+        <li th:each="value : ${productOptionValues}" th:if="${value.optionKeyId == option.optionKeyId}">
+            <input type="radio" th:name="'option_' + ${value.optionKeyId}" th:value="${value.optionValueId}" th:id="'optionValue_' + ${value.optionValueId}" />
+            <label th:for="'optionValue_' + ${value.optionValueId}" th:text="${value.optionValueName}"></label>
+            <span th:text="'추가 비용: ' + ${value.extraFee}"></span>
+            <span th:text="'재고: ' + ${value.stock}"></span>
+        </li>
+    </ul>
+</div>
+
+
+
+
+
+
+
+
+
 
 <!-- 장바구니 버튼 -->
 <form action="/cart/add" method="post">
@@ -43,3 +67,9 @@
 </form>
 </body>
 </html>
+
+
+
+
+
+

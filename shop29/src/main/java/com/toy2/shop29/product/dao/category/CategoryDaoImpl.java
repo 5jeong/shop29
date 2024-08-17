@@ -169,38 +169,6 @@ public class CategoryDaoImpl implements CategoryDao {
 
 
 
-
-
-//    //insert - 1
-//    @Override
-//    public int insertCategory(CategoryDto categoryDto) {
-//        return session.insert(namespace + "insertCategory", categoryDto);
-//    }
-//
-//    //update - 1
-//    @Override
-//    public int updateCategory(CategoryDto categoryDto) {
-//        return session.update(namespace + "updateCategory", categoryDto);
-//    }
-//
-//    //delete - 1 by Id
-//    @Override
-//    public int deleteCategory(int majorCategoryId, int middleCategoryId, int smallCategoryId) {
-//        return session.delete(namespace + "deleteCategory", new CategoryDto(majorCategoryId, middleCategoryId, smallCategoryId));
-//    }
-//
-//    //delete - all
-//    @Override
-//    public int deleteAll() {
-//        return session.delete(namespace + "deleteAll");
-//    }
-//
-//    //count
-//    @Override
-//    public int countCategories() {
-//        return session.selectOne(namespace + "countCategory");
-
-
     @Override
     public int countMiddleCategory(int middleCategoryId) {
         return session.selectOne(namespace + "countMiddleCategory", middleCategoryId);
