@@ -58,7 +58,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:if="${cartList != null && #lists.size(cartList) > 0}" th:each="cart : ${cartList}" th:data-id="${cart.productId}"
+        <tr th:if="${cartList != null && #lists.size(cartList) > 0}" th:each="cart : ${cartList}"
+            th:data-id="${cart.productId}"
             th:data-price="${cart.price}">
             <td><input class="chkbox" type="checkbox" checked></td>
             <td>
@@ -80,7 +81,7 @@
             </td>
             <td>
                 <span class="price" th:text="${cart.price * cart.quantity} + '원'">1,927,800원</span>
-                <button class="buy-btn" >BUY NOW</button>
+                <button class="buy-btn">BUY NOW</button>
             </td>
             <td>조건무료<br/>일반배송</td>
         </tr>
@@ -121,6 +122,14 @@
 <script>
 
     $(document).ready(function () {
+        $("tr").each(function () {
+            const row = $(this); // 현재 tr 요소
+            const pricePerUnit = parseFloat(row.data('price')); // tr에 data-price로 설정된 값
+            const quantity = parseInt(row.find('.quantity-input').val()); // .quantity 클래스의 텍스트 값을 정수로 변환
+            const totalPrice = pricePerUnit * quantity; // 총 가격 계산
+            row.find('.price').text(totalPrice.toLocaleString() + '원'); // price 클래스의 텍스트 업데이트
+        });
+
         // 전체선택 체크박스를 클릭했을 때
         $('.chkAll').on('click', function () {
             const isChecked = $(this).is(':checked');
@@ -156,20 +165,37 @@
             }
         });
 
-        // 수량 감소 버튼 클릭 시
-        $('.quantity-input').on('change', function () {
-            const quantityInput = $(this).siblings('.quantity-input');
-            let currentValue = parseInt(quantityInput.val());
-            if (currentValue > 1) {
-                quantityInput.val(currentValue - 1);
-                updatePrice(this, currentValue - 1);
-                updateSummary();
+        $('.quantity-input').on('input', function () {
+            const quantityInput = $(this); // 현재 입력 필드를 가리킴
+            let currentValue = quantityInput.val();
+
+            // 정규표현식을 사용하여 숫자만 남기기
+            currentValue = currentValue.replace(/[^0-9]/g, '');
+
+            if (currentValue) {
+                quantityInput.val(currentValue); // 숫자만 남은 값을 다시 입력 필드에 설정
+                let quantity = parseInt(currentValue); // 정수로 변환
+
+                if (quantity > 0) {
+                    updatePrice(quantityInput, quantity); // 가격 업데이트
+                    updateSummary(); // 요약 정보 업데이트
+                } else {
+                    quantityInput.val(1); // 0 이하일 경우 최소 수량 1로 설정
+                    updatePrice(quantityInput, 1); // 1로 가격 업데이트
+                    updateSummary(); // 요약 정보 업데이트
+                }
+            } else {
+                // 유효하지 않은 값(빈 값 등)이 입력되었을 경우
+                quantityInput.val(1); // 최소 수량을 1로 유지
+                updatePrice(quantityInput, 1); // 1로 가격 업데이트
+                updateSummary(); // 요약 정보 업데이트
             }
         });
 
+
         // CHECK OUT 버튼 클릭 시 실행
         $('.checkout').on('click', function () {
-            if ($('.checkout').data('login') === 0){
+            if ($('.checkout').data('login') === 0) {
                 alert('로그인 후 주문 가능합니다.');
                 window.location.href = '/login?redirectURI=/cart';
                 return
@@ -293,7 +319,7 @@
 
         // BUY NOW 버튼 클릭 시 실행
         $('.buy-btn').on('click', function () {
-            if ($('.checkout').data('login') === 0){
+            if ($('.checkout').data('login') === 0) {
                 alert('로그인 후 주문 가능합니다.');
                 window.location.href = '/login?redirectURI=/cart';
                 return
@@ -331,7 +357,11 @@
                     location.reload();
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error: ' + error);
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.errors && response.errors.length > 0) {
+                        const reason = response.errors[0].reason; // 첫 번째 오류의 reason 값
+                        alert(reason); // 알림창으로 reason 표시
+                    }
                 }
             });
         });
