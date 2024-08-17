@@ -44,7 +44,6 @@ public class CartController {
         ModelAndView mav = new ModelAndView("cart/cart");
 
         // 로그인과 비로그인 사용자 구분
-        // TODO : 아래 코드를 어떻게 하면 깔끔하게 작성할 수 있을지 고민
         String userInfo = getUserInfo(userId, guestId);
         int isUser = (userId != null) ? 1 : 0;
 

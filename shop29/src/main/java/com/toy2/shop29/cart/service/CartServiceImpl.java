@@ -111,7 +111,6 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public int updateProductQuantity(String userId, Long productId, Long quantity) throws Exception {
-        // TODO : 상품이 존재하는지 유무 확인
         if (false) {
             throw new IllegalArgumentException("존재하지 않는 상품 ID");
         }
