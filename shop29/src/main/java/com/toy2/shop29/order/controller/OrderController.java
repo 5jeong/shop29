@@ -56,7 +56,6 @@ public class OrderController {
         // 응답 즉시 만료 설정
         response.setDateHeader("Expires", 0);
 
-        // TODO : 로그인 확인
         // 주문에 필요한 데이터 모델에 추가하여 뷰로 전달
         OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(userId);
 
@@ -106,7 +105,6 @@ public class OrderController {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // TODO : 로그인 확인
         if (!logInCheck(userId)) {
             return "redirect:/login";
         }
@@ -138,7 +136,6 @@ public class OrderController {
             Model model,
             @RequestBody OrderCompletedRequestDTO orderRequest,
             HttpServletRequest request) {
-        // TODO : 로그인 확인
         // 카카오 결제 준비하기
         try {
             KakaoPayReadyResponseDto KakaoPayReadyResponseDto = kakaoPayService.payReady(userId, orderRequest);
@@ -167,7 +164,6 @@ public class OrderController {
             @SessionAttribute(name = "loginUser", required = true) String userId,
             @RequestParam("pg_token") String pgToken,
             HttpServletRequest request) {
-        // TODO : 로그인 확인
         HttpSession session = request.getSession(true);
         String tid = (String) session.getAttribute("tid");
         logger.info("결제승인 요청을 인증하는 토큰: " + pgToken);
@@ -193,7 +189,6 @@ public class OrderController {
      */
     @GetMapping("/pay/cancel")
     public String payCancel() throws Exception {
-        // TODO : 로그인 확인
         return "pay/payCancel";
     }
 
@@ -205,8 +200,6 @@ public class OrderController {
      */
     @GetMapping("/pay/fail")
     public String payFail() throws Exception {
-        // TODO : 로그인 확인
-        // TODO : 결제 실패 시 장바구니로 상품 복구
         return "pay/payFail";
     }
 

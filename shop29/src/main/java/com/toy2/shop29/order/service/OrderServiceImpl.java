@@ -1,6 +1,7 @@
 package com.toy2.shop29.order.service;
 
 import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.exception.error.ForbiddenAccessException;
 import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
@@ -175,11 +176,11 @@ public class OrderServiceImpl implements OrderService {
             Long productId = product.getProductId();
             Long quantity = product.getQuantity();
             if (orderDao.countProduct(productId) < 1) {
-                throw new IllegalArgumentException("비정상적인 접근입니다.");
+                throw new ForbiddenAccessException();
             }
             int addResult = addProductToCurrentOrder(userId, productId, quantity);
             if (addResult > 1) {
-                throw new IllegalArgumentException("비정상적인 접근입니다.");
+                throw new ForbiddenAccessException();
             }
         }
         return 0;
@@ -219,7 +220,7 @@ public class OrderServiceImpl implements OrderService {
         int addOrderAddressResult = insertOrderAddress(orderId, userId, shippingAddress);
 
         if (deleteCurrentOrderResult != 1 || deleteCurrentOrderProductsResult < 1 || addOrderAddressResult != 1) {
-            throw new IllegalArgumentException("비정상적인 접근입니다.");
+            throw new ForbiddenAccessException();
         }
 
         // TODO : Service에서 Map에 넣어서 보낼지 Dao에서 Map에 넣을지
@@ -230,9 +231,9 @@ public class OrderServiceImpl implements OrderService {
         // map.put("totalPrice", totalPrice);
         // map.put("shippingAddressId", shippingAddress.getShippingAddressId());
 
-        int createCurrentOrderResult = createOrderHistory(orderId, userId, tid, totalPrice, shippingAddress.getShippingAddressId());
+        int createOrderHistoryResult = createOrderHistory(orderId, userId, tid, totalPrice, shippingAddress.getShippingAddressId());
 
-        if (createCurrentOrderResult != 1) {
+        if (createOrderHistoryResult != 1) {
             throw new IllegalArgumentException("서버 오류");
         }
 
@@ -275,7 +276,7 @@ public class OrderServiceImpl implements OrderService {
         int deleteOrderHistory = deletePayFailedOrderHistory(userId, tid);
 
         if (deleteAddressResult != 1 || deleteOrderItem < 1 || deleteOrderHistory != 1) {
-            throw new IllegalArgumentException("비정상적 접근입니다.");
+            throw new ForbiddenAccessException();
         }
     }
 

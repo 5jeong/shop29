@@ -5,6 +5,7 @@ import com.toy2.shop29.cart.domain.request.DeleteCartItemsRequestDto;
 import com.toy2.shop29.cart.domain.request.OrderCountRequestDto;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ public class CartController {
         ModelAndView mav = new ModelAndView("cart/cart");
 
         // 로그인과 비로그인 사용자 구분
-        // TODO : 아래 코드를 어떻게 하면 깔끔하게 작성할 수 있을지 고민
         String userInfo = getUserInfo(userId, guestId);
         int isUser = (userId != null) ? 1 : 0;
 
@@ -75,7 +75,7 @@ public class CartController {
     public ResponseEntity<Map<String, String>> addCartItem(
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
-            @RequestBody AddCartProductDto addCartProductDto) {
+            @Valid @RequestBody AddCartProductDto addCartProductDto) {
 
         // 로그인과 비로그인 사용자 구분
         String userInfo = getUserInfo(userId, guestId);
