@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handle404(NoHandlerFoundException ex, Model model) {
-        model.addAttribute("message", "The page you are looking for does not exist.");
+        model.addAttribute("message", "존재하지 않는 페이지입니다.");
         return "error/404"; // templates/error/404.html을 반환
     }
 
