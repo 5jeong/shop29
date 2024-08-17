@@ -1,8 +1,9 @@
-package com.toy2.shop29.product.service;
+package com.toy2.shop29.product.service.product;
 
-import com.toy2.shop29.product.dao.ProductDao;
+import com.toy2.shop29.product.dao.product.ProductDao;
 import com.toy2.shop29.product.domain.ProductDto;
-import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithMiddleSmallDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +40,6 @@ public class ProductServiceImpl implements ProductService {
 
     //2-3.특정 페이지에 해당하는 상품리스트 조회해서 반환 (select)
     //offest과 pageSize 필요해서 map을 인자로 받는다
-    @Override
-    public List<ProductDto> getPage(Map map){
-        return productDao.selectPage(map);
-    }
 
     //3.상품 수정 (update)
     @Override
@@ -85,33 +82,38 @@ public class ProductServiceImpl implements ProductService {
 
     //가격 내림차순으로 상품들 정렬
     @Override
-    public List<ProductDto> sortByPriceDesc(Map<String, Object> paramap) {
-        return productDao.SortedByPriceDesc(paramap);
+    public List<ProductWithMiddleSmallDto> sortByPriceAsc(Map<String, Object> paramMap) {
+        return productDao.sortedByPriceAsc(paramMap);
     }
 
     //가격 오름차순으로 상품들 정렬
     @Override
-    public List<ProductDto> sortByPriceAsc(Map<String, Object> paramap) {
-        return productDao.SortedByPriceAsc(paramap);
+    public List<ProductWithMiddleSmallDto> sortByPriceDesc(Map<String, Object> paramMap) {
+        return productDao.sortedByPriceDesc(paramMap);
     }
-
     //최신 상품순으로 정렬
     @Override
-    public List<ProductDto> sortByNewest(Map<String, Object> paramap) {
-        return productDao.SortedByNew(paramap);
+    public List<ProductWithMiddleSmallDto> sortByNewest(Map<String, Object> paramMap) {
+        return productDao.sortedByNewest(paramMap);
     }
 
     //할인율 높은순으로 정렬
     @Override
-    public List<ProductDto> sortByHighDiscount(Map<String, Object> paramap) {
-        return productDao.SortedByHighDiscount(paramap);
+    public List<ProductWithMiddleSmallDto> sortByHighDiscount(Map<String, Object> paramMap) {
+        return productDao.sortedByHighDiscount(paramMap);
     }
 
     //별점 높은순으로 정렬
     @Override
-    public List<ProductDto> sortedByRating(Map<String, Object> paramap){
-        return productDao.SortedByRating(paramap);
+    public List<ProductWithMiddleSmallDto> sortedByRating(Map<String, Object> paramMap) {
+        return productDao.sortedByRating(paramMap);
     }
+
+    @Override
+    public List<ProductWithMiddleSmallDto> getPage(Map<String, Object> paramMap) {
+        return productDao.getPage(paramMap);
+    }
+
 
 
     @Override
@@ -121,18 +123,24 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-
     @Override
     //특정 중분류에 해당하는 모든 제품 개수 세기
     public int getCountByMiddleCategory(Integer middleCategoryId) {
         return productDao.countMiddleCategory(middleCategoryId);
     }
 
+
+
     @Override
-    //특정 중분류에 해당하는 모든 상품 페이징
-    public List<ProductDto> getPageByMiddleCategory(Map<String, Object> map) {
-        return productDao.selectPage(map);
+    public int getCountBySmallCategory(int smallCategoryId) {
+        return productDao.getCountBySmallCategory(smallCategoryId);
     }
+
+    @Override
+    public int getCountByMiddleCategory(int middleCategoryId) {
+        return productDao.getCountByMiddleCategory(middleCategoryId);
+    }
+
 
 
 

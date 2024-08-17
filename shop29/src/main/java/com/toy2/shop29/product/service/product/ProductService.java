@@ -1,7 +1,8 @@
-package com.toy2.shop29.product.service;
+package com.toy2.shop29.product.service.product;
 
 import com.toy2.shop29.product.domain.ProductDto;
-import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithMiddleSmallDto;
 
 import java.util.List;
 import java.util.Map;
@@ -15,9 +16,6 @@ public interface ProductService {
 
     //2-2.모든 상품 정보 조회해서 반환 (select)
     List<ProductDto> getList();
-
-    //2-3.특정 페이지에 해당하는 상품리스트 조회해서 반환 (select)
-    List<ProductDto> getPage(Map map);
 
     //3.상품 수정 (update)
     int modify(ProductDto productDto);
@@ -37,20 +35,27 @@ public interface ProductService {
     //특정 가격 범위 안에 있는 상품들을 조회
     List<ProductDto> getProductsByPriceRange(int minPrice, int maxPrice);
 
+
+
+
     //가격 내림차순으로 상품들 정렬
-    List<ProductDto> sortByPriceDesc(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortByPriceAsc(Map<String, Object> paramMap);
 
     //가격 오름차순으로 상품들 정렬
-    List<ProductDto> sortByPriceAsc(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortByPriceDesc(Map<String, Object> paramMap);
 
     //최신 상품순으로 정렬
-    List<ProductDto> sortByNewest(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortByNewest(Map<String, Object> paramMap);
 
     //할인율 높은순으로 정렬
-    List<ProductDto> sortByHighDiscount(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortByHighDiscount(Map<String, Object> paramMap);
 
     //높은 별점순으로 정렬
-    List<ProductDto> sortedByRating(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByRating(Map<String, Object> paramMap);
+
+    List<ProductWithMiddleSmallDto> getPage(Map<String, Object> paramMap);
+
+
 
     //상품에 해당하는 모든 카테고리 가져오기
     ProductWithCategoriesDto getProductWithCategories(int productId);
@@ -58,10 +63,11 @@ public interface ProductService {
     //특정 중분류에 해당하는 모든 제품 개수 세기
     int getCountByMiddleCategory(Integer middleCategoryId);
 
-    //특정 중분류에 해당하는 모든 상품 페이징
-    List<ProductDto> getPageByMiddleCategory(Map<String, Object> map);
 
 
+    int getCountBySmallCategory(int smallCategoryId);
+
+    int getCountByMiddleCategory(int middleCategoryId);
 
 
 }

@@ -1,8 +1,8 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.product;
 
 import com.toy2.shop29.product.domain.ProductDto;
-import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
-import com.toy2.shop29.product.domain.ProductWithMiddleSmallDto;
+import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithMiddleSmallDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -66,38 +66,21 @@ public class ProductDaoImpl implements ProductDao {
 
 
 
-    //페이징
-    @Override
-    public List<ProductDto> selectPage(Map<String, Object> paramMap) {
-        return session.selectList(namespace+"selectPage", paramMap);
-    }
-
-//    public int increaseResultCnt(SearchCondition sc){
-//        System.out.println("sc in searchResultCnt() = " + sc);
-//        System.out.println("session =" + session);
-//        return session.selectOne(namespace+"searchResultCnt",sc);
-//    }
-//
-//    public List<ProductDto> searchSelectPage(SearchCondition sc){
-//        return session.selectList(namespace+"searchSelectPage",sc);
-//    }
-
-
-
 
     //특정 카테고리 상품 조회
+
     @Override
     public List<ProductDto> selectProductByCategory(int smallCategoryId){
         return session.selectList(namespace+"selectProductByCategory",smallCategoryId);
     }
-
     //특정 브랜드 상품 조회
+
     @Override
     public List<ProductDto> selectProductByBrand(int brandId){
         return session.selectList(namespace+"selectProductByBrand",brandId);
     }
-
     //특정 가격 범위 내의 상품 조회
+
     @Override
     public List<ProductDto> selectProductByPriceRange(int minPrice, int maxPrice){
         Map<String, Object> params = new HashMap<>();
@@ -108,36 +91,50 @@ public class ProductDaoImpl implements ProductDao {
     }
 
 
+
+
+    //페이징, 기본 정렬
+    @Override
+    public List<ProductWithMiddleSmallDto> getPage(Map<String, Object> paramMap) {
+        return session.selectList(namespace + "selectPage", paramMap);
+    }
+
+
+
     //정렬 관련
     //1.높은 가격순
     @Override
-    public List<ProductDto> SortedByPriceDesc(Map<String, Object> paramMap){
-        return session.selectList(namespace+"SortedByPriceDesc",paramMap);
+    public List<ProductWithMiddleSmallDto> sortedByPriceDesc(Map<String, Object> paramMap) {
+        return session.selectList(namespace + "SortedByPriceDesc", paramMap);
     }
 
     //2.낮은 가격순
     @Override
-    public List<ProductDto> SortedByPriceAsc(Map<String, Object> paramMap){
-        return session.selectList(namespace+"SortedByPriceAsc",paramMap);
+    public List<ProductWithMiddleSmallDto> sortedByPriceAsc(Map<String, Object> paramMap) {
+        return session.selectList(namespace + "SortedByPriceAsc", paramMap);
     }
 
     //3.신규순
     @Override
-    public List<ProductDto> SortedByNew(Map<String, Object> paramMap){
-        return session.selectList(namespace+"SortedByNew",paramMap);
+    public List<ProductWithMiddleSmallDto> sortedByNewest(Map<String, Object> paramMap) {
+        return session.selectList(namespace + "SortedByNew", paramMap);
     }
 
     //4.할인율순
     @Override
-    public List<ProductDto> SortedByHighDiscount(Map<String, Object> paramMap){
-        return session.selectList(namespace+"SortedByHighDiscount",paramMap);
+    public List<ProductWithMiddleSmallDto> sortedByHighDiscount(Map<String, Object> paramMap) {
+        return session.selectList(namespace + "SortedByHighDiscount", paramMap);
     }
 
     //5.별점 높은순
     @Override
-    public List<ProductDto> SortedByRating(Map<String, Object> paramMap){
-        return session.selectList(namespace+"SortedByRating",paramMap);
+    public List<ProductWithMiddleSmallDto> sortedByRating(Map<String, Object> paramMap) {
+        return  session.selectList(namespace + "SortedByRating", paramMap);
     }
+
+
+
+
 
 
 
@@ -155,6 +152,18 @@ public class ProductDaoImpl implements ProductDao {
         return session.selectOne(namespace + "countMiddleCategory", middleCategoryId);
     }
 
+
+
+
+    @Override
+    public int getCountBySmallCategory(int smallCategoryId) {
+        return session.selectOne(namespace + "getCountBySmallCategory", smallCategoryId);
+    }
+
+    @Override
+    public int getCountByMiddleCategory(int middleCategoryId) {
+        return session.selectOne(namespace + "getCountByMiddleCategory", middleCategoryId);
+    }
 
 
 

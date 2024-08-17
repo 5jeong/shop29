@@ -5,28 +5,28 @@
 <mapper namespace="com.toy2.shop29.product.dao.MiddleCategoryMapper">
 
     <!-- 모든 중분류 가져오기 -->
-    <select id="selectAll" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         SELECT * FROM middlecategory
     </select>
 
     <!-- Id로 하나의 중분류만 가져오기 -->
-    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         SELECT * FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
     </select>
 
     <!-- 대분류Id에 맞는 중분류 모두 가져오기 -->
-    <select id="selectByMajorCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+    <select id="selectByMajorCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         SELECT * FROM middlecategory WHERE major_category_id = #{majorCategoryId}
     </select>
 
     <!-- 중분류 추가하기 -->
-    <insert id="insert" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         INSERT INTO middlecategory (major_category_id, middle_category_name, created_id, created_date, updated_id, updated_date)
         VALUES (#{majorCategoryId}, #{middleCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
     </insert>
 
     <!-- Id로 하나의 중분류 내용 수정하기 -->
-    <update id="update" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
+    <update id="update" parameterType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         UPDATE middlecategory
         SET middle_category_name = #{middleCategoryName},
             updated_id = #{updatedId},

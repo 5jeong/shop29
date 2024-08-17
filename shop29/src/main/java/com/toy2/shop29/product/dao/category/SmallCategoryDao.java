@@ -1,6 +1,6 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.category;
 
-import com.toy2.shop29.product.domain.SmallCategoryDto;
+import com.toy2.shop29.product.domain.category.SmallCategoryDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

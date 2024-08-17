@@ -1,11 +1,35 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.category;
 
-import com.toy2.shop29.product.domain.*;
-import org.apache.ibatis.annotations.Select;
+import com.toy2.shop29.product.domain.category.*;
 
 import java.util.List;
 
 public interface CategoryDao {
+
+
+    //메인페이지에서 사용
+    //모든 대분류 리스트 반환
+    List<MajorCategoryDto> findAllMajorCategories();
+
+    //대분류Id에 따른 중분류 리스트 반환
+    List<MajorMiddleDto> getMiddleByMajor(int majorCategoryId);
+
+
+    //상품리스트페이지에서 사용
+    //중분류Id에 따른 소분류 리스트 반환
+    List<SmallCategoryDto> getSmallCategoriesByMiddle(int middleCategoryId);
+
+    //같은 대분류를 가지는 중분류 리스트 반환
+    List<MiddleCategoryDto> getRelatedMiddleCategories(int middleCategoryId);
+
+    //소분류Id로 중분류Dto 반환
+    MiddleCategoryDto getMiddleCategoryBySmall(int smallCategoryId);
+
+
+
+
+
+
 
 //    //select
 //    CategoryDto selectCategoryByCategoryDto( CategoryDto categoryDto);
@@ -56,8 +80,15 @@ public interface CategoryDao {
     List<CategoryDto> findAllCategories();
 
 
-    //모든 Major카테고리들 List로 가져오기
-    List<MajorCategoryDto> findAllMajorCategories();
+
+
+
+
+
+
+
+
+
 
     //
 //    //특정 MajorId에 해당하는 모든 Middle카테고리를 List로 가져오기

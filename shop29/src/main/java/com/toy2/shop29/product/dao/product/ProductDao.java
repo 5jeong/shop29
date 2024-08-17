@@ -1,7 +1,8 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.product;
 
 import com.toy2.shop29.product.domain.ProductDto;
-import com.toy2.shop29.product.domain.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
+import com.toy2.shop29.product.domain.product.ProductWithMiddleSmallDto;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public interface ProductDao {
     int count();
 
     //페이징
-    List<ProductDto> selectPage(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> getPage(Map<String, Object> paramMap);
 
     //소분류Id에 맞는 상품 조회
     List<ProductDto> selectProductByCategory(int smallCategoryId);
@@ -42,19 +43,19 @@ public interface ProductDao {
 
     //정렬 관련
     //1.높은 가격순
-    List<ProductDto> SortedByPriceDesc(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByPriceDesc(Map<String, Object> paramMap);
 
     //2.낮은 가격순
-    List<ProductDto> SortedByPriceAsc(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByPriceAsc(Map<String, Object> paramMap);
 
     //3.신규순
-    List<ProductDto> SortedByNew(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByNewest(Map<String, Object> paramMap);
 
     //4.할인율순
-    List<ProductDto> SortedByHighDiscount(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByHighDiscount(Map<String, Object> paramMap);
 
     //5.별점 높은순
-    List<ProductDto> SortedByRating(Map<String, Object> paramMap);
+    List<ProductWithMiddleSmallDto> sortedByRating(Map<String, Object> paramMap);
 
 
     //제품ID로 상품의 분류 정보까지 조회
@@ -64,6 +65,10 @@ public interface ProductDao {
 
     int countMiddleCategory(int middleCategoryId);
 
+
+    int getCountBySmallCategory(int smallCategoryId);
+
+    int getCountByMiddleCategory(int middleCategoryId);
 
 
 }

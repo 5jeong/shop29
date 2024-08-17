@@ -1,6 +1,6 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.category;
 
-import com.toy2.shop29.product.domain.*;
+import com.toy2.shop29.product.domain.category.*;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,6 +18,38 @@ public class CategoryDaoImpl implements CategoryDao {
     String namespace = "com.toy2.shop29.product.dao.CategoryMapper.";
 
 
+    //메인페이지에서 사용
+    //모든 Major카테고리들 List로 가져오기
+    @Override
+    public List<MajorCategoryDto> findAllMajorCategories(){
+        return session.selectList(namespace+"findAllMajorCategories");
+    }
+
+    //MajorId에 해당하는 middle 가져오기
+    public List<MajorMiddleDto> getMiddleByMajor(int majorCategoryId) {
+        return session.selectList(namespace+"getMiddleByMajor", majorCategoryId);
+    }
+
+    @Override
+    public List<SmallCategoryDto> getSmallCategoriesByMiddle(int middleCategoryId) {
+        return session.selectList(namespace+ "getSmallCategoriesByMiddle", middleCategoryId);
+    }
+
+    //같은 대분류를 가지는 중분류 리스트 반환
+    @Override
+    public List<MiddleCategoryDto> getRelatedMiddleCategories(int middleCategoryId) {
+        return session.selectList(namespace+ "getRelatedMiddleCategories", middleCategoryId);
+    }
+
+    @Override
+    public MiddleCategoryDto getMiddleCategoryBySmall(int smallCategoryId){
+        return session.selectOne(namespace+ "getMiddleCategoryBySmall", smallCategoryId);
+    }
+
+
+
+
+
 
 
 
@@ -29,14 +61,6 @@ public class CategoryDaoImpl implements CategoryDao {
         return session.selectList(namespace + "findAllMiddleCategories");
     }
 
-
-
-
-    //모든 Major카테고리들 List로 가져오기
-    @Override
-    public List<MajorCategoryDto> findAllMajorCategories(){
-        return session.selectList(namespace+"findAllMajorCategories");
-    }
 
 
     // 대분류, 중분류, 소분류 전체 가져오기

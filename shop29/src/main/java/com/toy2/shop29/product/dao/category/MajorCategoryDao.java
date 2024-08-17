@@ -1,11 +1,10 @@
-package com.toy2.shop29.product.dao;
+package com.toy2.shop29.product.dao.category;
 
-import com.toy2.shop29.product.domain.MajorCategoryDto;
+import com.toy2.shop29.product.domain.category.MajorCategoryDto;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -39,6 +38,8 @@ public class MajorCategoryDao {
     public MajorCategoryDto selectByName(String majorCategoryName) {
         return session.selectOne(namespace + "selectByName", majorCategoryName);
     }
+
+
 
 
 }

@@ -1,10 +1,9 @@
-package com.toy2.shop29.product.domain;
+package com.toy2.shop29.product.domain.category;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Objects;
 
 @Getter
 @Setter

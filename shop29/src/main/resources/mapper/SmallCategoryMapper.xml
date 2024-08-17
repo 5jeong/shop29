@@ -4,24 +4,24 @@
 
 <mapper namespace="com.toy2.shop29.product.dao.SmallCategoryMapper">
 
-    <select id="selectAll" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+    <select id="selectAll" resultType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
         SELECT * FROM smallcategory
     </select>
 
-    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+    <select id="selectById" parameterType="int" resultType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
         SELECT * FROM smallcategory WHERE small_category_id = #{smallCategoryId}
     </select>
 
-    <select id="selectByMiddleCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
+    <select id="selectByMiddleCategoryId" parameterType="int" resultType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
         SELECT * FROM smallcategory WHERE middle_category_id = #{middleCategoryId}
     </select>
 
-    <insert id="insert" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
         INSERT INTO smallcategory (middle_category_id, small_category_name, created_id, created_date, updated_id, updated_date)
         VALUES (#{middleCategoryId}, #{smallCategoryName}, #{createdId}, #{createdDate}, #{updatedId}, #{updatedDate})
     </insert>
 
-    <update id="update" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
+    <update id="update" parameterType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
         UPDATE smallcategory
         SET small_category_name = #{smallCategoryName},
             updated_id = #{updatedId},

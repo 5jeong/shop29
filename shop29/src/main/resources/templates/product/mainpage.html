@@ -1,29 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Shop Main Page</title>
+    <title>Home</title>
 </head>
 <body>
-
-<div id="menu">
-    <ul>
-        <li id="logo">MyShop</li>
-        <li><a th:href="@{/}">Home</a></li>
-        <!-- Major Category를 반복하여 출력 -->
-        <li th:each="majorCategory : ${majorToMiddleMap.keySet()}">
-            <span th:text="${majorCategory.majorCategoryName}">Major Category Name</span>
-            <!-- 해당 Major Category에 속한 Middle Category들을 반복하여 출력 -->
-            <ul>
-                <li th:each="middleCategory : ${majorToMiddleMap.get(majorCategory)}">
-                    <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
-                       th:text="${middleCategory.middleCategoryName}">Middle Category Name</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-</div>
-
+<h1>Major Categories</h1>
+<ul>
+    <li th:each="entry : ${majorWithMiddleCategories}">
+        <!-- 대분류 이름 -->
+        <h2 th:text="${entry.key.majorCategoryName}"></h2>
+        <ul>
+            <!-- 중분류 이름들 -->
+            <li th:each="middleCategory : ${entry.value}">
+                <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
+                   th:text="${middleCategory.middleCategoryName}"></a>
+            </li>
+        </ul>
+    </li>
+</ul>
 </body>
 </html>
-
