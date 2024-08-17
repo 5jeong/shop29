@@ -2,12 +2,11 @@ package com.toy2.shop29.order.service;
 
 import com.toy2.shop29.cart.controller.CartController;
 import com.toy2.shop29.cart.service.CartService;
-import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.pay.KakaoPayApproveResponseDTO;
 import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
-import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
+import com.toy2.shop29.order.domain.request.OrderProductDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +31,9 @@ public class KakaoPayServiceImpl implements KakaoPayService {
 
     @Autowired
     private OrderService orderService;
-    private final CartService cartService;
 
-    public KakaoPayServiceImpl(CartService cartService) {
-        this.cartService = cartService;
-    }
+    @Autowired
+    private CartService cartService;
 
     // 카카오페이 결제창 연결
     @Override

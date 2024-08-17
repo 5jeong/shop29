@@ -3,6 +3,8 @@ package com.toy2.shop29.cart.service;
 import com.toy2.shop29.cart.dao.CartDao;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.exception.CartNotFoundException;
+import com.toy2.shop29.product.dao.ProductDao;
+import com.toy2.shop29.product.domain.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,9 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private CartDao cartDao;
+
+    @Autowired
+    private ProductDao productDao;
 
     /**
      * 해당 유저 장바구니 유무 확인
@@ -122,14 +127,7 @@ public class CartServiceImpl implements CartService {
             throw new CartNotFoundException("상품 번호" + productId + "를 찾을 수 없음");
         }
 
-        // application.properties
-        if (quantity > 100) {
-            throw new IllegalArgumentException("수량 초과");
-        }
-
-        if (quantity <= 0) {
-            deleteSpecificProduct(userId, productId);
-        }
+        quantity = Math.max(1, Math.min(quantity, 100));
 
         int result = cartDao.updateUserCartProductQuantity(userId, productId, quantity);
         if (result > 0) {
@@ -183,24 +181,42 @@ public class CartServiceImpl implements CartService {
      * @param isUser    로그인 비로그인 확인
      * @throws Exception .
      */
-    // TODO : 테스트 필요
     @Override
     @Transactional
-    public int updateGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
-        // 장바구니 없거나(장바구니에 담은 것이 없음) 장바구니에 담은 상품이 없을 경우 유저 장바구니에 담을 필요가 없기 떄문에 반환
-        if (checkUserCartExist(guestId) != 1 || getUserCartProductsCount(guestId) == 0) {
-            return 0;
+    public void updateGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
+        if (!isCartTransferNeeded(guestId)) {
+            return;
         }
-        // 장바구니에 담은 상품들을 리스트로 가져옴(상품 id와 상품 수량)
-        List<CartDto> guestCartProducts = cartDao.selectUserCartProductsByUserId(guestId);
 
-        // 가져온 상품들을 해당 유저의 uid로 상품에 추가
+        transferGuestCartToUser(loginUser, guestId, isUser);
+        if (removeGuestCart(guestId) == 0) {
+            throw new CartNotFoundException("해당 유저의 장바구니를 찾을 수 없음");
+        }
+    }
+
+    private boolean isCartTransferNeeded(String guestId) throws Exception {
+        return isGuestCartNotEmpty(guestId) && getUserCartProductsCount(guestId) > 0;
+    }
+
+    private boolean isGuestCartNotEmpty(String guestId) throws Exception {
+        return checkUserCartExist(guestId) == 1;
+    }
+
+    private void transferGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
+        List<CartDto> guestCartProducts = getGuestCartProducts(guestId);
         for (CartDto cartDto : guestCartProducts) {
             addProductToCart(loginUser, cartDto.getProductId(), cartDto.getQuantity(), isUser);
         }
-        // 정상적으로 상품까지 추가하면 해당 유저의 비로그인 장바구니는 필요없으니 삭제
+    }
+
+    private List<CartDto> getGuestCartProducts(String guestId) throws Exception {
+        return cartDao.selectUserCartProductsByUserId(guestId);
+    }
+
+    private int removeGuestCart(String guestId) throws Exception {
         return cartDao.deleteUserCart(guestId);
     }
+
 
     /**
      * 장바구니 수정일(lastUpdate) 업데이트 메서드

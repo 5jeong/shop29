@@ -14,7 +14,7 @@ public enum ErrorCode {
     FORBIDDEN_ACCESS(403, "EC007", "비정상적 접근"),
 
     // 장바구니
-    PRODUCT_NOT_EXISTS(400, "M001", "존재하지 않는 상품 ID")
+    PRODUCT_NOT_EXISTS(400, "M001", "존재하지 않는 상품 ID");
 
     private final String code;
     private final String message;
