@@ -7,43 +7,52 @@
 </head>
 <body>
 
-<div id="menu">
+
+<!-- 카테고리 링크들 -->
+<p>대분류: <a th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}" th:text="${product.majorCategoryName}"></a></p>
+<p>중분류: <a th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}" th:text="${product.middleCategoryName}"></a></p>
+<p>소분류: <a th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}" th:text="${product.smallCategoryName}"></a></p>
+
+
+<!-- 제품 상세 정보 -->
+<p>브랜드: <span th:text="${product.brandName}">브랜드</span></p>
+<h1 th:text="${product.productName}">상품 이름</h1>
+<p>별점: <span th:text="${product.rating}">별점</span></p>
+<p>할인율: <span th:text="${product.saleRatio}">할인율</span></p>
+<p>정가: <span th:text="${product.price}">정가</span></p>
+<p>할인가: <span th:text="${(product.price * (1 - product.saleRatio / 100)).intValue() - ((product.price * (1 - product.saleRatio / 100)).intValue() % 100)}">할인가</span></p>
+<p>상품 사이즈 측정 표: <span th:text="${product.sizeTable != null ? product.sizeTable : ''}">상품 사이즈 측정 표</span></p>
+
+
+
+
+
+
+
+ <!-- 옵션 키와 해당 옵션 값들 나열 -->
+<div th:each="option : ${productOptions}">
+    <!-- 옵션 키 이름을 표시하는 영역 -->
+    <h3 th:text="${option.optionKeyName}">옵션 키 이름</h3>
+
+    <!-- 옵션 값들을 나열하는 영역 -->
     <ul>
-        <li id="logo">fastcampus</li>
-        <li><a th:href="@{/}">Home</a></li>
-        <li><a th:href="@{/board/list}">Board</a></li>
-        <li><a th:href="@{/login/login}">Login</a></li>
-        <li><a th:href="@{/register/add}">Sign in</a></li>
-        <li><a href=""><i class="fas fa-search small"></i></a></li>
+        <li th:each="value : ${productOptionValues}" th:if="${value.optionKeyId == option.optionKeyId}">
+            <input type="radio" th:name="'option_' + ${value.optionKeyId}" th:value="${value.optionValueId}" th:id="'optionValue_' + ${value.optionValueId}" />
+            <label th:for="'optionValue_' + ${value.optionValueId}" th:text="${value.optionValueName}"></label>
+            <span th:text="'추가 비용: ' + ${value.extraFee}"></span>
+            <span th:text="'재고: ' + ${value.stock}"></span>
+        </li>
     </ul>
 </div>
 
 
 
-<!-- 카테고리 링크들 -->
-<p>대분류: <span th:text="${product.majorCategoryName}"></span></p>
-<p>중분류: <span th:text="${product.middleCategoryName}"></span></p>
-<p>소분류: <span th:text="${product.smallCategoryName}"></span></p>
-
-
-
-<!-- 제품 상세 정보 -->
-<p>브랜드: <span th:text="${product.brandId}">브랜드</span></p>
-<h1 th:text="${product.productName}">상품 이름</h1>
-<p>별점: <span th:text="${product.rating}">별점</span></p>
-<p>할인율: <span th:text="${product.saleRatio}">할인율</span></p>
-<p>정가: <span th:text="${product.price}">정가</span></p>
-<p>할인가: <span th:text="${#numbers.formatDecimal(product.price * (1 - product.saleRatio / 100), 1, 2)}">할인가</span></p>
-<p>상품 사이즈 측정 표: <span th:text="${product.sizeTable}">상품 사이즈 측정 표</span></p>
 
 
 
 
-<!-- 옵션 선택 버튼 -->
-<form>
-    <input type="hidden" name="Option">
-    <button type="submit">옵션</button>
-</form>
+
+
 
 <!-- 장바구니 버튼 -->
 <form action="/cart/add" method="post">
@@ -63,33 +72,4 @@
 
 
 
-
-
-
-<div style="text-align:center">
-    <table border="1">
-        <thead>
-        <tr>
-            <td>번호</td>
-            <td>상품이름</td>
-            <td>브랜드</td>
-            <td>할인율</td>
-            <td>정가</td>
-            <td>할인가</td>
-            <td>별점</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="productDto, status: ${list}">
-            <td th:text="${status.index + 1}"></td>
-            <td><a th:href="@{/product/{productId}(productId=${productDto.productId})}" th:text="${productDto.productName}"></a></td>
-            <td th:text="${productDto.brandId}"></td>
-            <td th:text="${productDto.saleRatio}"></td>
-            <td th:text="${productDto.price}"></td>
-            <td th:text="${#numbers.formatDecimal(productDto.price * (1 - productDto.saleRatio / 100), 1, 2)}"></td>
-            <td th:text="${productDto.rating}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 
