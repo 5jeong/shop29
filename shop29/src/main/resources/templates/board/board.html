@@ -1,26 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>공지사항 상세</title>
   <link rel="stylesheet" href="/css/main.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 80%;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-top: 20px;
+    }
+
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: #333;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .actions a {
+      display: inline-block;
+      margin: 0 10px;
+      padding: 10px 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #007bff;
+      text-decoration: none;
+      transition: background-color 0.2s ease-in;
+    }
+
+    .actions a:hover {
+      background-color: #e9ecef;
+    }
+  </style>
 </head>
 <body>
-<h1 th:text="${board.noticeTitle}">공지사항 제목</h1>
-<p th:text="${board.noticeCreatorId}">작성 날짜</p>
-<div th:text="${board.noticeContent}">공지사항 내용</div>
+<div class="container">
+  <h1>공지사항 상세</h1>
 
-<a href="/board/list">목록으로 돌아가기</a>
-<form th:action="@{/board/edit}" method="get">
-<!-- 수정 버튼 클릭 시 자바스크립트 함수 호출 -->
-  <input type="hidden" name="noticeId" th:value="${board.noticeId}">
-  <input type="submit" value="수정"></input>
-</form>
-<!-- 삭제 폼 -->
-<form th:action="@{/board/delete}" method="post" style="display:inline;">
-  <input type="hidden" name="noticeId" th:value="${board.noticeId}">
-  <input type="hidden" name="noticeCreatorId" th:value="${board.noticeCreatorId}">
-  <button type="submit" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</button>
-</form>
+  <div>
+    <h2 th:text="${board.noticeTitle}">공지사항 제목</h2>
+    <p><strong>작성자:</strong> <span th:text="${board.noticeCreatorId}">작성자</span></p>
+    <p><strong>작성일시:</strong> <span th:text="${#dates.format(board.noticeCreationTime, 'yyyy-MM-dd HH:mm:ss')}">작성일시</span></p>
+    <p><strong>내용:</strong></p>
+    <p th:text="${board.noticeContent}">공지사항 내용</p>
+  </div>
+
+  <div class="actions">
+    <a th:href="@{/board/edit(noticeId=${board.noticeId})}">수정하기</a>
+    <a href="/board/list">목록으로 돌아가기</a>
+  </div>
+</div>
 </body>
 </html>
