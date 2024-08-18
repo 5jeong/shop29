@@ -38,9 +38,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updateUser(String userId, UserUpdateDto userUpdateDto) {
-        log.info("userUpdateDto = {}",userUpdateDto);
-        log.info("들어옴????????????????????");
-
         return userMapper.updateUser(userId, userUpdateDto);
     }
 
