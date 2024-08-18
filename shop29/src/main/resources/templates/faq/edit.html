@@ -63,26 +63,26 @@
     </style>
 </head>
 <body>
-<h1>새 FAQ 작성</h1>
+<div class="container">
+    <h1>FAQ 수정</h1>
+    <form th:action="@{/faq/edit}" method="post">
+        <input type="hidden" name="faqId" th:value="${faq.faqId}" />
 
-<form th:action="@{/faq/edit}" th:object="${faq}" method="post">
-    <input type="hidden" th:field="*{faqId}" />
+        <label for="faqTitle">제목:</label>
+        <input type="text" id="faqTitle" name="faqTitle" th:value="${faq.faqTitle}" />
 
-    <label for="faqTitle">제목:</label>
-    <input type="text" id="faqTitle" th:field="*{faqTitle}" required>
+        <label for="faqCreatorId">작성자:</label>
+        <input type="text" id="faqCreatorId" name="faqCreatorId" th:value="${faq.faqCreatorId}" required />
 
-    <label for="faqCreatorId">작성자:</label>
-    <input type="text" id="faqCreatorId" th:field="*{faqCreatorId}" required>
+        <label for="faqContent">내용:</label>
+        <textarea id="faqContent" name="faqContent" rows="6" required th:text="${faq.faqContent}"></textarea>
 
-    <label for="faqContent">내용:</label>
-    <textarea id="faqContent" th:field="*{faqContent}" rows="6" required></textarea>
+        <button type="submit">수정 완료</button>
+    </form>
 
-    <button type="submit">저장</button>
-</form>
-
-<div class="actions">
-    <a href="/faq/list">목록으로 돌아가기</a>
-</div>
+    <div class="actions">
+        <a href="/faq/list">목록으로 돌아가기</a>
+    </div>
 </div>
 </body>
 </html>

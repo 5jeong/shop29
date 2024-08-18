@@ -109,17 +109,59 @@
             justify-content: space-between;
             margin: 20px 0;
         }
+
+        /* 검색 폼을 테이블 왼쪽 위에 위치시킴 */
+        .search-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .search-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 250px;
+        }
+
+        .search-button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>FAQ 목록</h1>
 
-    <!-- 검색 폼 추가 -->
-    <div class="search-form">
-        <form th:action="@{/faq/list}" method="get">
-            <input type="text" name="searchQuery" placeholder="검색어를 입력하세요" value="${searchQuery}">
-            <button type="submit">검색</button>
+    <!-- 검색 폼 및 색인 옵션을 테이블 위로 위치 -->
+    <div class="search-wrapper">
+        <form action="/faq/list" method="get" class="search-form">
+            <select class="search-option" name="option">
+                <option value="A" th:selected="${option == 'A'}">제목+내용</option>
+                <option value="T" th:selected="${option == 'T'}">제목만</option>
+                <option value="W" th:selected="${option == 'W'}">작성자</option>
+            </select>
+            <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요" th:value="${keyword != null ? keyword : ''}">
+
+            <input type="submit" class="search-button" value="검색">
         </form>
     </div>
 
@@ -137,7 +179,7 @@
         <!-- FAQ 항목 출력 -->
         <tr th:each="faq, iterStat : ${list}">
             <!-- 번호 계산: 총 항목 수 - (현재 페이지 - 1) * 페이지 크기 - 현재 항목 인덱스 -->
-            <td th:text="${(totalCnt != null ? totalCnt : 0) - ((page.currentPage != null ? page.currentPage : 1) - 1) * (pageSize != null ? pageSize : 10) - iterStat.index}"></td>
+            <td th:text="${(totalCnt != null ? totalCnt : 0) - (((page != null && page.currentPage != null) ? page.currentPage : 1) - 1) * (pageSize != null ? pageSize : 10) - iterStat.index}"></td>
             <td th:text="${faq.faqTypeId}"></td>
             <td class="title">
                 <a th:href="@{/faq/read(faqId=${faq.faqId})}" th:text="${faq.faqTitle}"></a>

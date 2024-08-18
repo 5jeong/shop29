@@ -72,9 +72,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>새 FAQ 작성</h1>
-
-    <form th:action="@{/faq/write}" th:object="${faq}" method="post">
+    <h1>FAQ 작성</h1>
+    <form th:action="@{/faq/save}" th:object="${faq}" method="post">
         <label for="faqTitle">제목:</label>
         <input type="text" id="faqTitle" th:field="*{faqTitle}" placeholder="제목을 입력하세요" required>
 
@@ -86,9 +85,8 @@
 
         <button type="submit">저장</button>
     </form>
-
     <div class="actions">
-        <a href="/faq/list">목록으로 돌아가기</a>
+        <a href="/faq/list">FAQ 목록으로 돌아가기</a>
     </div>
 </div>
 </body>
