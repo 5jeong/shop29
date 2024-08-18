@@ -70,10 +70,10 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
                 </li>
-                <li class="nav-item" th:if="${session.userId}">
+                <li class="nav-item" th:if="${session.loginUser == null}">
                     <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
                 </li>
-                <li class="nav-item" th:if="${session.userId == null}">
+                <li class="nav-item" th:if="${session.loginUser == null}">
                     <a class="nav-link active" href="/login" th:text="'로그인'">로그인</a>
                 </li>
                 <li class="nav-item" th:if="${session.loginUser != null}">
