@@ -4,33 +4,85 @@
     <meta charset="UTF-8">
     <title>FAQ 수정</title>
     <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-<h1>FAQ 수정</h1>
+<h1>새 FAQ 작성</h1>
 
-<form th:action="@{/faq/edit}" method="post">
-    <!-- FAQ ID는 히든 필드로 폼 데이터에 포함 -->
-    <input type="hidden" name="faqId" th:value="${faq.faqId}">
+<form th:action="@{/faq/edit}" th:object="${faq}" method="post">
+    <input type="hidden" th:field="*{faqId}" />
 
     <label for="faqTitle">제목:</label>
-    <input type="text" id="faqTitle" name="faqTitle" th:value="${faq.faqTitle}" required><br>
+    <input type="text" id="faqTitle" th:field="*{faqTitle}" required>
+
+    <label for="faqCreatorId">작성자:</label>
+    <input type="text" id="faqCreatorId" th:field="*{faqCreatorId}" required>
 
     <label for="faqContent">내용:</label>
-    <textarea id="faqContent" name="faqContent" required th:text="${faq.faqContent}"></textarea><br>
+    <textarea id="faqContent" th:field="*{faqContent}" rows="6" required></textarea>
 
-    <button type="submit">수정완료</button>
+    <button type="submit">저장</button>
 </form>
 
-<div>
-    <a th:href="@{/faq/list}">목록으로 돌아가기</a>
+<div class="actions">
+    <a href="/faq/list">목록으로 돌아가기</a>
 </div>
-
-<!-- 디버깅을 위한 데이터 표시 -->
-<div>
-    <p>FAQ ID: <span th:text="${faq.faqId}"></span></p>
-    <p>FAQ Title: <span th:text="${faq.faqTitle}"></span></p>
-    <p>FAQ Content: <span th:text="${faq.faqContent}"></span></p>
 </div>
-
 </body>
 </html>
