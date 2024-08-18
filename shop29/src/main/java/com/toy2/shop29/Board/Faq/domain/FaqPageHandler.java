@@ -14,7 +14,7 @@ public class FaqPageHandler {
     private int pageSize;
     private int totalPages;
 
-    // Constructor, getters, and setters
+    // 생성자
     public FaqPageHandler(int totalCnt, int currentPage, int pageSize) {
         this.totalCnt = totalCnt;
         this.currentPage = currentPage;
@@ -22,23 +22,19 @@ public class FaqPageHandler {
         this.totalPages = (int) Math.ceil((double) totalCnt / pageSize);
     }
 
-    public int getNumber() {
-        return currentPage - 1;
-    }
-
-    public int getSize() {
-        return pageSize;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
+    public boolean hasPrevious() {
+        return currentPage > 1;
     }
 
     public boolean hasNext() {
         return currentPage < totalPages;
     }
 
-    public boolean hasPrevious() {
-        return currentPage > 1;
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
     }
 }

@@ -64,5 +64,14 @@ public class FaqDaoImpl implements FaqDao {
         // MyBatis의 count 쿼리 실행
         return session.selectOne(namespace + "count");
     }
+    @Override
+    public int countBySearchQuery(String searchQuery) {
+        return session.selectOne(namespace + "countBySearchQuery", searchQuery);
+    }
+
+    @Override
+    public List<FaqDto> selectPageWithSearchQuery(Map<String, Object> map) {
+        return session.selectList(namespace + "selectPageWithSearchQuery", map);
+    }
 }
 

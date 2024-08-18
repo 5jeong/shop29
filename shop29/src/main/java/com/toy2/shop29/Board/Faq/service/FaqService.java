@@ -12,7 +12,8 @@ public interface FaqService {
      *
      * @return 총 FAQ 개수
      */
-    int getCount();
+    int getCount(String searchQuery);
+    List<FaqDto> getPageWithSearchQuery(Map<String, Object> map);
 
     /**
      * 특정 FAQ를 삭제합니다.

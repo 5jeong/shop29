@@ -28,6 +28,9 @@ public class FaqController {
     @GetMapping("/read")
     public String read(@RequestParam("faqId") Integer faqId, Model m) {
         try {
+            if (faqId == null) {
+                throw new IllegalArgumentException("FAQ ID cannot be null");
+            }
             FaqDto faqDto = faqService.read(faqId);
             m.addAttribute("board", faqDto);
             return "faq/faq";
@@ -41,28 +44,34 @@ public class FaqController {
     @GetMapping("/list")
     public String list(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                       @RequestParam(value = "searchQuery", defaultValue = "") String searchQuery,
                        Model m) {
         try {
-            int totalCnt = faqService.getCount();
+            int totalCnt = faqService.getCount(searchQuery); // 검색어를 고려하여 총 FAQ 수를 가져옵니다.
             FaqPageHandler faqPageHandler = new FaqPageHandler(totalCnt, currentPage, pageSize);
 
             Map<String, Object> map = new HashMap<>();
             map.put("offset", (currentPage - 1) * pageSize);
             map.put("pageSize", pageSize);
+            map.put("searchQuery", searchQuery); // 검색어를 추가합니다.
 
             List<FaqDto> list = faqService.getPage(map);
+            if (list == null || list.isEmpty()) {
+                m.addAttribute("error", "No FAQs found.");
+            }
 
             m.addAttribute("list", list);
-            m.addAttribute("page", faqPageHandler); // Add this line
+            m.addAttribute("page", faqPageHandler);
             m.addAttribute("totalCnt", totalCnt);
-
+            m.addAttribute("searchQuery", searchQuery); // 검색어를 모델에 추가합니다.
         } catch (Exception e) {
-            LoggerFactory.getLogger(FaqController.class).error("Error retrieving FAQ list", e);
+            logger.error("Error retrieving FAQ list", e);
             throw new RuntimeException("Error retrieving FAQ list", e);
         }
 
         return "faq/list";
     }
+
 
     @GetMapping("/edit")
     public String edit(@RequestParam("faqId") Integer faqId, Model m) {
@@ -80,6 +89,9 @@ public class FaqController {
     @PostMapping("/edit")
     public String editSubmit(FaqDto faqDto) {
         try {
+            if (faqDto.getFaqId() == null) {
+                throw new IllegalArgumentException("FAQ ID cannot be null");
+            }
             faqService.modify(faqDto);
             return "redirect:/faq/list";
         } catch (Exception e) {

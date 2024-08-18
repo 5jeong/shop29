@@ -21,4 +21,11 @@ public interface FaqDao {
     int deleteAll();
 
     int count();
+
+    // 검색어를 포함한 총 FAQ 수를 가져오는 메서드
+    int countBySearchQuery(String searchQuery);
+
+    // 검색어를 포함한 페이지 데이터를 가져오는 메서드
+    List<FaqDto> selectPageWithSearchQuery(Map<String, Object> map);
+
 };

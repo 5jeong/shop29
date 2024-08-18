@@ -7,12 +7,13 @@
 
     <!-- Faq의 총 개수를 조회하는 쿼리 -->
     <select id="count" resultType="int">
-        select count(*) from Faq
+        SELECT COUNT(*)
+        FROM Faq
     </select>
 
     <!-- 특정 Faq를 조회하는 쿼리 -->
     <select id="select" parameterType="int" resultType="com.toy2.shop29.Board.Faq.domain.FaqDto">
-        select faq_id,
+        SELECT faq_id,
                faq_type_id,
                faq_title,
                faq_content,
@@ -21,13 +22,13 @@
                faq_creation_time,
                faq_modification_time,
                faq_view_count
-        from Faq
-        where faq_id = #{faqId}
+        FROM Faq
+        WHERE faq_id = #{faqId}
     </select>
 
     <!-- 모든 Faq를 조회하는 쿼리 -->
     <select id="selectAll" resultType="com.toy2.shop29.Board.Faq.domain.FaqDto">
-        select faq_id,
+        SELECT faq_id,
                faq_type_id,
                faq_title,
                faq_content,
@@ -36,8 +37,8 @@
                faq_creation_time,
                faq_modification_time,
                faq_view_count
-        from Faq
-        order by faq_creation_time desc, faq_id desc
+        FROM Faq
+        ORDER BY faq_creation_time DESC, faq_id DESC
     </select>
 
     <!-- 페이지네이션을 적용하여 Faq를 조회하는 쿼리 -->
@@ -52,34 +53,60 @@
                faq_modification_time,
                faq_view_count
         FROM Faq
-        ORDER BY faq_id DESC, faq_creation_time DESC
+        ORDER BY faq_creation_time DESC, faq_id DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 검색어를 포함한 총 FAQ 수를 조회하는 쿼리 -->
+    <select id="countBySearchQuery" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM Faq
+        WHERE faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+           OR faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+    </select>
+
+    <!-- 검색어를 포함한 페이지 데이터를 조회하는 쿼리 -->
+    <select id="selectPageWithSearchQuery" parameterType="map" resultType="com.toy2.shop29.Board.Faq.domain.FaqDto">
+        SELECT faq_id,
+               faq_type_id,
+               faq_title,
+               faq_content,
+               faq_creator_id,
+               faq_modifier_id,
+               faq_creation_time,
+               faq_modification_time,
+               faq_view_count
+        FROM Faq
+        WHERE faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+           OR faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+        ORDER BY faq_creation_time DESC, faq_id DESC
             LIMIT #{offset}, #{pageSize}
     </select>
 
     <!-- Faq를 삽입하는 쿼리 -->
     <insert id="insert" parameterType="com.toy2.shop29.Board.Faq.domain.FaqDto">
-        insert into Faq (faq_title, faq_content, faq_creator_id, faq_creation_time)
-        values (#{faqTitle}, #{faqContent}, #{faqCreatorId}, NOW())
+        INSERT INTO Faq (faq_title, faq_content, faq_creator_id, faq_creation_time)
+        VALUES (#{faqTitle}, #{faqContent}, #{faqCreatorId}, NOW())
     </insert>
 
     <!-- 모든 Faq를 삭제하는 쿼리 -->
     <delete id="deleteAll">
-        delete from Faq
+        DELETE FROM Faq
     </delete>
 
     <!-- 특정 Faq를 삭제하는 쿼리 -->
     <delete id="delete" parameterType="map">
-        delete from Faq
-        where faq_id = #{faqId} and faq_creator_id = #{faqCreatorId}
+        DELETE FROM Faq
+        WHERE faq_id = #{faqId} AND faq_creator_id = #{faqCreatorId}
     </delete>
 
     <!-- Faq를 업데이트하는 쿼리 -->
     <update id="update" parameterType="com.toy2.shop29.Board.Faq.domain.FaqDto">
-        update Faq
-        set faq_title = #{faqTitle},
+        UPDATE Faq
+        SET faq_title = #{faqTitle},
             faq_content = #{faqContent},
-            faq_modification_time = now()
-        where faq_id = #{faqId}
+            faq_modification_time = NOW()
+        WHERE faq_id = #{faqId}
     </update>
 
 </mapper>

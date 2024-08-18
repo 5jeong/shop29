@@ -20,9 +20,9 @@ public class FaqServiceImpl implements FaqService {
     private FaqDao faqDao;
 
     @Override
-    public int getCount() {
+    public int getCount(String searchQuery) {
         try {
-            return faqDao.count();
+            return faqDao.countBySearchQuery(searchQuery); // 검색어를 고려한 FAQ 수를 반환합니다.
         } catch (Exception e) {
             logger.error("Error getting FAQ count", e);
             throw new RuntimeException("Error getting FAQ count", e);
@@ -74,7 +74,7 @@ public class FaqServiceImpl implements FaqService {
     @Override
     public List<FaqDto> getPage(Map<String, Object> map) {
         try {
-            return faqDao.selectPage(map);
+            return faqDao.selectPage(map); // 검색어를 포함한 FAQ 데이터를 반환합니다.
         } catch (Exception e) {
             logger.error("Error getting FAQ page with parameters: {}", map, e);
             throw new RuntimeException("Error getting FAQ page", e);
@@ -89,6 +89,16 @@ public class FaqServiceImpl implements FaqService {
         } catch (Exception e) {
             logger.error("Error modifying FAQ: {}", faqDto, e);
             throw new RuntimeException("Error modifying FAQ", e);
+        }
+    }
+
+    @Override
+    public List<FaqDto> getPageWithSearchQuery(Map<String, Object> map) {
+        try {
+            return faqDao.selectPageWithSearchQuery(map);
+        } catch (Exception e) {
+            logger.error("Error getting FAQ page with search query", e);
+            throw new RuntimeException("Error getting FAQ page with search query", e);
         }
     }
 }

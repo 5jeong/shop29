@@ -10,7 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
     public class FaqDto {
     private Integer faqId;
-    private Integer faqTypeId;
+    private String faqTypeId;
     private String faqTitle;
     private String faqContent;
     private String faqCreatorId;
@@ -24,12 +24,12 @@ import java.util.Date;
 
     }
 
-    public FaqDto(String faqTitle, String faqContent, String faqCreatorId) {
+    public FaqDto(String faqTitle, String faqContent, String faqCreatorId, String faqTypeId) {
 //        this.faqId = faqId;   //faqId는  auto_increase라서 생략
         this.faqTitle = faqTitle;
         this.faqContent = faqContent;
         this.faqCreatorId = faqCreatorId;
-
+        this.faqTypeId=faqTypeId;
 
     }
 }
