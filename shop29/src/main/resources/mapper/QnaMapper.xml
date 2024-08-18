@@ -334,6 +334,29 @@
             COUNT(*)
         FROM `Qna`
         WHERE `user_id` = #{userId}
+          AND `is_deleted` = false
+    </select>
+
+    <select id="countForAdminWithFilter" parameterType="map" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM `Qna` AS q
+        JOIN `QnaType` AS qt ON q.qna_type_id = qt.qna_type_id
+        <if test="isAnswered != null">
+            LEFT JOIN `QnaAnswer` AS qa ON q.qna_id = qa.qna_id
+        </if>
+        WHERE q.is_deleted = false
+        <if test="qnaTypeId != null">
+            AND q.qna_type_id = #{qnaTypeId}
+        </if>
+        <if test="isAnswered != null">
+            <if test="isAnswered == true">
+                AND qa.qna_answer_id IS NOT NULL
+            </if>
+            <if test="isAnswered == false">
+                AND qa.qna_answer_id IS NULL
+            </if>
+        </if>
     </select>
 
     <!-- UPDATE -->

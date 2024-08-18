@@ -29,7 +29,8 @@ public class LoginConfig implements WebMvcConfigurer {
                         "/css/**",
                         "/error",
                         "/mainPage/**",
-                        "/images/**"
+                        "/images/**",
+                        "/attachment/**"
                         );
     }
 }

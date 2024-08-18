@@ -1,5 +1,9 @@
 package com.toy2.shop29.qna.service.qna;
 
+import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.service.OrderService;
+import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
+import com.toy2.shop29.product.service.product.ProductService;
 import com.toy2.shop29.qna.domain.AttachmentTableName;
 import com.toy2.shop29.qna.domain.QnaDto;
 import com.toy2.shop29.qna.domain.request.QnaCreateRequest;
@@ -8,8 +12,6 @@ import com.toy2.shop29.qna.domain.response.QnaDetailResponse;
 import com.toy2.shop29.qna.domain.response.QnaResponse;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.service.attachment.AttachmentService;
-import com.toy2.shop29.qna.service.qnaanswer.QnaAnswerService;
-import com.toy2.shop29.qna.util.FileUploadHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +30,14 @@ public class QnaServiceImpl implements QnaService{
 
     private QnaDao qnaDao;
     private AttachmentService attachmentService;
-    private QnaAnswerService qnaAnswerService;
-    private FileUploadHandler fileUploadHandler;
+    private OrderService orderService;
+    private ProductService productService;
 
-    public QnaServiceImpl(QnaDao qnaDao, AttachmentService attachmentService, FileUploadHandler fileUploadHandler) {
+    public QnaServiceImpl(QnaDao qnaDao, AttachmentService attachmentService, OrderService orderService, ProductService productService){
         this.qnaDao = qnaDao;
         this.attachmentService = attachmentService;
-        this.fileUploadHandler = fileUploadHandler;
+        this.orderService = orderService;
+        this.productService = productService;
     }
 
     // [READ] 1:1 문의 전체조회(유저) <- 유저 페이지 정보제공 목적
@@ -66,10 +69,35 @@ public class QnaServiceImpl implements QnaService{
         return qnaDao.countByUserId(userId);
     }
 
+    @Override
+    public int countForAdminWithFilter(String qnaTypeId, Boolean isAnswered) throws RuntimeException {
+        return qnaDao.countForAdminWithFilter(qnaTypeId,isAnswered);
+    }
+
     // [CREATE] 1:1 문의 등록
     @Transactional
     @Override
     public void createQna(QnaCreateRequest request, String userId) throws RuntimeException {
+        // 0. 주문ID와 상품ID가 존재하는지 확인
+        if(request.getOrderId() != null){
+            try{
+                List<OrderHistoryDTO> orderHistorys= orderService.getOrderHistory(userId);
+                boolean isExist = orderHistorys.stream().anyMatch(orderHistoryDTO -> orderHistoryDTO.getOrderId().equals(request.getOrderId()));
+                if(!isExist){
+                    throw new IllegalArgumentException("주문ID가 존재하지 않습니다.");
+                }
+            }catch (Exception e){
+                throw new IllegalArgumentException("주문ID가 존재하지 않습니다.",e);
+            }
+        }
+
+        if (request.getProductId() != null) {
+            ProductWithCategoriesDto product = productService.getProductWithCategories(request.getProductId());
+            if (product == null) {
+                throw new IllegalArgumentException("상품ID가 존재하지 않습니다.");
+            }
+        }
+
         // 1. 1:1 문의 등록
         QnaDto qnaDto = QnaDto.builder()
                 .qnaTypeId(request.getQnaTypeId())
@@ -87,7 +115,7 @@ public class QnaServiceImpl implements QnaService{
         // 2. 첨부파일 등록
         List<String> attachmentNames = request.getAttachmentNames();
         // 2-1. 첨부파일이 없을 경우, 종료
-        if(attachmentNames == null || attachmentNames.isEmpty()){
+        if(attachmentNames.isEmpty()){
             return;
         }
 

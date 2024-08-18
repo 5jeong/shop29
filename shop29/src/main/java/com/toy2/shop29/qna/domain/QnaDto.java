@@ -17,7 +17,7 @@ public class QnaDto {
     private String qnaTypeId;
     private String title;
     private String content;
-    private Integer orderId;
+    private String orderId;
     private Integer productId;
 
     private boolean isDeleted;

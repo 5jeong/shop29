@@ -82,6 +82,15 @@ public class QnaDaoImpl implements QnaDao{
     }
 
     @Override
+    public int countForAdminWithFilter(String qnaTypeId, Boolean isAnswered) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("qnaTypeId", qnaTypeId);
+        map.put("isAnswered", isAnswered);
+
+        return session.selectOne(namespace + "countForAdminWithFilter", map);
+    }
+
+    @Override
     public int count() {
         return session.selectOne(namespace + "count");
     }
