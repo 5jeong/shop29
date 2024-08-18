@@ -13,17 +13,14 @@ import com.toy2.shop29.product.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/product")
+
 public class ProductController {
 
     @Autowired
@@ -32,12 +29,11 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
 
-
     @Autowired
     private OptionService optionService;
 
     // 상품 상세 페이지 이동
-    @GetMapping("/{productId}")
+    @GetMapping("/product/{productId}")
     public String getProductDetail(@PathVariable("productId") int productId, Model model) {
         // 상품과 관련된 카테고리 정보를 포함한 상세 정보를 가져옵니다
         try {
@@ -58,7 +54,6 @@ public class ProductController {
         model.addAttribute("productOptionValues", productOptionValues);
 
 
-
         ProductWithCategoriesDto product = productService.getProductWithCategories(productId);
         model.addAttribute("product", product);
 
@@ -67,7 +62,7 @@ public class ProductController {
 
 
     //상품 게시판으로 이동
-    @GetMapping("/list")
+    @GetMapping("/product/list")
     //page와 pageSize로 offset을 계산하기 때문에 필요하고, 값을 넘겨주기 위해 model이 필요
     public String list(@RequestParam(name = "page", required = false) Integer page,
                        @RequestParam(name = "pageSize", required = false) Integer pageSize,
@@ -77,6 +72,7 @@ public class ProductController {
                        Model model) {
 
         //레퍼런스페이지 기준 pageSize 50
+        //RequestParam의 defaultValue는 String형만 가능해서 따로 빼놓음
         if (page == null) {
             page = 1;
         }
@@ -84,7 +80,7 @@ public class ProductController {
             pageSize = 50;
         }
 
-        //메인페이지를 타고 오는게 아닌 url로 /product/list 직접 치고 들어오는거라면 middleCategoryId=1인 상태
+        //메인페이지를 타고 오는게 아닌 url로 /product/list 직접 치고 들어오는거라면 middleCategoryId=1인 상태로
         if (middleCategoryId == null) {
             middleCategoryId = 1;
         }

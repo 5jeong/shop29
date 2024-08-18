@@ -1,5 +1,6 @@
 package com.toy2.shop29.product.service.product;
 
+import com.toy2.shop29.product.dao.option.OptionDao;
 import com.toy2.shop29.product.dao.product.ProductDao;
 import com.toy2.shop29.product.domain.ProductDto;
 import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
@@ -16,6 +17,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductDao productDao;
 
+    @Autowired
+    private OptionDao optionDao;
+
     //기본적인 CRUD
 
     //1.새 상품 등록 (insert)
@@ -26,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
 
     //2-1.특정 product_id에 해당하는 상품 정보 조회하여 반환 (select)
     @Override
-    public ProductDto read(Integer productId){
+    public ProductDto read(Integer productId) {
         ProductDto productDto = productDao.select(productId);
         //원래는 조회수+1 시키는게 여기에 있는데 나는 따로 조회수 신경 안써서 패스
         return productDto;
@@ -43,13 +47,13 @@ public class ProductServiceImpl implements ProductService {
 
     //3.상품 수정 (update)
     @Override
-    public int modify(ProductDto productDto){
+    public int modify(ProductDto productDto) {
         return productDao.update(productDto);
     }
 
     //4. 주어진 product_id에 해당하는 상품 삭제 (delete)
     @Override
-    public int remove(Integer product_id){
+    public int remove(Integer product_id) {
         return productDao.delete(product_id);
     }
 
@@ -62,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productDao.checkPurchaseAvailability(productId, optionValueId, quantity);
     }
-
+  
     // 상품 재고 확인
     @Override
     public Long checkProductStock(Long productId, Long optionValueId) {
@@ -71,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
 
     //총 상품 개수
     @Override
-    public int getCount(){
+    public int getCount() {
         return productDao.count();
     }
 
@@ -128,12 +132,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-
     @Override
     public ProductWithCategoriesDto getProductWithCategories(int productId) {
         return productDao.selectProductWithCategories(productId);
     }
-
 
 
     @Override
@@ -141,7 +143,6 @@ public class ProductServiceImpl implements ProductService {
     public int getCountByMiddleCategory(Integer middleCategoryId) {
         return productDao.countMiddleCategory(middleCategoryId);
     }
-
 
 
     @Override
