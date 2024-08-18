@@ -51,22 +51,22 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="product/list" th:text="'상품'">상품</a>
+                    <a class="nav-link active" aria-current="page" th:href="@{/product/list}" th:text="'상품'">상품</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/cart" th:text="'장바구니'"></a>
+                    <a class="nav-link active" th:href="@{/cart}" th:text="'장바구니'"></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/order" th:text="'주문'"></a>
+                    <a class="nav-link active" th:href="@{/order}" th:text="'주문'"></a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
+                <a class="nav-link active" th:href="@{/qna/qna-list}" th:text="'1:1 문의'">1:1 문의</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
+                <a class="nav-link active" th:href="@{/board/list}" th:text="'공지사항'">공지사항</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
+                    <a class="nav-link active" th:href="@{/user/signup}" th:text="'회원가입'">회원가입</a>
                 </li>
             </ul>
             <form class="d-flex">
