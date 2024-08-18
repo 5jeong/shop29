@@ -36,8 +36,6 @@ public interface ProductService {
     List<ProductDto> getProductsByPriceRange(int minPrice, int maxPrice);
 
 
-
-
     //가격 내림차순으로 상품들 정렬
     List<ProductWithMiddleSmallDto> sortByPriceAsc(Map<String, Object> paramMap);
 
@@ -56,7 +54,6 @@ public interface ProductService {
     List<ProductWithMiddleSmallDto> getPage(Map<String, Object> paramMap);
 
 
-
     //상품에 해당하는 모든 카테고리 가져오기
     ProductWithCategoriesDto getProductWithCategories(int productId);
 
@@ -64,10 +61,7 @@ public interface ProductService {
     int getCountByMiddleCategory(Integer middleCategoryId);
 
 
-
     int getCountBySmallCategory(int smallCategoryId);
 
     int getCountByMiddleCategory(int middleCategoryId);
-
-
 }

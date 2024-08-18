@@ -134,10 +134,6 @@ public class ProductDaoImpl implements ProductDao {
 
 
 
-
-
-
-
     //상품Dto에 상품 카테고리 모두 넣어서 반환(상품상세)
     @Override
     public ProductWithCategoriesDto selectProductWithCategories(int productId) {

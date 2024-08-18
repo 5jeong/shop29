@@ -1,11 +1,83 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Product Board</title>
-    <link rel="stylesheet" th:href="@{/css/menu.css}">
+
+    <!-- Bootstrap CSS 추가 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- 사용자 정의 스타일 추가 -->
+    <style>
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .nav-link {
+            color: #ffffff !important;
+        }
+        .nav-link.active {
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            color: #d4d4d4 !important;
+        }
+        .btn-outline-success {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+        .btn-outline-success:hover {
+            background-color: #ffffff;
+            color: #343a40;
+        }
+    </style>
 </head>
+
+
+
 <body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/" th:text="'29CM'">29cm</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="product/list" th:text="'상품'">상품</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/cart" th:text="'장바구니'"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/order" th:text="'주문'"></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
 
 
 <!-- 카테고리 링크들 -->
@@ -54,17 +126,46 @@
 
 
 
+<!--&lt;!&ndash; 장바구니 버튼 &ndash;&gt;-->
+<!--<form action="/cart/add" method="post">-->
+<!--    <input type="hidden" name="productId" th:value="${product.productId}" />-->
+<!--    <button type="submit">장바구니</button>-->
+<!--</form>-->
+
+<!--&lt;!&ndash; 결제 버튼 &ndash;&gt;-->
+<!--<form action="/checkout" method="post">-->
+<!--    <input type="hidden" name="productId" th:value="${product.productId}" />-->
+<!--    <button type="submit">구매</button>-->
+<!--</form>-->
+
 <!-- 장바구니 버튼 -->
-<form action="/cart/add" method="post">
+<form id="cartForm" action="/cart/add" method="post">
     <input type="hidden" name="productId" th:value="${product.productId}" />
-    <button type="submit">장바구니</button>
+    <div id="selectedOptions"></div>
+    <input type="number" name="quantity" min="1" value="1" />
+    <button type="button" onclick="submitCartForm()">장바구니</button>
 </form>
 
-<!-- 결제 버튼 -->
-<form action="/checkout" method="post">
-    <input type="hidden" name="productId" th:value="${product.productId}" />
-    <button type="submit">구매</button>
-</form>
+<script>
+    function submitCartForm() {
+        const selectedOptionsDiv = document.getElementById("selectedOptions");
+        selectedOptionsDiv.innerHTML = '';
+
+        const optionRadios = document.querySelectorAll('input[type="radio"]:checked');
+
+        optionRadios.forEach(function(radio) {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "selectedOptionValueIds";
+            input.value = radio.value;
+            selectedOptionsDiv.appendChild(input);
+        });
+
+        document.getElementById("cartForm").submit();
+    }
+</script>
+
+
 </body>
 </html>
 

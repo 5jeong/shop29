@@ -47,21 +47,18 @@
             p.product_name,
             ov.option_value_id,
             ov.option_value_name,
-            po.option_key_id,  -- 이 부분 추가
+            po.option_key_id,
             pov.stock,
             pov.extra_fee
         FROM
             product p
                 JOIN productoptionvalue pov ON p.product_id = pov.product_id
                 JOIN optionvalue ov ON pov.option_value_id = ov.option_value_id
-                JOIN productoption po ON p.product_id = po.product_id AND po.option_key_id = ov.option_key_id  -- 이 부분 추가
+                JOIN productoption po ON p.product_id = po.product_id AND po.option_key_id = ov.option_key_id
         WHERE
             p.product_id = #{productId};
 
     </select>
-
-
-
 
 
 
