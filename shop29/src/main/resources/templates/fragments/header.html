@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -17,22 +16,28 @@
             font-weight: bold;
             color: #ffffff !important;
         }
+
         .navbar {
             background-color: #343a40;
         }
+
         .nav-link {
             color: #ffffff !important;
         }
+
         .nav-link.active {
             font-weight: bold;
         }
+
         .nav-link:hover {
             color: #d4d4d4 !important;
         }
+
         .btn-outline-success {
             color: #ffffff;
             border-color: #ffffff;
         }
+
         .btn-outline-success:hover {
             background-color: #ffffff;
             color: #343a40;
@@ -56,17 +61,25 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/cart" th:text="'장바구니'"></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/order" th:text="'주문'"></a>
+                <li class="nav-item" th:if="${session.loginUser != null}">
+                    <a class="nav-link active" href="/order/history" th:text="'주문내역'"></a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
+                    <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
+                    <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" th:if="${session.userId}">
                     <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
+                </li>
+                <li class="nav-item" th:if="${session.userId == null}">
+                    <a class="nav-link active" href="/login" th:text="'로그인'">로그인</a>
+                </li>
+                <li class="nav-item" th:if="${session.loginUser != null}">
+                    <form class="mb-0" th:action="@{/logout}" method="post">
+                        <button type="submit" class="nav-link active btn btn-link" th:text="'로그아웃'"></button>
+                    </form>
                 </li>
             </ul>
             <form class="d-flex">
