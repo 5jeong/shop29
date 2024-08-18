@@ -166,8 +166,22 @@ public class ProductDaoImpl implements ProductDao {
         return session.selectOne(namespace + "getCountByMiddleCategory", middleCategoryId);
     }
 
+    @Override
+    public Long checkProductStock(Long productId, Long optionValueId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("productId", productId);
+        params.put("optionValueId", optionValueId);
+        return session.selectOne(namespace + "checkProductStock", params);
+    }
 
-
+    @Override
+    public int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("productId", productId);
+        params.put("optionValueId", optionValueId);
+        params.put("quantity", quantity);
+        return session.selectOne(namespace + "checkPurchaseAvailability", params);
+    }
 }
 
 

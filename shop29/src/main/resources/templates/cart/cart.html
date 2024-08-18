@@ -60,7 +60,9 @@
         <tbody>
         <tr th:if="${cartList != null && #lists.size(cartList) > 0}" th:each="cart : ${cartList}"
             th:data-id="${cart.productId}"
-            th:data-price="${cart.price}">
+            th:data-price="${cart.price}"
+            th:data-size-option="${cart.productOptionId}"
+        >
             <td><input class="chkbox" type="checkbox" checked></td>
             <td>
                 <div class="item-info">
@@ -68,6 +70,10 @@
                          alt="Product Image">
                     <div class="item-details">
                         <span th:text="${cart.productName}">Item Name</span>
+                        <br/>
+                        <br/>
+                        옵션 :
+                        <span th:text="${cart.optionValueName}">Item Name</span>
                     </div>
                 </div>
             </td>
@@ -207,10 +213,12 @@
                 const row = $(this).closest('tr');
                 const productId = row.data('id');
                 const quantity = row.find('.quantity-input').val();
+                const sizeOption = row.data('size-option');
 
                 orderItems.push({
                     productId: productId,
-                    quantity: parseInt(quantity)
+                    quantity: parseInt(quantity),
+                    productOptionId: sizeOption
                 });
             });
 
@@ -255,19 +263,23 @@
 
         // 선택상품 삭제 버튼 클릭 시 실행
         $('.delete').on('click', function () {
-            const selectedIds = [];
+            orderItems = [];
             $('.chkbox:checked').each(function () {
                 const row = $(this).closest('tr');
                 const productId = row.data('id');
-                selectedIds.push(productId);
+                const productOptionId = row.data('size-option')
+                orderItems.push({
+                    productId: productId,
+                    productOptionId: productOptionId
+                });
             });
 
-            if (selectedIds.length > 0) {
+            if (orderItems.length > 0) {
                 $.ajax({
                     url: '/cart/delete',
                     type: 'DELETE',
                     contentType: 'application/json',
-                    data: JSON.stringify({productIds: selectedIds}),
+                    data: JSON.stringify(orderItems),
                     success: function (response) {
                         // 삭제 후 페이지를 새로고침하거나 삭제된 항목을 화면에서 제거
                         location.reload();
@@ -287,6 +299,7 @@
             const id = row.data('id');
             const quantityInput = row.find('.quantity-input');
             const orderCount = quantityInput.val();
+            const sizeOption = row.data('size-option');
             if (orderCount > 100) {
                 quantityInput.val(100);
                 alert("수량 최대 100개까지 가능합니다.");
@@ -296,7 +309,11 @@
                 url: '/cart/order-count',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({product_id: id, quantity: Number(orderCount)}),
+                data: JSON.stringify({
+                    product_id: id,
+                    quantity: Number(orderCount),
+                    productOptionId: Number(sizeOption)
+                }),
                 beforeSend: function () {
                     // 요청이 시작되기 전에 버튼을 비활성화하거나 로딩 표시를 추가
                     $(this).prop('disabled', true);
@@ -327,10 +344,12 @@
             const row = $(this).closest('tr');
             const productId = row.data('id');
             const quantity = row.find('.quantity-input').val();
+            const sizeOption = row.data('size-option');
 
             const orderItems = [{
                 productId: productId,
-                quantity: parseInt(quantity)
+                quantity: parseInt(quantity),
+                productOptionId: sizeOption
             }];
 
             $('#orderItems').val(JSON.stringify(orderItems));
@@ -347,7 +366,8 @@
                 contentType: 'application/json',
                 data: JSON.stringify({
                     productId: Number(productId),
-                    quantity: 2 // 수량을 2로 설정
+                    quantity: 2, // 수량을 2로 설정
+                    productOptionId: Number(sizeOption),
                 }),
                 success: function (response) {
                     // 요청이 성공하면 페이지 새로고침

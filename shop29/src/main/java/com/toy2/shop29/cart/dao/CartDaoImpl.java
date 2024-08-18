@@ -45,21 +45,21 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public CartDto searchProductIdByUserIdAndProductId(String userId, Long productId) throws Exception {
+    public CartDto searchProductIdByUserIdAndProductId(String userId, Long productId, Long productOptionId) throws Exception {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
-
+        map.put("productOptionId", productOptionId);
         return session.selectOne(namespace + "searchProductIdByUserIdAndProductId", map);
     }
 
     @Override
-    public int insertUserCartProduct(String userId, Long productId, Long quantity) throws Exception {
+    public int insertUserCartProduct(String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
         map.put("quantity", quantity);
-
+        map.put("productOptionId", productOptionId);
         return session.insert(namespace + "insertUserCartProduct", map);
     }
 
@@ -69,20 +69,22 @@ public class CartDaoImpl implements CartDao {
     }
 
     @Override
-    public int updateUserCartProductQuantity(String userId, Long productId, Long quantity) throws Exception {
+    public int updateUserCartProductQuantity(String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
         map.put("quantity", quantity);
+        map.put("productOptionId", productOptionId);
 
         return session.update(namespace + "updateUserCartProductQuantity", map);
     }
 
     @Override
-    public int deleteUserCartProduct(String userId, Long productId) throws Exception {
+    public int deleteUserCartProduct(String userId, Long productId, Long productOptionId) throws Exception {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("productId", productId);
+        map.put("productOptionId", productOptionId);
         return session.delete(namespace + "deleteUserCartProduct", map);
     }
 

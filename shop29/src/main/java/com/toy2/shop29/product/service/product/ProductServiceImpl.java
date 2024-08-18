@@ -53,8 +53,21 @@ public class ProductServiceImpl implements ProductService {
         return productDao.delete(product_id);
     }
 
+    // 상품 재고 수정
+    @Override
+    public int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity) {
+        Long stock = checkProductStock(productId, optionValueId);
+        if (stock < quantity) {
+            return 0;
+        }
+        return productDao.checkPurchaseAvailability(productId, optionValueId, quantity);
+    }
 
-
+    // 상품 재고 확인
+    @Override
+    public Long checkProductStock(Long productId, Long optionValueId) {
+        return productDao.checkProductStock(productId, optionValueId);
+    }
 
     //총 상품 개수
     @Override

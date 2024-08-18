@@ -92,7 +92,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
             orderService.updateUserOrderStatus(userId, tid, "결제 완료");
             List<OrderItemDTO> historyItems = orderService.selectUserOrderHistoryItem(userId, tid);
             for (OrderItemDTO orderItemDTO : historyItems) {
-                cartService.deleteSpecificProduct(userId, orderItemDTO.getProductId());
+                cartService.deleteSpecificProduct(userId, orderItemDTO.getProductId(), orderItemDTO.getProductOptionId());
             }
             return template.postForObject(url, requestEntity, KakaoPayApproveResponseDTO.class);
         } catch (Exception e) {

@@ -24,6 +24,20 @@
         where product_id = #{productId}
     </select>
 
+    <update id="checkPurchaseAvailability" parameterType="map">
+        UPDATE productoptionvalue
+        SET stock = #{stock}
+        WHERE product_id = #{productId} AND option_value_id = #{optionValueId}
+    </update>
+
+<!--    상품 재고 반환-->
+    <select id="checkProductStock" parameterType="map" resultType="int">
+        SELECT stock
+        FROM productoptionvalue
+        WHERE product_id = #{productId} AND option_value_id = #{optionValueId}
+    </select>
+
+
 
     <!-- 전체 product들 모두 읽어오기 -->
     <select id="selectAll" resultType="com.toy2.shop29.product.domain.ProductDto">

@@ -69,5 +69,7 @@ public interface ProductService {
 
     int getCountByMiddleCategory(int middleCategoryId);
 
+    Long checkProductStock(Long productId, Long optionValueId);
 
+    int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity);
 }

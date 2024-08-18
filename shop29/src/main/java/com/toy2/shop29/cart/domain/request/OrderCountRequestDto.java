@@ -8,4 +8,5 @@ import lombok.Setter;
 public class OrderCountRequestDto {
     private Long product_id;
     private Long quantity;
+    private Long productOptionId;
 }

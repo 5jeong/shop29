@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.service;
 
 import com.toy2.shop29.cart.dao.CartDao;
+import com.toy2.shop29.cart.domain.request.DeleteCartItemsRequestDto;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.exception.CartNotFoundException;
 import com.toy2.shop29.cart.exception.ProductNotFoundException;
@@ -82,7 +83,7 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public void addProductToCart(String userId, Long productId, Long quantity, int isUser) throws Exception {
+    public void addProductToCart(String userId, Long productId, Long quantity, Long productOptionId, int isUser) throws Exception {
         ensureUserCartExists(userId, isUser);
 
         ProductDto isExistProduct = productDao.select(productId.intValue());
@@ -91,7 +92,7 @@ public class CartServiceImpl implements CartService {
         }
 
         // 해당 유저의 장바구니에서 상품을 가져옴
-        CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId);
+        CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId, productOptionId);
 
         // 이미 장바구니에 존재하는 경우 수량을 더함
         long totalQuantity = (specificProduct != null) ? specificProduct.getQuantity() + quantity : quantity;
@@ -101,10 +102,10 @@ public class CartServiceImpl implements CartService {
 
         if (specificProduct != null) {
             // 기존 제품이 있을 경우 수량 업데이트
-            updateProductQuantity(userId, productId, totalQuantity);
+            updateProductQuantity(userId, productId, totalQuantity, productOptionId);
         } else {
             // 새로 추가하는 경우
-            int result = cartDao.insertUserCartProduct(userId, productId, totalQuantity);
+            int result = cartDao.insertUserCartProduct(userId, productId, totalQuantity, productOptionId);
             if (result > 0) {
                 updateCartLastUpdate(userId);
             }
@@ -122,7 +123,7 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public int updateProductQuantity(String userId, Long productId, Long quantity) throws Exception {
+    public int updateProductQuantity(String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
         ProductDto isExistProduct = productDao.select(productId.intValue());
         if (isExistProduct == null) {
             throw new ProductNotFoundException("상품 번호 " + productId + "번을 찾을 수 없음");
@@ -130,7 +131,7 @@ public class CartServiceImpl implements CartService {
 
         quantity = Math.max(1, Math.min(quantity, 100));
 
-        int result = cartDao.updateUserCartProductQuantity(userId, productId, quantity);
+        int result = cartDao.updateUserCartProductQuantity(userId, productId, quantity, productOptionId);
         if (result > 0) {
             updateCartLastUpdate(userId);
         }
@@ -147,9 +148,9 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public int deleteCartProducts(String userId, List<Long> productIds) throws Exception {
-        for (Long productId : productIds) {
-            deleteSpecificProduct(userId, productId);
+    public int deleteCartProducts(String userId, List<DeleteCartItemsRequestDto> productIds) throws Exception {
+        for (DeleteCartItemsRequestDto product : productIds) {
+            deleteSpecificProduct(userId, product.getProductId(), product.getProductOptionId());
         }
         return updateCartLastUpdate(userId);
     }
@@ -163,12 +164,12 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public void deleteSpecificProduct(String userId, Long productId) throws Exception {
-        CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId);
+    public void deleteSpecificProduct(String userId, Long productId, Long productOptionId) throws Exception {
+        CartDto specificProduct = cartDao.searchProductIdByUserIdAndProductId(userId, productId, productOptionId);
         if (specificProduct == null) {
             return;
         }
-        int result = cartDao.deleteUserCartProduct(userId, productId);
+        int result = cartDao.deleteUserCartProduct(userId, productId, productOptionId);
         if (result > 0) {
             updateCartLastUpdate(userId);
         }
@@ -206,7 +207,7 @@ public class CartServiceImpl implements CartService {
     private void transferGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
         List<CartDto> guestCartProducts = getGuestCartProducts(guestId);
         for (CartDto cartDto : guestCartProducts) {
-            addProductToCart(loginUser, cartDto.getProductId(), cartDto.getQuantity(), isUser);
+            addProductToCart(loginUser, cartDto.getProductId(), cartDto.getQuantity(), cartDto.getProductOptionId(), isUser);
         }
     }
 

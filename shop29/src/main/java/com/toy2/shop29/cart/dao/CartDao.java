@@ -20,19 +20,19 @@ public interface CartDao {
     List<CartDto> selectUserCartProductsByUserId(String userId) throws Exception;
 
     // 같은 상품이 장바구니에 있는지 조회
-    CartDto searchProductIdByUserIdAndProductId(String userId, Long productId) throws Exception;
+    CartDto searchProductIdByUserIdAndProductId(String userId, Long productId, Long productOptionId) throws Exception;
 
     // 유저 장바구니 상품 담기
-    int insertUserCartProduct(String userId, Long productId, Long quantity) throws Exception;
+    int insertUserCartProduct(String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     // 장바구니 마지막 수정일 업데이트
     int updateCartLastUpdate(String userId) throws Exception;
 
     // 유저 장바구니 상품 수량 업데이트
-    int updateUserCartProductQuantity(String userId, Long productId, Long quantity) throws Exception;
+    int updateUserCartProductQuantity(String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     // 유저 장바구니 상품 삭제
-    int deleteUserCartProduct(String userId, Long productId) throws Exception;
+    int deleteUserCartProduct(String userId, Long productId, Long productOptionId) throws Exception;
 
     // 유저 장바구니 삭제
     int deleteUserCart(String userId) throws Exception;
