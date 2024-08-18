@@ -15,4 +15,6 @@ public class AddCartProductDto {
     @Min(value = 1, message = "수량은 최소 1이어야 합니다.")
     @Max(value = 100, message = "수량은 최대 100이어야 합니다.")
     private Long quantity;
+    @NotNull(message = "상품 옵션을 선택하지 않았습니다")
+    private Long productOptionId;
 }

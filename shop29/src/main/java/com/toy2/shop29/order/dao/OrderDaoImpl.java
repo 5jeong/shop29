@@ -65,11 +65,12 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public int insertCurrentOrderItem(String userId, Long productId, Long quantity) throws Exception {
+    public int insertCurrentOrderItem(String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("productId", productId);
         params.put("quantity", quantity);
+        params.put("productOptionId", productOptionId);
         return session.insert(namespace + "insertCurrentOrderItem", params);
     }
 
@@ -112,12 +113,13 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity) throws Exception {
+    public int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("orderId", orderId);
         params.put("userId", userId);
         params.put("productId", productId);
         params.put("quantity", quantity);
+        params.put("productOptionId", productOptionId);
         return session.insert(namespace + "insertUserOrderHistoryItem", params);
     }
 

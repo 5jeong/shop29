@@ -10,6 +10,7 @@ import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.utils.GenerateId;
+import com.toy2.shop29.product.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +21,12 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderDao orderDao;
-    private final CartService cartService;
 
-    public OrderServiceImpl(CartService cartService) {
-        this.cartService = cartService;
-    }
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private ProductService productService;
 
     @Override
     public int countCurrentOrder() throws Exception {
@@ -118,8 +120,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity) throws Exception {
-        return orderDao.insertUserOrderHistoryItem(orderId, userId, productId, quantity);
+    public int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
+        return orderDao.insertUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId);
     }
 
     @Override
@@ -153,8 +155,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int addProductToCurrentOrder(String userId, Long productId, Long quantity) throws Exception {
-        return orderDao.insertCurrentOrderItem(userId, productId, quantity);
+    public int addProductToCurrentOrder(String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
+        return orderDao.insertCurrentOrderItem(userId, productId, quantity, productOptionId);
     }
 
     @Override
@@ -175,10 +177,11 @@ public class OrderServiceImpl implements OrderService {
         for (OrderProductDto product : products) {
             Long productId = product.getProductId();
             Long quantity = product.getQuantity();
+            Long productOptionId = product.getProductOptionId();
             if (orderDao.countProduct(productId) < 1) {
                 throw new ForbiddenAccessException();
             }
-            int addResult = addProductToCurrentOrder(userId, productId, quantity);
+            int addResult = addProductToCurrentOrder(userId, productId, quantity, productOptionId);
             if (addResult > 1) {
                 throw new ForbiddenAccessException();
             }
@@ -223,14 +226,6 @@ public class OrderServiceImpl implements OrderService {
             throw new ForbiddenAccessException();
         }
 
-        // TODO : Service에서 Map에 넣어서 보낼지 Dao에서 Map에 넣을지
-        // Map<String, Object> map = new HashMap<>();
-        // map.put("orderId", orderId);
-        // map.put("userId", userId);
-        // map.put("tid", tid);
-        // map.put("totalPrice", totalPrice);
-        // map.put("shippingAddressId", shippingAddress.getShippingAddressId());
-
         int createOrderHistoryResult = createOrderHistory(orderId, userId, tid, totalPrice, shippingAddress.getShippingAddressId());
 
         if (createOrderHistoryResult != 1) {
@@ -240,7 +235,8 @@ public class OrderServiceImpl implements OrderService {
         for (OrderProductDto orderItem : orderItems) {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
-            int addItems = addUserOrderHistoryItem(orderId, userId, productId, quantity);
+            Long productOptionId = orderItem.getProductOptionId();
+            int addItems = addUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId);
             if (addItems != 1) {
                 throw new IllegalArgumentException("서버 오류");
             }
@@ -268,13 +264,13 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemDTO orderItem : orderHistoryItems) {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
-            cartService.addProductToCart(userId, productId, quantity, 1);
+            Long productOptionId = orderItem.getProductOptionId();
+            cartService.addProductToCart(userId, productId, quantity, productOptionId, 1);
         }
 
         int deleteAddressResult = deletePayFailedOrderAddress(userId, tid);
         int deleteOrderItem = deletePayFailedOrderHistoryItem(userId, tid);
         int deleteOrderHistory = deletePayFailedOrderHistory(userId, tid);
-
         if (deleteAddressResult != 1 || deleteOrderItem < 1 || deleteOrderHistory != 1) {
             throw new ForbiddenAccessException();
         }

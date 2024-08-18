@@ -27,7 +27,7 @@ public interface OrderDao {
 
     List<OrderItemDTO> getUserCurrentOrderProducts(String userId) throws Exception;
 
-    int insertCurrentOrderItem(String userId, Long productId, Long quantity) throws Exception;
+    int insertCurrentOrderItem(String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     int updateUserCurrentOrderItemQuantity(String userId, Long productId, Long quantity) throws Exception;
 
@@ -39,7 +39,7 @@ public interface OrderDao {
 
     int insertOrderHistory(String orderId, String userId, String tid, Long totalPrice, Long shippingAddressId) throws Exception;
 
-    int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity) throws Exception;
+    int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     Long getProductPrice(Long productId);
 

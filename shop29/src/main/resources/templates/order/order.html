@@ -85,6 +85,7 @@
             <div th:if="${#lists.size(order.currentItemsData) > 0}" th:each="item : ${order.currentItemsData}"
                  th:data-id="${item.productId}"
                  th:data-price="${item.price}"
+                 th:data-option-id="${item.productOptionId}"
                  class="product-info">
                 <div class="product">
                     <img
@@ -96,7 +97,7 @@
                             [침대패드] 시원스쿨 쿨매트와 사이좋게 여름차렵이불(SS/Q/K)
                             10종
                         </p>
-                        <p class="product-options">
+                        <p class="product-options" th:text="'옵션 : ' + ${item.optionValueName}">
                             옵션: [패턴01] 스위트멜로디 [사이즈:SS]
                         </p>
                         <p class="product-price" th:text="${item.price} + '원 / 수량 ' + ${item.quantity}">
@@ -280,7 +281,8 @@
                     productName: $(this).find('.product-name').text().trim(),
                     quantity: parseInt($(this).find('.product-price').text().match(/수량 (\d+)/)[1]),
                     price: parseFloat($(this).data('price')),
-                    saleRatio: 0 // Assuming saleRatio is 0 or you can calculate it based on your requirements
+                    saleRatio: 0, // Assuming saleRatio is 0 or you can calculate it based on your requirements
+                    productOptionId : $(this).data('option-id')
                 };
                 orderCompletedRequestDTO.orderItems.push(item);
             });

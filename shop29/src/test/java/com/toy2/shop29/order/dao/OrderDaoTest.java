@@ -73,9 +73,9 @@ public class OrderDaoTest {
         assertEquals(0, orderDao.countCurrentOrder());
         orderDao.insertCurrentOrder("test001");
         orderDao.insertCurrentOrder("test002");
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
         assertEquals(1, orderDao.countCurrentOrderItem());
-        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L, 23L);
         assertEquals(2, orderDao.countCurrentOrderItem());
         assertEquals(1, orderDao.countUserCurrentOrderItemById("test001"));
         assertEquals(1, orderDao.countUserCurrentOrderItemById("test002"));
@@ -87,14 +87,14 @@ public class OrderDaoTest {
         assertEquals(0, orderDao.countCurrentOrder());
         orderDao.insertCurrentOrder("test001");
         orderDao.insertCurrentOrder("test002");
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
-        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
+        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L, 23L);
         assertEquals(2, orderDao.countCurrentOrderItem());
         assertEquals(1, orderDao.deleteUserCurrentOrderItem("test001", 2588784L));
         assertEquals(1, orderDao.countCurrentOrderItem());
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
         assertEquals(2, orderDao.deleteAllCurrentOrderItem());
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
         assertEquals(1, orderDao.deleteAllCurrentOrderItem());
     }
 
@@ -105,14 +105,14 @@ public class OrderDaoTest {
         assertEquals(0, orderDao.countCurrentOrder());
         orderDao.insertCurrentOrder("test001");
         orderDao.insertCurrentOrder("test002");
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
-        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
+        orderDao.insertCurrentOrderItem("test002", 2588784L, 2L, 23L);
         assertEquals(2, orderDao.countCurrentOrderItem());
         assertEquals(1, orderDao.deleteUserCurrentOrderItem("test001", 2588784L));
         assertEquals(1, orderDao.countCurrentOrderItem());
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
         assertEquals(2, orderDao.deleteAllCurrentOrderItem());
-        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L);
+        orderDao.insertCurrentOrderItem("test001", 2588784L, 2L, 23L);
         assertEquals(1, orderDao.deleteAllCurrentOrderItem());
     }
 }

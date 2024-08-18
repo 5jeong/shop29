@@ -16,7 +16,7 @@ public interface OrderService {
 
     List<OrderItemDTO> getCurrentOrderItems(String userId) throws Exception;
 
-    int addProductToCurrentOrder(String userId, Long productId, Long quantity) throws Exception;
+    int addProductToCurrentOrder(String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     int updateProductsToCurrentOrder(String userId, Long productId, Long quantity) throws Exception;
 
@@ -34,7 +34,7 @@ public interface OrderService {
 
     Long getProductPrice(Long productId);
 
-    int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity) throws Exception;
+    int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
 
     int insertOrderAddress(String orderId, String userId, ShippingAddressInfoDTO orderAddress) throws Exception;
 

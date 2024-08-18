@@ -129,7 +129,7 @@
                 <ul>
                     <li th:each="item : ${order.orderItems}">
                         <p>상품명: <span th:text="${item.productName}">[상품명]</span></p>
-                        <!--                        <p>상품 설명: <span th:text="${item.productDescription}">[상품 설명]</span></p>-->
+                        <p>상품 옵션: <span th:text="${item.optionValueName}">[상품 설명]</span></p>
                         <p>수량: <span th:text="${item.quantity}">1</span></p>
                         <p>가격: <span th:text="${item.price}">39,900</span> 원</p>
                         <p>총액: <span th:text="${item.price * item.quantity}">39,900</span> 원</p>
@@ -139,7 +139,7 @@
 
             <div class="shipping-info">
                 <h3>배송 정보</h3>
-<!--                <p>배송 상태: <span th:text="${order.deliveryStatus}">배송 중</span></p>-->
+                <!--                <p>배송 상태: <span th:text="${order.deliveryStatus}">배송 중</span></p>-->
                 <p>배송지: <span th:text="${order.shippingAddress.recipientName}">서울시 강남구</span></p>
                 <p>주소: <span th:text="${order.shippingAddress.address + ' ' + order.shippingAddress.addressDetail}">서울시 강남구</span>
                 </p>

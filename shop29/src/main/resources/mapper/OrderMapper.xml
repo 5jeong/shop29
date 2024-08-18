@@ -70,12 +70,16 @@
                CurrentOrderItem.quantity,
                Product.product_name,
                Product.price,
-               Product.sale_ratio
+               Product.sale_ratio,
+               ov.option_value_name,
+               CurrentOrderItem.product_option_id
         FROM CurrentOrderItem
                  JOIN
              Product ON CurrentOrderItem.product_id = Product.product_id
                  JOIN
              CurrentOrder ON CurrentOrderItem.order_id = CurrentOrder.order_id
+                 JOIN
+             optionValue ov ON CurrentOrderItem.product_option_id = ov.option_value_id
         WHERE CurrentOrder.user_id = #{userId};
     </select>
 
@@ -96,8 +100,8 @@
 
     <!--    주문 처리 상품 추가-->
     <insert id="insertCurrentOrderItem" parameterType="map">
-        INSERT INTO CurrentOrderItem (order_id, product_id, quantity)
-        VALUES ((SELECT order_id FROM CurrentOrder WHERE user_id = #{userId}), #{productId}, #{quantity});
+        INSERT INTO CurrentOrderItem (order_id, product_id, quantity, product_option_id)
+        VALUES ((SELECT order_id FROM CurrentOrder WHERE user_id = #{userId}), #{productId}, #{quantity}, #{productOptionId});
     </insert>
 
     <!--    주문 처리 상품 수량 업데이트-->
@@ -206,8 +210,8 @@
 
     <!--    주문내역 상품 추가-->
     <insert id="insertUserOrderHistoryItem" parameterType="map">
-        INSERT INTO OrderHistoryItem (order_id, product_id, quantity)
-        VALUES (#{orderId}, #{productId}, #{quantity});
+        INSERT INTO OrderHistoryItem (order_id, product_id, quantity, product_option_id)
+        VALUES (#{orderId}, #{productId}, #{quantity}, #{productOptionId});
     </insert>
 
     <!--    주문내역 상태 업데이트-->
@@ -310,11 +314,13 @@
                oa.address_detail,
                oa.contact,
                oa.sub_contact,
-               oa.delivery_note
+               oa.delivery_note,
+               ov.option_value_name
         FROM orderhistory oh
                  LEFT JOIN orderhistoryitem ohi ON oh.order_id = ohi.order_id
                  LEFT JOIN product p ON ohi.product_id = p.product_id
                  LEFT JOIN orderaddress oa ON oh.order_id = oa.order_id
+                 LEFT JOIN optionValue ov ON ohi.product_option_id = ov.option_value_id
         WHERE oh.user_id = #{userId}
           AND length(oh.order_status) >= 1
         ORDER BY oh.order_time DESC
@@ -343,6 +349,7 @@
             <result property="productName" column="product_name"/>
             <result property="quantity" column="quantity"/>
             <result property="price" column="price"/>
+            <result property="optionValueName" column="option_value_name"/>
         </collection>
     </resultMap>
 </mapper>

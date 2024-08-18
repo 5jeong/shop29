@@ -53,6 +53,9 @@ public class CartController {
         // 장바구니 조회 성공 시 모델 객체에 장바구니 추가
         try {
             List<CartDto> getAllCart = cartService.getUserCartProducts(userInfo, isUser);
+            for (CartDto cart : getAllCart) {
+                System.out.println(cart.getProductOptionId());
+            }
             mav.addObject("cartList", getAllCart);
             mav.addObject("isLogin", isUser);
         } catch (Exception e) {
@@ -88,12 +91,13 @@ public class CartController {
         try {
             Long productId = addCartProductDto.getProductId();
             Long quantity = addCartProductDto.getQuantity();
+            Long productOptionId = addCartProductDto.getProductOptionId();
 
             // 수량 제한 적용: 최소 1, 최대 100
             quantity = Math.max(1, Math.min(quantity, 100));
 
             // 장바구니에 상품 추가
-            cartService.addProductToCart(userInfo, productId, quantity, isUser);
+            cartService.addProductToCart(userInfo, productId, quantity, productOptionId, isUser);
 
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -127,7 +131,10 @@ public class CartController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            cartService.updateProductQuantity(userInfo, orderCountRequestDto.getProduct_id(), orderCountRequestDto.getQuantity());
+            Long productId = orderCountRequestDto.getProduct_id();
+            Long quantity = orderCountRequestDto.getQuantity();
+            Long productOptionId = orderCountRequestDto.getProductOptionId();
+            cartService.updateProductQuantity(userInfo, productId, quantity, productOptionId);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -151,7 +158,7 @@ public class CartController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCartItems(
-            @RequestBody DeleteCartItemsRequestDto deleteRequest,
+            @RequestBody List<DeleteCartItemsRequestDto> deleteRequest,
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId
     ) {
@@ -160,7 +167,7 @@ public class CartController {
         String userInfo = getUserInfo(userId, guestId);
 
         try {
-            cartService.deleteCartProducts(userInfo, deleteRequest.getProductIds());
+            cartService.deleteCartProducts(userInfo, deleteRequest);
             return ResponseEntity.ok("삭제 완료");
         } catch (Exception e) {
             logger.error("상품 삭제 중 오류", e);

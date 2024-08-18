@@ -12,4 +12,6 @@ public class CartDto {
     private Long price;
     private Long saleRatio;
     private String sizeInfo;
+    private Long productOptionId;
+    private String optionValueName;
 }
