@@ -1,5 +1,6 @@
 package com.toy2.shop29.users.service.login;
 
+import com.toy2.shop29.timeProvider.TimeProvider;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
 import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final UserMapper userMapper;
+    private final TimeProvider timeProvider; // 존성 주입으로 시의간 공급자를 받음
 
     public UserDto loginCheck(String userId, String password) {
         UserDto user = userMapper.findById(userId);
@@ -61,19 +63,19 @@ public class LoginService {
     // 계정 잠금 해제 여부를 확인하는 메서드
     private boolean shouldUnlockAccount(UserDto user) {
         LocalDateTime lockExpiryTime = user.getLockExpiryTime();
-        return lockExpiryTime != null && lockExpiryTime.isBefore(LocalDateTime.now());
+        return lockExpiryTime != null && lockExpiryTime.isBefore(timeProvider.now());
     }
 
     private void resetFailureInfo(String userId) {
         userMapper.resetLoginFailureCount(userId);
     }
 
-    private static boolean isAccountLocked(UserDto user) {
+    private boolean isAccountLocked(UserDto user) {
         LocalDateTime lockExpiryTime = user.getLockExpiryTime();
-        return lockExpiryTime != null && lockExpiryTime.isAfter(LocalDateTime.now());
+        return lockExpiryTime != null && lockExpiryTime.isAfter(timeProvider.now());
     }
 
-    private static boolean invalidPassword(String password, UserDto user) {
+    private boolean invalidPassword(String password, UserDto user) {
         return !user.getPassword().equals(password);
     }
 
