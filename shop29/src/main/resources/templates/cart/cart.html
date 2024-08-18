@@ -1,9 +1,11 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/cart/styles.css}"/>
@@ -24,24 +26,24 @@
 <div class="container">
     <h1>장바구니</h1>
     <div class="cart-items">
-        <button id="1" class="add-to-cart">
-            <span class="button-inner">상품1 담기</span>
-        </button>
-        <button id="2" class="add-to-cart">
-            <span class="button-inner">상품2 담기</span>
-        </button>
-        <button id="3" class="add-to-cart">
-            <span class="button-inner">상품3 담기</span>
-        </button>
-        <button id="4" class="add-to-cart">
-            <span class="button-inner">상품4 담기</span>
-        </button>
-        <button id="5" class="add-to-cart">
-            <span class="button-inner">상품5 담기</span>
-        </button>
-        <button class="add-to-cart">
-            <a class="button-inner" href="/order/history">주문 내역</a>
-        </button>
+<!--        <button id="1" class="add-to-cart">-->
+<!--            <span class="button-inner">상품1 담기</span>-->
+<!--        </button>-->
+<!--        <button id="2" class="add-to-cart">-->
+<!--            <span class="button-inner">상품2 담기</span>-->
+<!--        </button>-->
+<!--        <button id="3" class="add-to-cart">-->
+<!--            <span class="button-inner">상품3 담기</span>-->
+<!--        </button>-->
+<!--        <button id="4" class="add-to-cart">-->
+<!--            <span class="button-inner">상품4 담기</span>-->
+<!--        </button>-->
+<!--        <button id="5" class="add-to-cart">-->
+<!--            <span class="button-inner">상품5 담기</span>-->
+<!--        </button>-->
+<!--        <button class="add-to-cart">-->
+<!--            <a class="button-inner" href="/order/history">주문 내역</a>-->
+<!--        </button>-->
     </div>
     <!-- 주문 내역이 없는 경우 -->
     <div class="empty-text" th:if="${cartList == null || #lists.size(cartList) == 0}">

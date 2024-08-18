@@ -1,3 +1,4 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
@@ -42,42 +43,6 @@
 
 
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/" th:text="'29CM'">29cm</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="product/list" th:text="'상품'">상품</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/cart" th:text="'장바구니'"></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/order" th:text="'주문'"></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/board/list" th:text="'공지사항'">공지사항</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-        </div>
-    </div>
-</nav>
 
 <!-- 관련 중분류 리스트 -->
 <div id="related-middle-categories">
