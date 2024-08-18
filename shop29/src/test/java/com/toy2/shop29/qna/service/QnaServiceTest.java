@@ -486,8 +486,6 @@ public class QnaServiceTest {
                 .title("1:1 문의 제목")
                 .content("1:1 문의 내용")
                 .attachmentNames(savedFileNames)
-                .orderId(123456)
-                .productId(123456)
                 .build();
 
         // 2단계 데이터 처리
@@ -503,8 +501,6 @@ public class QnaServiceTest {
         assertTrue(qnaDto.getQnaTypeId().equals(qnaTypeActive.getQnaTypeId()));
         assertTrue(qnaDto.getTitle().equals(request.getTitle()));
         assertTrue(qnaDto.getContent().equals(request.getContent()));
-        assertTrue(qnaDto.getOrderId().equals(request.getOrderId()));
-        assertTrue(qnaDto.getProductId().equals(request.getProductId()));
         // 3-1-2. 첨부파일 검증
         assertTrue(qnaDto.getAttachments().size() == savedFileNames.size());
     }
@@ -547,8 +543,6 @@ public class QnaServiceTest {
                 .title(title)
                 .content(title)
                 .userId(userId)
-                .orderId(123456)
-                .productId(123456)
                 .createdId(userId)
                 .updatedId(userId)
                 .build();

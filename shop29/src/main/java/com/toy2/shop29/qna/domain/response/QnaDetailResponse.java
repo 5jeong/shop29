@@ -21,15 +21,16 @@ public class QnaDetailResponse {
     private Boolean parentQnaTypeIsActive;
 
     // 주문ID
-    private int orderId;
+    private String orderId;
 
     // 상품ID
-    private int productId;
+    private Integer productId;
 
     // 1:1문의
     private int qnaId;
     private String title;
     private LocalDateTime createdTime;
+    private String content;
 
     // 첨부파일
     private List<String> attachmentPaths;
@@ -41,6 +42,7 @@ public class QnaDetailResponse {
     // 문의답변
     private String adminId;
     private String answerContent;
+    private Integer answerId;
     private LocalDateTime answerCreatedTime;
 
     public static QnaDetailResponse of(QnaDto qnaDto){
@@ -63,6 +65,7 @@ public class QnaDetailResponse {
         res.setQnaId(qnaDto.getQnaId());
         res.setTitle(qnaDto.getTitle());
         res.setCreatedTime(qnaDto.getCreatedTime());
+        res.setContent(qnaDto.getContent());
 
         // 첨부파일
         res.setAttachmentPaths(qnaDto.getAttachments().stream()
@@ -76,6 +79,7 @@ public class QnaDetailResponse {
         // 문의답변
         if(qnaDto.getQnaAnswer() != null){
             res.setAdminId(qnaDto.getQnaAnswer().getAdminId());
+            res.setAnswerId(qnaDto.getQnaAnswer().getQnaAnswerId());
             res.setAnswerContent(qnaDto.getQnaAnswer().getContent());
             res.setAnswerCreatedTime(qnaDto.getQnaAnswer().getCreatedTime());
         }

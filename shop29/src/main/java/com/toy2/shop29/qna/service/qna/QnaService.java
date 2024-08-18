@@ -20,6 +20,8 @@ public interface QnaService {
 
     int countByUserId(String userId) throws RuntimeException;
 
+    int countForAdminWithFilter(String qnaTypeId, Boolean isAnswered) throws RuntimeException;
+
     // [CREATE] 1:1 문의 등록
     void createQna(QnaCreateRequest request, String userId) throws RuntimeException;
 
