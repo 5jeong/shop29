@@ -13,4 +13,6 @@ public class OrderItemDTO {
     private Long quantity;
     private Long price;
     private int saleRatio;
+    private Long productOptionId;
+    private String optionValueName;
 }

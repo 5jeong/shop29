@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.toy2.shop29.product.dao.OptionMapper">
+
+
+
+    <!-- productId로 해당 상품의 옵션 검색 -->
+    <select id="selectOptionKeys" parameterType="int" resultType="com.toy2.shop29.product.domain.option.ProductOptionDto">
+    SELECT
+    p.product_id,
+    p.product_name,
+    ok.option_key_id,
+    ok.option_key_name
+    FROM
+    product p
+    JOIN productoption po ON p.product_id = po.product_id
+    JOIN optionkey ok ON po.option_key_id = ok.option_key_id
+    WHERE
+    p.product_id = #{productId}
+    </select>
+
+
+    <!-- OptionKey값이 어떤 Value값을 가지고 있는지 검색 -->
+    <select id="selectValuesByKey" parameterType="int" resultType="com.toy2.shop29.product.domain.option.OptionKeyValue">
+        SELECT
+            ok.option_key_id,
+            ok.option_key_name,
+            ov.option_value_id,
+            ov.option_value_name
+        FROM
+            optionkey ok
+                JOIN
+            optionvalue ov ON ok.option_key_id = ov.option_key_id
+        WHERE
+            ok.option_key_id = #{optionKeyId};
+
+    </select>
+
+
+    <!-- productId로 해당 상품의 옵션 value 검색 -->
+    <select id="selectOptionValues" parameterType="int" resultType="com.toy2.shop29.product.domain.option.ProductOptionValueDto">
+
+        SELECT
+            p.product_id,
+            p.product_name,
+            ov.option_value_id,
+            ov.option_value_name,
+            po.option_key_id,
+            pov.stock,
+            pov.extra_fee
+        FROM
+            product p
+                JOIN productoptionvalue pov ON p.product_id = pov.product_id
+                JOIN optionvalue ov ON pov.option_value_id = ov.option_value_id
+                JOIN productoption po ON p.product_id = po.product_id AND po.option_key_id = ov.option_key_id
+        WHERE
+            p.product_id = #{productId};
+
+    </select>
+
+
+
+
+
+
+</mapper>

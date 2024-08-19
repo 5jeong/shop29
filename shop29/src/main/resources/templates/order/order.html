@@ -1,9 +1,11 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Order Page</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/order/styles.css}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -85,6 +87,7 @@
             <div th:if="${#lists.size(order.currentItemsData) > 0}" th:each="item : ${order.currentItemsData}"
                  th:data-id="${item.productId}"
                  th:data-price="${item.price}"
+                 th:data-option-id="${item.productOptionId}"
                  class="product-info">
                 <div class="product">
                     <img
@@ -96,7 +99,7 @@
                             [침대패드] 시원스쿨 쿨매트와 사이좋게 여름차렵이불(SS/Q/K)
                             10종
                         </p>
-                        <p class="product-options">
+                        <p class="product-options" th:text="'옵션 : ' + ${item.optionValueName}">
                             옵션: [패턴01] 스위트멜로디 [사이즈:SS]
                         </p>
                         <p class="product-price" th:text="${item.price} + '원 / 수량 ' + ${item.quantity}">
@@ -118,7 +121,7 @@
                     <div class="payment-methods">
                         <!--                        <button type="button"><span>무통장입금</span></button>-->
                         <label>
-                            <input type="radio" id="kakaoPay">
+                            <input type="radio" id="kakaoPay" checked>
                         </label>
                         <button type="button" class="btn-pay-ready">
                             <img alt="카카오페이" th:src="@{/images/payment-kakao.png}" src="/images/payment-kakao.png"/>
@@ -280,7 +283,8 @@
                     productName: $(this).find('.product-name').text().trim(),
                     quantity: parseInt($(this).find('.product-price').text().match(/수량 (\d+)/)[1]),
                     price: parseFloat($(this).data('price')),
-                    saleRatio: 0 // Assuming saleRatio is 0 or you can calculate it based on your requirements
+                    saleRatio: 0, // Assuming saleRatio is 0 or you can calculate it based on your requirements
+                    productOptionId : $(this).data('option-id')
                 };
                 orderCompletedRequestDTO.orderItems.push(item);
             });

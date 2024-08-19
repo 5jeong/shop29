@@ -5,6 +5,7 @@ import com.toy2.shop29.cart.domain.request.DeleteCartItemsRequestDto;
 import com.toy2.shop29.cart.domain.request.OrderCountRequestDto;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ public class CartController {
         ModelAndView mav = new ModelAndView("cart/cart");
 
         // 로그인과 비로그인 사용자 구분
-        // TODO : 아래 코드를 어떻게 하면 깔끔하게 작성할 수 있을지 고민
         String userInfo = getUserInfo(userId, guestId);
         int isUser = (userId != null) ? 1 : 0;
 
@@ -75,7 +75,7 @@ public class CartController {
     public ResponseEntity<Map<String, String>> addCartItem(
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
-            @RequestBody AddCartProductDto addCartProductDto) {
+            @Valid @RequestBody AddCartProductDto addCartProductDto) {
 
         // 로그인과 비로그인 사용자 구분
         String userInfo = getUserInfo(userId, guestId);
@@ -88,12 +88,13 @@ public class CartController {
         try {
             Long productId = addCartProductDto.getProductId();
             Long quantity = addCartProductDto.getQuantity();
+            Long productOptionId = addCartProductDto.getProductOptionId();
 
             // 수량 제한 적용: 최소 1, 최대 100
             quantity = Math.max(1, Math.min(quantity, 100));
 
             // 장바구니에 상품 추가
-            cartService.addProductToCart(userInfo, productId, quantity, isUser);
+            cartService.addProductToCart(userInfo, productId, quantity, productOptionId, isUser);
 
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -127,7 +128,10 @@ public class CartController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            cartService.updateProductQuantity(userInfo, orderCountRequestDto.getProduct_id(), orderCountRequestDto.getQuantity());
+            Long productId = orderCountRequestDto.getProduct_id();
+            Long quantity = orderCountRequestDto.getQuantity();
+            Long productOptionId = orderCountRequestDto.getProductOptionId();
+            cartService.updateProductQuantity(userInfo, productId, quantity, productOptionId);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -151,7 +155,7 @@ public class CartController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCartItems(
-            @RequestBody DeleteCartItemsRequestDto deleteRequest,
+            @RequestBody List<DeleteCartItemsRequestDto> deleteRequest,
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId
     ) {
@@ -160,7 +164,7 @@ public class CartController {
         String userInfo = getUserInfo(userId, guestId);
 
         try {
-            cartService.deleteCartProducts(userInfo, deleteRequest.getProductIds());
+            cartService.deleteCartProducts(userInfo, deleteRequest);
             return ResponseEntity.ok("삭제 완료");
         } catch (Exception e) {
             logger.error("상품 삭제 중 오류", e);

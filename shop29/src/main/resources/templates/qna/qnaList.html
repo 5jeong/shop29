@@ -1,8 +1,11 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <title>1:1 문의 내역</title>
     <style>
         body {
@@ -163,8 +166,10 @@
         }
 
         async function deleteRow(event) {
-            const row = event.currentTarget.closest('tr');
             event.stopPropagation();
+            if(confirm('정말 삭제하시겠습니까?') === false) return;
+
+            const row = event.currentTarget.closest('tr');
 
             // 로딩 표시와 오버레이 보이기
             document.getElementById('loading').style.display = 'block';

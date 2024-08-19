@@ -31,6 +31,7 @@ public interface QnaDao {
     QnaDto select(int qnaId, Boolean isDeleted) throws DataAccessException; // 테스트용
     //    List<QnaDto> selectAll() throws DataAccessException; // 테스트용
     int countByUserId(String userId) throws DataAccessException;
+    int countForAdminWithFilter(String qnaTypeId, Boolean isAnswered) throws DataAccessException;
     int count() throws DataAccessException;
 
     // Update

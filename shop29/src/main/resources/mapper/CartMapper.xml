@@ -36,45 +36,55 @@
 
     <!--    유저 아이디로 해당 유저의 장바구니 상품 전체 조회-->
     <select id="selectUserCartProductsByUserId" parameterType="String" resultType="com.toy2.shop29.cart.domain.response.CartDto">
-        SELECT
-            ci.product_id,
-            ci.quantity,
-            p.product_name,
-            p.price,
-            p.sale_ratio
-        FROM
-            CartItem ci
-                JOIN
-            Product p ON ci.product_id = p.product_id
-                JOIN
-            Cart c ON ci.cart_id = c.cart_id
-        WHERE
-            c.user_id = #{userId};
+        SELECT ci.product_id,
+               ci.quantity,
+               p.product_name,
+               p.price,
+               p.sale_ratio,
+               ov.option_value_name,
+               ci.product_option_id,
+               pov.stock
+        FROM CartItem ci
+                 JOIN
+             ProductOptionValue pov
+             ON ci.product_option_id = pov.option_value_id AND ci.product_id = pov.product_id
+                 JOIN
+             Product p ON ci.product_id = p.product_id
+                 JOIN
+             Cart c ON ci.cart_id = c.cart_id
+                 JOIN
+             optionValue ov ON ci.product_option_id = ov.option_value_id
+        WHERE c.user_id = #{userId}
+        ORDER BY
+            ci.created_time ASC;
     </select>
 
 <!--    (유저 아이디와 상품 번호로) 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
     <select id="searchProductIdByUserIdAndProductId" parameterType="map" resultType="com.toy2.shop29.cart.domain.response.CartDto">
-        SELECT
-            ci.product_id,
-            ci.quantity,
-            p.product_name,
-            p.price,
-            p.sale_ratio
-        FROM
-            CartItem ci
-                JOIN
-            Product p ON ci.product_id = p.product_id
-                JOIN
-            Cart c ON ci.cart_id = c.cart_id
-        WHERE
-            c.user_id = #{userId}
-          AND ci.product_id = #{productId};
+        SELECT ci.product_id,
+               ci.quantity,
+               p.product_name,
+               p.price,
+               p.sale_ratio,
+               ov.option_value_name,
+               ci.product_option_id
+        FROM CartItem ci
+                 JOIN
+             Product p ON ci.product_id = p.product_id
+                 JOIN
+             Cart c ON ci.cart_id = c.cart_id
+                 JOIN
+             optionvalue ov On ci.product_option_id = ov.option_value_id
+        WHERE c.user_id = #{userId}
+          AND ci.product_id = #{productId}
+          AND ci.product_option_id =
+              #{productOptionId}
     </select>
 
     <!--    장바구니 해당 상품 담기-->
     <insert id="insertUserCartProduct" parameterType="map">
-        INSERT INTO CartItem (cart_id, product_id, quantity)
-        VALUES ((SELECT cart_id FROM Cart WHERE user_id = #{userId}),#{productId},#{quantity});
+        INSERT INTO CartItem (cart_id, product_id, quantity, product_option_id)
+        VALUES ((SELECT cart_id FROM Cart WHERE user_id = #{userId}), #{productId}, #{quantity}, #{productOptionId});
     </insert>
 
     <!--    장바구니 해당 상품 수량 업데이트-->
@@ -89,14 +99,15 @@
         UPDATE CartItem
         SET quantity = #{quantity}
         WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
-          AND product_id = #{productId};
+          AND product_id = #{productId}
+          AND product_option_id = #{productOptionId}
     </update>
 
     <!--    장바구니 해당 상품 삭제-->
     <delete id="deleteUserCartProduct" parameterType="map">
         DELETE FROM CartItem
         WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
-          AND product_id = #{productId};
+          AND product_id = #{productId} AND product_option_id = #{productOptionId};
     </delete>
 
     <!--    장바구니 해당 상품 삭제-->

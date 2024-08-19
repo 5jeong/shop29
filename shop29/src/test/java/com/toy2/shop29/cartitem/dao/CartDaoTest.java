@@ -72,7 +72,7 @@ public class CartDaoTest {
         assertEquals(0, cartDao.countCartItem());
 
         assertThrows(Exception.class, () -> {
-            cartDao.insertUserCartProduct("test001", 5L, 1L);
+            cartDao.insertUserCartProduct("test001", 5L, 1L, 23L);
         });
 
         cartDao.createCart("test001", 1);
@@ -82,16 +82,16 @@ public class CartDaoTest {
         cartDao.createCart("test005", 0);
         cartDao.createCart("test006", 0);
         cartDao.createCart("test007", 0);
-        cartDao.insertUserCartProduct("test001", 5L, 1L);
-        cartDao.insertUserCartProduct("test002", 5L, 1L);
-        cartDao.insertUserCartProduct("test003", 5L, 1L);
-        cartDao.insertUserCartProduct("test004", 5L, 1L);
-        cartDao.insertUserCartProduct("test005", 5L, 1L);
-        cartDao.insertUserCartProduct("test006", 5L, 1L);
+        cartDao.insertUserCartProduct("test001", 5L, 1L, 23L);
+        cartDao.insertUserCartProduct("test002", 5L, 1L, 23L);
+        cartDao.insertUserCartProduct("test003", 5L, 1L, 23L);
+        cartDao.insertUserCartProduct("test004", 5L, 1L, 23L);
+        cartDao.insertUserCartProduct("test005", 5L, 1L, 23L);
+        cartDao.insertUserCartProduct("test006", 5L, 1L, 23L);
 
         assertEquals(6, cartDao.countCartItem());
 
-        cartDao.insertUserCartProduct("test007", 5L, 1L);
+        cartDao.insertUserCartProduct("test007", 5L, 1L, 23L);
 
         assertEquals(7, cartDao.countCartItem());
     }
