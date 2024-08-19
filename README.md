@@ -3,6 +3,7 @@
 - 화면정의서 : 토이프로젝트2_2조_화면정의서.pdf
 - DB 테이블 생성문 노션 링크 : https://www.notion.so/125fac482ca44789a62a65d7c9853c13
 - 요구사항 정의 노션 링크 : https://www.notion.so/125fac482ca44789a62a65d7c9853c13
+- 발표자료 링크 : https://docs.google.com/presentation/d/1lb-evTzhQQqgn2i1laZWcUrdsfzrfcU7e1fsXYGeXT8/edit#slide=id.p16
 
 ### 개발환경
 - Web BackEnd : `Java 17, Spring Boot 3.3.2, Mybais, MySql 8.0이상, Gradle`,
