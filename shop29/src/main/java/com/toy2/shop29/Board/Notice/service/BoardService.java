@@ -19,6 +19,11 @@ public interface BoardService {
     List<BoardDto> getPage(Map<String, Object> map);
 
     int modify(BoardDto boardDto);
+
     // 상단 고정 공지사항 목록을 가져오는 메서드
     List<BoardDto> getFixedNotices();
+
+    // 상단 고정된 공지사항을 우선순위에 따라 수정하는 메서드
+    int updateFixedNoticePriority(Integer noticeId, int priority);
 }
+

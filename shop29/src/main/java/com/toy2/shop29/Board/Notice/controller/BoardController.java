@@ -98,6 +98,7 @@ public class BoardController {
     public String writeSubmit(BoardDto boardDto) {
         try {
             boardDto.setNoticeCreatorId("관리자");
+
             boardService.write(boardDto);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -111,5 +112,14 @@ public class BoardController {
         System.out.println("Deleting notice with noticeCreatorId: " + noticeCreatorId);
         int deleteResult = boardService.remove(noticeId, noticeCreatorId);
         return "redirect:/board/list";
+    }
+    @PostMapping("/updatePriority")
+    public String updatePriority(@RequestParam("noticeId") Integer noticeId, @RequestParam("priority") int priority) {
+        try {
+            boardService.updateFixedNoticePriority(noticeId, priority);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return "redirect:/board/list"; // 우선순위 수정 후 목록 페이지로 리다이렉션
     }
 }

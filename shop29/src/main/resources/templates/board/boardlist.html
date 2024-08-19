@@ -4,33 +4,109 @@
 <head>
     <meta charset="UTF-8">
     <title>공지사항 목록</title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <style>
-        /* 테이블 기본 스타일 */
+        /* 기본 스타일 초기화 및 폰트 설정 */
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            text-align: center;
+            margin: 20px 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         table th, table td {
             border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        table th {
-            background-color: #f4f4f4;
+            padding: 12px;
             text-align: left;
         }
 
-        /* 상단 고정 공지사항 스타일 */
+        table th {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+        }
+
         .fixed-notice {
             background-color: #f9f9f9; /* 상단 고정 공지사항 구분 색상 */
         }
 
-        /* 가운데 정렬 적용 */
         .center-text {
             text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .pagination a, .pagination span {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: #007bff;
+            text-decoration: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        .pagination span.current-page {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .footer-buttons {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .footer-buttons a {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .footer-buttons a:hover {
+            background-color: #0056b3;
+        }
+
+        .total-count {
+            text-align: center;
+            margin: 20px;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -53,22 +129,22 @@
             <a th:href="@{/board/read(noticeId=${board.noticeId})}" th:text="${board.noticeTitle}"></a>
         </td>
         <td class="center-text" th:text="${board.noticeCreatorId}"></td>
-        <td th:text="${board.noticeCreationTime}"></td>
+        <td th:text="${#dates.format(board.noticeCreationTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
     </tr>
     <!-- 일반 공지사항 출력 -->
     <tr th:each="board, iterStat : ${list}" class="notice">
-        <td class="center-text" th:text="${(totalCnt - (ph.currentPage - 1) * ph.pageSize - iterStat.index)}"></td>
+        <td class="center-text" th:text="${totalCnt - (ph.currentPage - 1) * ph.pageSize - iterStat.index}"></td>
         <td>
             <a th:href="@{/board/read(noticeId=${board.noticeId})}" th:text="${board.noticeTitle}"></a>
         </td>
         <td class="center-text" th:text="${board.noticeCreatorId}"></td>
-        <td th:text="${board.noticeCreationTime}"></td>
+        <td th:text="${#dates.format(board.noticeCreationTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
     </tr>
     </tbody>
 </table>
 
 <!-- 페이지 네비게이션 -->
-<div>
+<div class="pagination">
     <a th:if="${ph.showPrev}" th:href="@{/board/list(currentPage=${ph.beginPage - 1}, pageSize=${ph.pageSize})}">&lt;</a>
 
     <th:block th:each="i : ${#numbers.sequence(ph.beginPage, ph.endPage)}">
@@ -78,8 +154,13 @@
     <a th:if="${ph.showNext}" th:href="@{/board/list(currentPage=${ph.endPage + 1}, pageSize=${ph.pageSize})}">&gt;</a>
 </div>
 
-<a href="/" class="button">홈페이지로 가기</a>
-<a href="/board/write" class="button">공지사항 작성</a>
+<div class="total-count">
+    <span th:text="${totalCnt != null ? totalCnt : 0}"></span> 개의 공지사항
+</div>
 
+<!--<div class="footer-buttons">-->
+<!--    <a href="/" class="button">홈페이지로 가기</a>-->
+<!--&lt;!&ndash;    <a href="/board/write" class="button">공지사항 작성</a>&ndash;&gt;-->
+<!--</div>-->
 </body>
 </html>

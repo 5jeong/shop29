@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,13 @@ public class BoardDaoImpl implements BoardDao {
     @Override
     public List<BoardDto> selectFixedNotices() {
         return session.selectList(namespace + "selectFixedNotices");
+    }
+    @Override
+    public int updateFixedNoticePriority(Integer noticeId, int priority) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("noticeId", noticeId);
+        params.put("priority", priority);
+        return session.update(namespace + "updateFixedNoticePriority", params);
     }
 
 }
