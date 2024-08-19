@@ -1,9 +1,11 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>공지사항 목록</title>
     <link rel="stylesheet" href="/css/main.css">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* 테이블 기본 스타일 */
         table {
