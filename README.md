@@ -7,13 +7,13 @@
 - 임정훈 : 공지사항, FAQ
 
 ## 개발환경
-- Web BackEnd : Java 17, Spring Boot 3.3.2, Mybais, MySql 8.0이상, Gradle
+- Web BackEnd : Java v17, Spring Boot 3.3.2, Mybatis, MySql 8.0이상, Gradle
 - Web FrontEnd : thymeleaf , HTML/CSS/JS
 - Versioning : Git, GitHub, Notion
 
 ## 실행방법
 - DB 테이블 생성문 실행 (상품관련 테이블은 컬럼 추가 필요)
 - `application.properties` 세팅
-- `application.properties`에 개인정보가 있는 관계로, 해당파일은 commit하지 않았습니다.
+- `application.properties`에 개인정보가 있는 관계로, 해 당파일은 commit하지 않았습니다.
 - slack으로 멤버에게 다이렉트 메시지 주시면, `application.properties` 파일 전달드리겠습니다.
 - Shop29Application 클래스 main() 메서드 실행
