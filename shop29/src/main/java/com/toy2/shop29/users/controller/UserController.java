@@ -55,9 +55,6 @@ public class UserController {
 
     @GetMapping("/update")
     public String updateUser(Model model, @SessionAttribute(name = "loginUser", required = false) String userId) {
-//        if (loginUser == null) {
-//            return "redirect:/login"; // 로그인 페이지로 리다이렉트
-//        }
         UserDto user = userService.findById(userId);
         model.addAttribute("loginUser", user);
         return "user/editUserForm"; // 수정 폼 페이지로 이동
