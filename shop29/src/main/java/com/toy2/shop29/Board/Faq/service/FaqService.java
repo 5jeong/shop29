@@ -8,12 +8,21 @@ import java.util.Map;
 public interface FaqService {
 
     /**
-     * 총 FAQ 개수를 반환합니다.
+     * 검색어와 옵션을 기준으로 총 FAQ 개수를 반환합니다.
      *
-     * @return 총 FAQ 개수
+     * @param option 검색 옵션 (제목, 내용, 작성자 등)
+     * @param searchQuery 검색어
+     * @return 검색 조건을 만족하는 FAQ 개수
      */
-    int getCount(String searchQuery);
-    List<FaqDto> getPageWithSearchQuery(Map<String, Object> map);
+    int getCountWithSearchQuery(String option, String searchQuery);
+
+    /**
+     * 검색 조건과 페이지 정보를 기준으로 FAQ 목록을 반환합니다.
+     *
+     * @param map 페이지 처리 정보 (offset, pageSize 등)와 검색 조건 (option, searchQuery 등)
+     * @return 페이지에 해당하는 검색된 FAQ 목록
+     */
+    List<FaqDto> getPageWithSearch(Map<String, Object> map);
 
     /**
      * 특정 FAQ를 삭제합니다.
@@ -35,7 +44,7 @@ public interface FaqService {
     /**
      * 전체 FAQ 목록을 반환합니다.
      *
-     * @return FAQ 목록
+     * @return 전체 FAQ 목록
      */
     List<FaqDto> getList();
 
@@ -43,7 +52,7 @@ public interface FaqService {
      * 특정 FAQ의 상세 정보를 반환합니다.
      *
      * @param faqId 조회할 FAQ의 ID
-     * @return FAQ의 상세 정보
+     * @return 특정 FAQ의 상세 정보
      */
     FaqDto read(Integer faqId);
 

@@ -58,30 +58,50 @@
     </select>
 
     <!-- 검색어를 포함한 총 FAQ 수를 조회하는 쿼리 -->
-    <select id="countBySearchQuery" parameterType="string" resultType="int">
+    <select id="countBySearchQuery" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM Faq
-        WHERE faq_title LIKE CONCAT('%', #{searchQuery}, '%')
-           OR faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+        WHERE
+        <if test="option == 'A'">
+            faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+        </if>
+        <if test="option == 'B'">
+            faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+        </if>
+        <if test="option != 'A' and option != 'B'">
+            faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+        </if>
     </select>
 
     <!-- 검색어를 포함한 페이지 데이터를 조회하는 쿼리 -->
-    <select id="selectPageWithSearchQuery" parameterType="map" resultType="com.toy2.shop29.Board.Faq.domain.FaqDto">
+    <select id="selectPageWithSearch" parameterType="map" resultType="com.toy2.shop29.Board.Faq.domain.FaqDto">
         SELECT faq_id,
-               faq_type_id,
-               faq_title,
-               faq_content,
-               faq_creator_id,
-               faq_modifier_id,
-               faq_creation_time,
-               faq_modification_time,
-               faq_view_count
+        faq_type_id,
+        faq_title,
+        faq_content,
+        faq_creator_id,
+        faq_modifier_id,
+        faq_creation_time,
+        faq_modification_time,
+        faq_view_count
         FROM Faq
-        WHERE faq_title LIKE CONCAT('%', #{searchQuery}, '%')
-           OR faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+        WHERE
+        <choose>
+            <when test="option == 'A'">
+                faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+            </when>
+            <when test="option == 'B'">
+                faq_content LIKE CONCAT('%', #{searchQuery}, '%')
+            </when>
+            <otherwise>
+                faq_title LIKE CONCAT('%', #{searchQuery}, '%')
+            </otherwise>
+        </choose>
         ORDER BY faq_creation_time DESC, faq_id DESC
-            LIMIT #{offset}, #{pageSize}
+        LIMIT #{offset}, #{pageSize}
     </select>
+
+
 
     <!-- Faq를 삽입하는 쿼리 -->
     <insert id="insert" parameterType="com.toy2.shop29.Board.Faq.domain.FaqDto">

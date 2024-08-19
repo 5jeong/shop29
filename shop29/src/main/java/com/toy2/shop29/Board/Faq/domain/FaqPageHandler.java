@@ -1,12 +1,11 @@
 package com.toy2.shop29.Board.Faq.domain;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 public class FaqPageHandler {
     private int totalCnt;
@@ -28,13 +27,5 @@ public class FaqPageHandler {
 
     public boolean hasNext() {
         return currentPage < totalPages;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public int getCurrentPage() {
-        return currentPage;
     }
 }

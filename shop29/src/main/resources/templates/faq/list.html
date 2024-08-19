@@ -1,11 +1,12 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>FAQ 목록</title>
-    <link rel="stylesheet" href="/css/main.css">
+    <link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <style>
-        /* 기본 스타일 초기화 및 폰트 설정 */
         body {
             font-family: 'Noto Sans', sans-serif;
             margin: 0;
@@ -75,7 +76,6 @@
             background-color: #0056b3;
         }
 
-        /* 페이지네이션 */
         .pagination {
             display: flex;
             justify-content: center;
@@ -103,14 +103,12 @@
             border-color: #007bff;
         }
 
-        /* 버튼 위치 조정 */
         .footer-buttons {
             display: flex;
             justify-content: space-between;
             margin: 20px 0;
         }
 
-        /* 검색 폼을 테이블 왼쪽 위에 위치시킴 */
         .search-wrapper {
             display: flex;
             justify-content: flex-start;
@@ -159,8 +157,7 @@
                 <option value="T" th:selected="${option == 'T'}">제목만</option>
                 <option value="W" th:selected="${option == 'W'}">작성자</option>
             </select>
-            <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요" th:value="${keyword != null ? keyword : ''}">
-
+            <input type="text" name="searchQuery" class="search-input" placeholder="검색어를 입력하세요" th:value="${searchQuery != null ? searchQuery : ''}">
             <input type="submit" class="search-button" value="검색">
         </form>
     </div>
@@ -194,18 +191,18 @@
     <div class="pagination">
         <!-- 이전 페이지 링크 -->
         <span th:if="${page.currentPage != null && page.currentPage > 1}">
-            <a th:href="@{/faq/list(currentPage=${page.currentPage - 1}, searchQuery=${searchQuery})}">이전</a>
+            <a th:href="@{/faq/list(currentPage=${page.currentPage - 1}, option=${option}, keyword=${keyword})}">이전</a>
         </span>
 
         <!-- 페이지 번호 링크 -->
         <span th:each="i : ${#numbers.sequence(1, page.totalPages != null ? page.totalPages : 1)}"
               th:classappend="${i == page.currentPage ? 'current-page' : ''}">
-            <a th:href="@{/faq/list(currentPage=${i}, searchQuery=${searchQuery})}" th:text="${i}"></a>
+            <a th:href="@{/faq/list(currentPage=${i}, option=${option}, keyword=${keyword})}" th:text="${i}"></a>
         </span>
 
         <!-- 다음 페이지 링크 -->
         <span th:if="${page.currentPage != null && page.currentPage < page.totalPages}">
-            <a th:href="@{/faq/list(currentPage=${page.currentPage + 1}, searchQuery=${searchQuery})}">다음</a>
+            <a th:href="@{/faq/list(currentPage=${page.currentPage + 1}, option=${option}, keyword=${keyword})}">다음</a>
         </span>
     </div>
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,28 @@ public class FaqServiceImpl implements FaqService {
     private FaqDao faqDao;
 
     @Override
-    public int getCount(String searchQuery) {
+    public int getCountWithSearchQuery(String option, String searchQuery) {
         try {
-            return faqDao.countBySearchQuery(searchQuery); // 검색어를 고려한 FAQ 수를 반환합니다.
+            // Map을 생성하여 검색 옵션과 검색어를 전달합니다.
+//            Map<String, Object> params = Map.of("option", option, "searchQuery", searchQuery);
+            Map<String, Object> params = new HashMap<>();
+            params.put("option", (int)option.charAt(0));
+            params.put("searchQuery", searchQuery);
+
+            return faqDao.countBySearchQuery(params);
         } catch (Exception e) {
-            logger.error("Error getting FAQ count", e);
-            throw new RuntimeException("Error getting FAQ count", e);
+            logger.error("Error counting FAQs with option: {} and searchQuery: {}", option, searchQuery, e);
+            throw new RuntimeException("Error counting FAQs", e);
+        }
+    }
+
+    @Override
+    public List<FaqDto> getPageWithSearch(Map<String, Object> map) {
+        try {
+            return faqDao.selectPageWithSearch(map);
+        } catch (Exception e) {
+            logger.error("Error retrieving FAQ page with search criteria: {}", map, e);
+            throw new RuntimeException("Error retrieving FAQ page with search criteria", e);
         }
     }
 
@@ -35,7 +52,7 @@ public class FaqServiceImpl implements FaqService {
         try {
             return faqDao.delete(faqId, faqCreatorId);
         } catch (Exception e) {
-            logger.error("Error removing FAQ with ID: {} and creator ID: {}", faqId, faqCreatorId, e);
+            logger.error("Error removing FAQ with ID: {} and Creator ID: {}", faqId, faqCreatorId, e);
             throw new RuntimeException("Error removing FAQ", e);
         }
     }
@@ -44,7 +61,8 @@ public class FaqServiceImpl implements FaqService {
     @Transactional
     public int write(FaqDto faqDto) {
         try {
-            return faqDao.insert(faqDto);
+            faqDao.insert(faqDto);
+            return faqDto.getFaqId(); // ID가 자동으로 설정되었다고 가정
         } catch (Exception e) {
             logger.error("Error writing FAQ: {}", faqDto, e);
             throw new RuntimeException("Error writing FAQ", e);
@@ -56,8 +74,8 @@ public class FaqServiceImpl implements FaqService {
         try {
             return faqDao.selectAll();
         } catch (Exception e) {
-            logger.error("Error getting FAQ list", e);
-            throw new RuntimeException("Error getting FAQ list", e);
+            logger.error("Error retrieving FAQ list", e);
+            throw new RuntimeException("Error retrieving FAQ list", e);
         }
     }
 
@@ -74,10 +92,10 @@ public class FaqServiceImpl implements FaqService {
     @Override
     public List<FaqDto> getPage(Map<String, Object> map) {
         try {
-            return faqDao.selectPage(map); // 검색어를 포함한 FAQ 데이터를 반환합니다.
+            return faqDao.selectPage(map);
         } catch (Exception e) {
-            logger.error("Error getting FAQ page with parameters: {}", map, e);
-            throw new RuntimeException("Error getting FAQ page", e);
+            logger.error("Error retrieving FAQ page with map: {}", map, e);
+            throw new RuntimeException("Error retrieving FAQ page", e);
         }
     }
 
@@ -89,16 +107,6 @@ public class FaqServiceImpl implements FaqService {
         } catch (Exception e) {
             logger.error("Error modifying FAQ: {}", faqDto, e);
             throw new RuntimeException("Error modifying FAQ", e);
-        }
-    }
-
-    @Override
-    public List<FaqDto> getPageWithSearchQuery(Map<String, Object> map) {
-        try {
-            return faqDao.selectPageWithSearchQuery(map);
-        } catch (Exception e) {
-            logger.error("Error getting FAQ page with search query", e);
-            throw new RuntimeException("Error getting FAQ page with search query", e);
         }
     }
 }

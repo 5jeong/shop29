@@ -23,6 +23,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public int remove(Integer noticeId, String noticeCreatorId) {
+
         return boardDao.delete(noticeId, noticeCreatorId);
     }
 

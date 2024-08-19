@@ -20,6 +20,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/faq")
 public class FaqController {
+
     private static final Logger logger = LoggerFactory.getLogger(FaqController.class);
 
     @Autowired
@@ -28,34 +29,33 @@ public class FaqController {
     @GetMapping("/read")
     public String read(@RequestParam("faqId") Integer faqId, Model m) {
         try {
-            if (faqId == null) {
-                throw new IllegalArgumentException("FAQ ID cannot be null");
-            }
             FaqDto faqDto = faqService.read(faqId);
-            m.addAttribute("board", faqDto);
-            return "faq/faq";
+            m.addAttribute("faq", faqDto);
         } catch (Exception e) {
             logger.error("Error reading FAQ with ID: {}", faqId, e);
-            m.addAttribute("error", "Error reading FAQ.");
-            return "error";
+            throw new RuntimeException("Error reading FAQ", e);
         }
+        return "faq/faq";
     }
 
     @GetMapping("/list")
     public String list(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                        @RequestParam(value = "searchQuery", defaultValue = "") String searchQuery,
+                       @RequestParam(value = "option", defaultValue = "A") String option, // 검색 옵션 추가
                        Model m) {
         try {
-            int totalCnt = faqService.getCount(searchQuery); // 검색어를 고려하여 총 FAQ 수를 가져옵니다.
+            int totalCnt = faqService.getCountWithSearchQuery(option, searchQuery); // 검색어를 고려하여 총 FAQ 수를 가져옵니다.
             FaqPageHandler faqPageHandler = new FaqPageHandler(totalCnt, currentPage, pageSize);
 
             Map<String, Object> map = new HashMap<>();
             map.put("offset", (currentPage - 1) * pageSize);
             map.put("pageSize", pageSize);
             map.put("searchQuery", searchQuery); // 검색어를 추가합니다.
+            map.put("option", (int)option.charAt(0)); // 검색 옵션 추가
 
-            List<FaqDto> list = faqService.getPage(map);
+            // 검색 결과 가져오기
+            List<FaqDto> list = faqService.getPageWithSearch(map);
             if (list == null || list.isEmpty()) {
                 m.addAttribute("error", "No FAQs found.");
             }
@@ -64,72 +64,68 @@ public class FaqController {
             m.addAttribute("page", faqPageHandler);
             m.addAttribute("totalCnt", totalCnt);
             m.addAttribute("searchQuery", searchQuery); // 검색어를 모델에 추가합니다.
+            m.addAttribute("option", option); // 검색 옵션 추가
         } catch (Exception e) {
-            logger.error("Error retrieving FAQ list", e);
-            throw new RuntimeException("Error retrieving FAQ list", e);
+            logger.error("Error listing FAQs", e);
+            throw new RuntimeException("Error listing FAQs", e);
         }
-
         return "faq/list";
     }
 
-
+    // FAQ 수정 페이지
     @GetMapping("/edit")
     public String edit(@RequestParam("faqId") Integer faqId, Model m) {
         try {
             FaqDto faqDto = faqService.read(faqId);
             m.addAttribute("faq", faqDto);
-            return "faq/edit";
         } catch (Exception e) {
-            logger.error("Error editing FAQ with ID: {}", faqId, e);
-            m.addAttribute("error", "Error editing FAQ.");
-            return "error";
+            logger.error("Error retrieving FAQ for editing with ID: {}", faqId, e);
+            throw new RuntimeException("Error retrieving FAQ for editing", e);
         }
+        return "faq/edit";
     }
 
     @PostMapping("/edit")
     public String editSubmit(FaqDto faqDto) {
         try {
-            if (faqDto.getFaqId() == null) {
-                throw new IllegalArgumentException("FAQ ID cannot be null");
-            }
-            faqService.modify(faqDto);
-            return "redirect:/faq/list";
+            faqService.modify(faqDto); // 수정된 부분
         } catch (Exception e) {
-            logger.error("Error modifying FAQ with ID: {}", faqDto.getFaqId(), e);
-            return "redirect:/error";
+            logger.error("Error submitting FAQ edit: {}", faqDto, e);
+            throw new RuntimeException("Error submitting FAQ edit", e); // 수정된 부분
         }
+        return "redirect:/faq/list";
     }
 
     @GetMapping("/write")
-    public String writeForm(Model m) {
-        m.addAttribute("faq", new FaqDto());
+    public String writeForm(Model model) {
+        model.addAttribute("faq", new FaqDto());
         return "faq/write";
     }
 
+    // FAQ 작성 처리
     @PostMapping("/write")
     public String writeSubmit(FaqDto faqDto) {
         try {
             faqDto.setFaqCreatorId("관리자");
-            if (faqDto.getFaqTypeId() == null || faqDto.getFaqTypeId().isEmpty()) {
-                faqDto.setFaqTypeId("defaultType"); // 적절한 기본값 설정
-            }
             faqService.write(faqDto);
-            return "redirect:/faq/list";
         } catch (Exception e) {
-            logger.error("Error writing FAQ", e);
-            throw new RuntimeException(e);
+            logger.error("Error writing FAQ: {}", faqDto, e);
+            throw new RuntimeException("Error writing FAQ", e);
         }
+        return "redirect:/faq/list"; // 작성 후 목록 페이지로 리다이렉션
     }
 
+    // FAQ 삭제 처리
     @PostMapping("/delete")
     public String deletefaq(@RequestParam("faqId") Integer faqId, @RequestParam("faqCreatorId") String faqCreatorId) {
         try {
-            logger.info("Deleting FAQ with ID: {} and creator ID: {}", faqId, faqCreatorId);
-            faqService.remove(faqId, faqCreatorId);
-            return "redirect:/faq/list";
+            System.out.println("Deleting FAQ with ID: " + faqId);
+            System.out.println("Deleting FAQ with Creator ID: " + faqCreatorId);
+            int deleteResult = faqService.remove(faqId, faqCreatorId);
         } catch (Exception e) {
-            logger.error("Error deleting FAQ with ID: {}", faqId, e);
-            return "redirect:/error";
+            logger.error("Error deleting FAQ with ID: {} and Creator ID: {}", faqId, faqCreatorId, e);
+            throw new RuntimeException("Error deleting FAQ", e);
         }
+        return "redirect:/faq/list";
     }
 }
