@@ -42,8 +42,12 @@
                p.price,
                p.sale_ratio,
                ov.option_value_name,
-               ci.product_option_id
+               ci.product_option_id,
+               pov.stock
         FROM CartItem ci
+                 JOIN
+             ProductOptionValue pov
+             ON ci.product_option_id = pov.option_value_id AND ci.product_id = pov.product_id
                  JOIN
              Product p ON ci.product_id = p.product_id
                  JOIN

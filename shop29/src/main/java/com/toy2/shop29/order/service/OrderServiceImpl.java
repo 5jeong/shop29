@@ -1,6 +1,7 @@
 package com.toy2.shop29.order.service;
 
 import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.exception.error.ErrorCode;
 import com.toy2.shop29.exception.error.ForbiddenAccessException;
 import com.toy2.shop29.order.dao.OrderDao;
 import com.toy2.shop29.order.domain.OrderItemDTO;
@@ -9,6 +10,7 @@ import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
+import com.toy2.shop29.order.exception.OrderException;
 import com.toy2.shop29.order.utils.GenerateId;
 import com.toy2.shop29.product.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,6 +180,11 @@ public class OrderServiceImpl implements OrderService {
             Long productId = product.getProductId();
             Long quantity = product.getQuantity();
             Long productOptionId = product.getProductOptionId();
+            Long stock = productService.checkProductStock(productId, productOptionId);
+            if (stock - quantity < 0) {
+                throw new OrderException(ErrorCode.OUT_OF_STOCK);
+            }
+
             if (orderDao.countProduct(productId) < 1) {
                 throw new ForbiddenAccessException();
             }
@@ -210,6 +217,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public int orderProcess(String userId, String tid, OrderCompletedRequestDTO orderRequest) throws Exception {
+
         String orderId = GenerateId.generateId();
         ShippingAddressInfoDTO shippingAddress = orderRequest.getShippingAddress();
         Long totalPrice = orderRequest.getTotalPrice();
@@ -229,16 +237,20 @@ public class OrderServiceImpl implements OrderService {
         int createOrderHistoryResult = createOrderHistory(orderId, userId, tid, totalPrice, shippingAddress.getShippingAddressId());
 
         if (createOrderHistoryResult != 1) {
-            throw new IllegalArgumentException("서버 오류");
+            throw new OrderException(ErrorCode.CREATE_CART_ERROR);
         }
 
         for (OrderProductDto orderItem : orderItems) {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
             Long productOptionId = orderItem.getProductOptionId();
+            int updateProductStockResult = productService.checkPurchaseAvailability(productId, productOptionId, quantity);
+            if (updateProductStockResult != 1) {
+                throw new OrderException(ErrorCode.FORBIDDEN_ACCESS);
+            }
             int addItems = addUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId);
             if (addItems != 1) {
-                throw new IllegalArgumentException("서버 오류");
+                throw new OrderException(ErrorCode.ADD_ITEM_ERROR);
             }
         }
         int userExists = orderDao.checkUserExists(userId);
@@ -266,7 +278,13 @@ public class OrderServiceImpl implements OrderService {
             Long quantity = orderItem.getQuantity();
             Long productOptionId = orderItem.getProductOptionId();
             cartService.addProductToCart(userId, productId, quantity, productOptionId, 1);
+            int updateProductStockResult = productService.checkPurchaseAvailability(productId, productOptionId, -quantity);
+            if (updateProductStockResult != 1) {
+                throw new ForbiddenAccessException();
+            }
+
         }
+
 
         int deleteAddressResult = deletePayFailedOrderAddress(userId, tid);
         int deleteOrderItem = deletePayFailedOrderHistoryItem(userId, tid);
