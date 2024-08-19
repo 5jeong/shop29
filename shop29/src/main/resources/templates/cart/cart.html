@@ -26,24 +26,24 @@
 <div class="container">
     <h1>장바구니</h1>
     <div class="cart-items">
-<!--        <button id="1" class="add-to-cart">-->
-<!--            <span class="button-inner">상품1 담기</span>-->
-<!--        </button>-->
-<!--        <button id="2" class="add-to-cart">-->
-<!--            <span class="button-inner">상품2 담기</span>-->
-<!--        </button>-->
-<!--        <button id="3" class="add-to-cart">-->
-<!--            <span class="button-inner">상품3 담기</span>-->
-<!--        </button>-->
-<!--        <button id="4" class="add-to-cart">-->
-<!--            <span class="button-inner">상품4 담기</span>-->
-<!--        </button>-->
-<!--        <button id="5" class="add-to-cart">-->
-<!--            <span class="button-inner">상품5 담기</span>-->
-<!--        </button>-->
-<!--        <button class="add-to-cart">-->
-<!--            <a class="button-inner" href="/order/history">주문 내역</a>-->
-<!--        </button>-->
+        <!--        <button id="1" class="add-to-cart">-->
+        <!--            <span class="button-inner">상품1 담기</span>-->
+        <!--        </button>-->
+        <!--        <button id="2" class="add-to-cart">-->
+        <!--            <span class="button-inner">상품2 담기</span>-->
+        <!--        </button>-->
+        <!--        <button id="3" class="add-to-cart">-->
+        <!--            <span class="button-inner">상품3 담기</span>-->
+        <!--        </button>-->
+        <!--        <button id="4" class="add-to-cart">-->
+        <!--            <span class="button-inner">상품4 담기</span>-->
+        <!--        </button>-->
+        <!--        <button id="5" class="add-to-cart">-->
+        <!--            <span class="button-inner">상품5 담기</span>-->
+        <!--        </button>-->
+        <!--        <button class="add-to-cart">-->
+        <!--            <a class="button-inner" href="/order/history">주문 내역</a>-->
+        <!--        </button>-->
     </div>
     <!-- 주문 내역이 없는 경우 -->
     <div class="empty-text" th:if="${cartList == null || #lists.size(cartList) == 0}">
@@ -76,6 +76,9 @@
                         <br/>
                         옵션 :
                         <span th:text="${cart.optionValueName}">Item Name</span>
+                        <br/>
+                        재고 :
+                        <span th:text="${cart.stock + '개'}">Item Name</span>
                     </div>
                 </div>
             </td>
@@ -228,8 +231,25 @@
                 // 숨겨진 폼의 input 필드에 orderItems 데이터를 JSON 문자열로 설정
                 $('#orderItems').val(JSON.stringify(orderItems));
 
-                // 폼 제출
-                $('#hidden-order-form').submit();
+
+                $('#orderItems').val(JSON.stringify(orderItems));
+                var formData = $('#hidden-order-form').serialize();
+
+                $.ajax({
+                    type: 'POST',
+                    url: $('#hidden-order-form').attr('action'),
+                    data: formData,
+                    success: function (response) {
+                        window.location.href = "/order";
+                    },
+                    error: function (xhr) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response?.message) {
+                            const reason = response.message; // 첫 번째 오류의 reason 값
+                            alert(reason); // 알림창으로 reason 표시
+                        }
+                    }
+                });
             } else {
                 alert("주문할 상품을 선택해주세요.");
             }
@@ -355,9 +375,23 @@
             }];
 
             $('#orderItems').val(JSON.stringify(orderItems));
+            var formData = $('#hidden-order-form').serialize();
 
-            // 폼 제출
-            $('#hidden-order-form').submit();
+            $.ajax({
+                type: 'POST',
+                url: $('#hidden-order-form').attr('action'),
+                data: formData,
+                success: function (response) {
+                    window.location.href = "/order";
+                },
+                error: function (xhr) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response?.message) {
+                        const reason = response.message; // 첫 번째 오류의 reason 값
+                        alert(reason); // 알림창으로 reason 표시
+                    }
+                }
+            });
         });
 
         $('.add-to-cart').click(function () {

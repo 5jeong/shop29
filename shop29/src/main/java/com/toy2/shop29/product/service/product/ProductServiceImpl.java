@@ -60,11 +60,11 @@ public class ProductServiceImpl implements ProductService {
     // 상품 재고 수정
     @Override
     public int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity) {
-        Long stock = checkProductStock(productId, optionValueId);
-        if (stock < quantity) {
+        long stock = checkProductStock(productId, optionValueId) - quantity;
+        if (stock < 0) {
             return 0;
         }
-        return productDao.checkPurchaseAvailability(productId, optionValueId, quantity);
+        return productDao.updateProductStock(productId, optionValueId, stock);
     }
   
     // 상품 재고 확인

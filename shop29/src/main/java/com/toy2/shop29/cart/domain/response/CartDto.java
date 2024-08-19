@@ -14,4 +14,5 @@ public class CartDto {
     private String sizeInfo;
     private Long productOptionId;
     private String optionValueName;
+    private Long stock;
 }

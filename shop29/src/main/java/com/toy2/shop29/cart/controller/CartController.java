@@ -53,9 +53,6 @@ public class CartController {
         // 장바구니 조회 성공 시 모델 객체에 장바구니 추가
         try {
             List<CartDto> getAllCart = cartService.getUserCartProducts(userInfo, isUser);
-            for (CartDto cart : getAllCart) {
-                System.out.println(cart.getProductOptionId());
-            }
             mav.addObject("cartList", getAllCart);
             mav.addObject("isLogin", isUser);
         } catch (Exception e) {
