@@ -1,20 +1,19 @@
-# 토이 프로젝트 2 : 쇼핑몰 만들기 프로젝트 2단계
-### [프로젝트 개요] 
-- **프로젝트 명** : 스프링을 통한 쇼핑몰 기본 기능 구현
-- **상세 내용 :** [프로젝트 RFP 노션 링크](https://www.notion.so/Toy-Project-2-ec8a67f0004d4a85a6ce91c756fddcf2?pvs=4)
-- **수행 및 결과물 제출 기한** : 8/5 (월) ~ 8/19 (월) 13:00
-- **멘토진 코드리뷰 기한** : 8/19 (월) ~ 9/1 (일), 2주 간 진행 
+# 29CM 쇼핑몰 벤치마킹
+## 멤버구성 및 역할
+- 김병훈 : 장바구니, 결제, 주문
+- 김정민 : 1:1문의, 첨부파일
+- 류은기 : 상품 분류, 상품 옵션
+- 오정훈 : 회원가입, 회원수정, 로그인, 계정찾기
+- 임정훈 : 공지사항, FAQ
 
+## 개발환경
+- Web BackEnd : Java 17, Spring Boot 3.3.2, Mybais, MySql 8.0이상, Gradle
+- Web FrontEnd : thymeleaf , HTML/CSS/JS
+- Versioning : Git, GitHub, Notion
 
-### [프로젝트 진행 및 제출 방법]
-- 본 패스트캠퍼스 Github의 Repository를 각 조별의 Github Repository를 생성 후 Fork합니다.
-    - 패스트캠퍼스 깃헙은 Private 형태 (Public 불가)
-- 조별 레포의 최종 branch → 패스트캠퍼스 업스트림 Repository의 main branch의 **PR 상태**로 제출합니다.
-    - **PR TITLE : N조 최종 제출**
-    - Pull Request 링크를 LMS로도 제출해 주셔야 최종 제출 완료 됩니다. (제출자: 조별 대표자 1인)
-    - LMS를 통한 과제 미제출 시 점수가 부여되지 않습니다. 
-- PR 제출 시 유의사항
-    - 프로젝트 진행 결과 및 과업 수행 내용은 README.md에 상세히 작성 부탁 드립니다. 
-    - 멘토님들께서 어플리케이션 실행을 위해 확인해야 할 환경설정 값 등도 반드시 PR 부가 설명란 혹은 README.md에 작성 부탁 드립니다.
-    - **Pull Request에서 제출 후 절대 병합(Merge)하지 않도록 주의하세요!**
-    - 수행 및 제출 과정에서 문제가 발생한 경우, 바로 질의응답 멘토님이나 강사님에서 얘기하세요! (강사님께서 필요시 개별 힌트 제공)
+## 실행방법
+- DB 테이블 생성문 실행 (상품관련 테이블은 컬럼 추가 필요)
+- `application.properties` 세팅
+- `application.properties`에 개인정보가 있는 관계로, 해당파일은 commit하지 않았습니다.
+- slack으로 멤버에게 다이렉트 메시지 주시면, `application.properties` 파일 전달드리겠습니다.
+- Shop29Application 클래스 main() 메서드 실행
