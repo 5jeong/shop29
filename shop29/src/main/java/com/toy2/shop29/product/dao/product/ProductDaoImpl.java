@@ -171,12 +171,12 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity) {
+    public int updateProductStock(Long productId, Long optionValueId, Long quantity) {
         Map<String, Object> params = new HashMap<>();
         params.put("productId", productId);
         params.put("optionValueId", optionValueId);
         params.put("quantity", quantity);
-        return session.selectOne(namespace + "checkPurchaseAvailability", params);
+        return session.update(namespace + "updateProductStock", params);
     }
 }
 

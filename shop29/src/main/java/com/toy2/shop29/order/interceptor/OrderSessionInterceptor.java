@@ -20,7 +20,6 @@ public class OrderSessionInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession();
         String userId = (String) session.getAttribute("loginUser");
-        session.removeAttribute("tid");
         String tid = (String) session.getAttribute("tid");
 
         if (userId == null) {

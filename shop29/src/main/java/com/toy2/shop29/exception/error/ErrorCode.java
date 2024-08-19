@@ -14,7 +14,13 @@ public enum ErrorCode {
     FORBIDDEN_ACCESS(403, "EC007", "비정상적 접근"),
 
     // 장바구니
-    PRODUCT_NOT_EXISTS(400, "M001", "존재하지 않는 상품 ID");
+    PRODUCT_NOT_EXISTS(400, "C001", "존재하지 않는 상품 ID"),
+    CREATE_CART_ERROR(400, "C002", "장바구니 생성 오류"),
+
+    // 주문
+    OUT_OF_STOCK(409, "OD01", "상품 재고가 부족합니다."),
+    ADD_ITEM_ERROR(400, "OD01", "결제 중 상품 오류가 발생하였습니다.");
+
 
     private final String code;
     private final String message;

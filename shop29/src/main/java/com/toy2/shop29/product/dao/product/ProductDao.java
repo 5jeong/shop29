@@ -72,5 +72,5 @@ public interface ProductDao {
 
     Long checkProductStock(Long productId, Long optionValueId);
 
-    int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity);
+    int updateProductStock(Long productId, Long optionValueId, Long quantity);
 }

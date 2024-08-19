@@ -101,7 +101,7 @@ public class OrderController {
     public String updateOrderProducts(
             @SessionAttribute(name = "loginUser", required = true) String userId,
             @RequestParam("orderItems") String orderItemsJson,
-            RedirectAttributes rattr) {
+            RedirectAttributes rattr) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -116,8 +116,6 @@ public class OrderController {
             logger.error("상품 수량 수정 오류");
             rattr.addFlashAttribute("msg", "ORDER_ERR");
             return "redirect:/cart";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
         return "redirect:/order";
     }
