@@ -54,7 +54,9 @@
              Cart c ON ci.cart_id = c.cart_id
                  JOIN
              optionValue ov ON ci.product_option_id = ov.option_value_id
-        WHERE c.user_id = #{userId};
+        WHERE c.user_id = #{userId}
+        ORDER BY
+            ci.created_time ASC;
     </select>
 
 <!--    (유저 아이디와 상품 번호로) 해당 유저의 장바구니에 해당 상품이 존재한지 조회-->
