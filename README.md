@@ -7,7 +7,7 @@
 - 임정훈 : 공지사항, FAQ
 
 ## 개발환경
-- Web BackEnd : Java v17, Spring Boot 3.3.2, Mybatis, MySql 8.0이상, Gradle
+- Web BackEnd : Java 17, Spring Boot 3.3.2, Mybatis, MySql 8.0이상, Gradle
 - Web FrontEnd : thymeleaf , HTML/CSS/JS
 - Versioning : Git, GitHub, Notion
 
