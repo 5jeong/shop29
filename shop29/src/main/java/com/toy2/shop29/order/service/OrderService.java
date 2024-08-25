@@ -1,9 +1,10 @@
 package com.toy2.shop29.order.service;
 
+import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
-import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
+import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 
@@ -58,7 +59,7 @@ public interface OrderService {
 
     int countUserOrderHistoryItem(String userId, String tid) throws Exception;
 
-    List<OrderItemDTO> selectUserOrderHistoryItem (String userId, String tid) throws Exception;
+    List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
 
     int deleteAllCurrentOrder() throws Exception;
 

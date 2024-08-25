@@ -1,5 +1,6 @@
 package com.toy2.shop29.order.dao;
 
+import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.order.domain.CurrentOrderDTO;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
@@ -77,7 +78,7 @@ public interface OrderDao {
 
     int updateShippingAddress(String userId, ShippingAddressInfoDTO shippingAddressInfo) throws Exception;
 
-    List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
+    List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
 
     Long countProduct(Long productId) throws Exception;
 

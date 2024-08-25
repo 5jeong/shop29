@@ -1,14 +1,13 @@
 package com.toy2.shop29.cart.controller;
 
-import com.toy2.shop29.cart.domain.request.AddCartProductDto;
 import com.toy2.shop29.cart.domain.request.DeleteCartItemsRequestDto;
-import com.toy2.shop29.cart.domain.request.OrderCountRequestDto;
 import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.common.ProductItem;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -21,13 +20,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/cart")
+@RequiredArgsConstructor
 public class CartController {
 
     // 예외 발생 시 추적할 수 있게 로깅 추가
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
-    @Autowired
-    private CartService cartService;
+    private final CartService cartService;
 
     /**
      * 장바구니 페이지 요청
@@ -43,7 +42,6 @@ public class CartController {
             @CookieValue(name = "guestId", required = false) String guestId,
             Model model) {
         ModelAndView mav = new ModelAndView("cart/cart");
-
         // 로그인과 비로그인 사용자 구분
         String userInfo = getUserInfo(userId, guestId);
         int isUser = (userId != null) ? 1 : 0;
@@ -75,36 +73,25 @@ public class CartController {
     public ResponseEntity<Map<String, String>> addCartItem(
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
-            @Valid @RequestBody AddCartProductDto addCartProductDto) {
+            @Valid @RequestBody ProductItem addCartProductDto) {
 
         // 로그인과 비로그인 사용자 구분
         String userInfo = getUserInfo(userId, guestId);
-        int isUser = (userId != null) ? 1 : 0;
-
         Map<String, String> response = new HashMap<>();
 
         // 유저 고유 아이디와 상품 아이디, 수량으로 장바구니에 담기
         // 장바구니에 이미 존재하는 상품이라면 담은 수량만큼 추가
         try {
-            Long productId = addCartProductDto.getProductId();
-            Long quantity = addCartProductDto.getQuantity();
-            Long productOptionId = addCartProductDto.getProductOptionId();
-
-            // 수량 제한 적용: 최소 1, 최대 100
-            quantity = Math.max(1, Math.min(quantity, 100));
-
+            int isUser = (userId != null) ? 1 : 0;
             // 장바구니에 상품 추가
-            cartService.addProductToCart(userInfo, productId, quantity, productOptionId, isUser);
-
+            cartService.addProductToCart(userInfo, addCartProductDto, isUser);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (Exception e) {
             logger.error("장바구니 상품 추가 실패", e);
-
             response.put("status", "fail");
             response.put("message", e.getMessage());
-
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -112,15 +99,15 @@ public class CartController {
     /**
      * 장바구니 상품 수량 변경
      *
-     * @param orderCountRequestDto 상품 id, 상품 수량
-     * @param userId               로그인 유저 uid
-     * @param guestId              비로그인 유저 id
+     * @param productItem 상품 id, 상품 수량
+     * @param userId      로그인 유저 uid
+     * @param guestId     비로그인 유저 id
      * @return 성공 실패
      * @throws Exception .
      */
     @PostMapping("/order-count")
     public ResponseEntity<Map<String, String>> orderCount(
-            @RequestBody OrderCountRequestDto orderCountRequestDto,
+            @RequestBody ProductItem productItem,
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId) {
 
@@ -128,10 +115,7 @@ public class CartController {
         Map<String, String> response = new HashMap<>();
 
         try {
-            Long productId = orderCountRequestDto.getProduct_id();
-            Long quantity = orderCountRequestDto.getQuantity();
-            Long productOptionId = orderCountRequestDto.getProductOptionId();
-            cartService.updateProductQuantity(userInfo, productId, quantity, productOptionId);
+            cartService.updateProductQuantity(userInfo, productItem);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {

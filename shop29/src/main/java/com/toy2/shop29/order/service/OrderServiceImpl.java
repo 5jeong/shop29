@@ -1,6 +1,7 @@
 package com.toy2.shop29.order.service;
 
 import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.exception.error.ErrorCode;
 import com.toy2.shop29.exception.error.ForbiddenAccessException;
 import com.toy2.shop29.order.dao.OrderDao;
@@ -13,7 +14,6 @@ import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.exception.OrderException;
 import com.toy2.shop29.order.utils.GenerateId;
 import com.toy2.shop29.product.service.product.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +21,15 @@ import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
-    @Autowired
-    private OrderDao orderDao;
+    private final OrderDao orderDao;
+    private final CartService cartService;
+    private final ProductService productService;
 
-    @Autowired
-    private CartService cartService;
-
-    @Autowired
-    private ProductService productService;
+    public OrderServiceImpl(OrderDao orderDao, CartService cartService, ProductService productService) {
+        this.orderDao = orderDao;
+        this.cartService = cartService;
+        this.productService = productService;
+    }
 
     @Override
     public int countCurrentOrder() throws Exception {
@@ -72,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
+    public List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
         return orderDao.selectUserOrderHistoryItem(userId, tid);
     }
 
@@ -272,12 +273,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void deleteOrderHistory(String userId, String tid) throws Exception {
-        List<OrderItemDTO> orderHistoryItems = selectUserOrderHistoryItem(userId, tid);
-        for (OrderItemDTO orderItem : orderHistoryItems) {
+        List<ProductItem> orderHistoryItems = selectUserOrderHistoryItem(userId, tid);
+        for (ProductItem orderItem : orderHistoryItems) {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
             Long productOptionId = orderItem.getProductOptionId();
-            cartService.addProductToCart(userId, productId, quantity, productOptionId, 1);
+            cartService.addProductToCart(userId, orderItem, 1);
             int updateProductStockResult = productService.checkPurchaseAvailability(productId, productOptionId, -quantity);
             if (updateProductStockResult != 1) {
                 throw new ForbiddenAccessException();

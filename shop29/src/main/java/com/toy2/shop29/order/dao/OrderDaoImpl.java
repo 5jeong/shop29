@@ -1,5 +1,6 @@
 package com.toy2.shop29.order.dao;
 
+import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.order.domain.CurrentOrderDTO;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
@@ -246,7 +247,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
+    public List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("tid", tid);
