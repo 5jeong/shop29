@@ -180,7 +180,7 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
-    <select id="selectUserOrderHistoryItem" parameterType="map" resultType="com.toy2.shop29.order.domain.OrderItemDTO">
+    <select id="selectUserOrderHistoryItem" parameterType="map" resultType="com.toy2.shop29.common.ProductItem">
         SELECT *
         FROM OrderHistoryItem
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})

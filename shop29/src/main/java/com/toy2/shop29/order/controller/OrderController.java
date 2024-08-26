@@ -13,9 +13,9 @@ import com.toy2.shop29.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.HttpSessionRequiredException;
@@ -25,17 +25,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/order")
 public class OrderController {
 
     // 예외 발생 시 추적할 수 있게 로깅 추가
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private KakaoPayService kakaoPayService;
+    private final OrderService orderService;
+    private final KakaoPayService kakaoPayService;
 
     /**
      * 주문 페이지
@@ -49,12 +46,8 @@ public class OrderController {
             @SessionAttribute(name = "loginUser", required = true) String userId,
             Model model,
             HttpServletResponse response) throws Exception {
-        // 응답에 대한 모든 데이터를 디스크, 메모리에 저장하지 않음. 모든 요청이 서버로 직접 전달
-        response.setHeader("Cache-Control", "no-store");
-        // 응답을 캐시하지 않도록 함
-        response.setHeader("Pragma", "no-cache");
-        // 응답 즉시 만료 설정
-        response.setDateHeader("Expires", 0);
+
+        setNoCacheHeaders(response);
 
         // 주문에 필요한 데이터 모델에 추가하여 뷰로 전달
         OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(userId);
@@ -67,6 +60,15 @@ public class OrderController {
 
         model.addAttribute("order", orderInfo);
         return "order/order";
+    }
+
+    private void setNoCacheHeaders(HttpServletResponse response) {
+        // 응답에 대한 모든 데이터를 디스크, 메모리에 저장하지 않음. 모든 요청이 서버로 직접 전달
+        response.setHeader("Cache-Control", "no-store");
+        // 응답을 캐시하지 않도록 함
+        response.setHeader("Pragma", "no-cache");
+        // 응답 즉시 만료 설정
+        response.setDateHeader("Expires", 0);
     }
 
     /**
@@ -102,22 +104,26 @@ public class OrderController {
             @SessionAttribute(name = "loginUser", required = true) String userId,
             @RequestParam("orderItems") String orderItemsJson,
             RedirectAttributes rattr) throws Exception {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        if (!logInCheck(userId)) {
-            return "redirect:/login";
-        }
         try {
-            List<OrderProductDto> orderItems = objectMapper.readValue(orderItemsJson, new TypeReference<>() {
-            });
+            List<OrderProductDto> orderItems = parseOrderItems(orderItemsJson);
             orderService.addProducts(userId, orderItems);
         } catch (IllegalArgumentException e) {
-            logger.error("상품 수량 수정 오류");
-            rattr.addFlashAttribute("msg", "ORDER_ERR");
+            handleOrderUpdateError(rattr, e);
             return "redirect:/cart";
         }
+
         return "redirect:/order";
+    }
+
+    private List<OrderProductDto> parseOrderItems(String orderItemsJson) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(orderItemsJson, new TypeReference<>() {
+        });
+    }
+
+    private void handleOrderUpdateError(RedirectAttributes rattr, IllegalArgumentException e) {
+        logger.error("상품 수량 수정 오류", e);
+        rattr.addFlashAttribute("msg", "ORDER_ERR");
     }
 
     /**
@@ -170,7 +176,6 @@ public class OrderController {
         // 카카오 결제 요청하기
         try {
             kakaoPayService.payApprove(userId, tid, pgToken);
-            // TODO : 테스트
         } catch (Exception e) {
             return "redirect:/order/pay/error";
         }
@@ -210,12 +215,6 @@ public class OrderController {
     @GetMapping("/pay/error")
     public String payError() throws Exception {
         return "pay/payError";
-    }
-
-    private boolean logInCheck(String userId) {
-        if (userId == null)
-            return false;
-        return true;
     }
 
     @ExceptionHandler(HttpSessionRequiredException.class)

@@ -1,8 +1,8 @@
 package com.toy2.shop29.order.service;
 
 import com.toy2.shop29.cart.controller.CartController;
-import com.toy2.shop29.cart.service.CartService;
-import com.toy2.shop29.order.domain.OrderItemDTO;
+import com.toy2.shop29.cart.service.CartItemService;
+import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.order.domain.pay.KakaoPayApproveResponseDTO;
 import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
@@ -33,7 +33,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     private OrderService orderService;
 
     @Autowired
-    private CartService cartService;
+    private CartItemService cartItemService;
 
     // 카카오페이 결제창 연결
     @Override
@@ -90,9 +90,9 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         String url = "https://open-api.kakaopay.com/online/v1/payment/approve";
         try {
             orderService.updateUserOrderStatus(userId, tid, "결제 완료");
-            List<OrderItemDTO> historyItems = orderService.selectUserOrderHistoryItem(userId, tid);
-            for (OrderItemDTO orderItemDTO : historyItems) {
-                cartService.deleteSpecificProduct(userId, orderItemDTO.getProductId(), orderItemDTO.getProductOptionId());
+            List<ProductItem> historyItems = orderService.selectUserOrderHistoryItem(userId, tid);
+            for (ProductItem orderItemDTO : historyItems) {
+                cartItemService.deleteSpecificProduct(userId, orderItemDTO.getProductId(), orderItemDTO.getProductOptionId());
             }
             return template.postForObject(url, requestEntity, KakaoPayApproveResponseDTO.class);
         } catch (Exception e) {

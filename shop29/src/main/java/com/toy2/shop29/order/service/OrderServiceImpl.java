@@ -1,6 +1,6 @@
 package com.toy2.shop29.order.service;
 
-import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.cart.service.CartItemService;
 import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.exception.error.ErrorCode;
 import com.toy2.shop29.exception.error.ForbiddenAccessException;
@@ -14,22 +14,18 @@ import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.exception.OrderException;
 import com.toy2.shop29.order.utils.GenerateId;
 import com.toy2.shop29.product.service.product.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderDao orderDao;
-    private final CartService cartService;
+    private final CartItemService cartItemService;
     private final ProductService productService;
-
-    public OrderServiceImpl(OrderDao orderDao, CartService cartService, ProductService productService) {
-        this.orderDao = orderDao;
-        this.cartService = cartService;
-        this.productService = productService;
-    }
 
     @Override
     public int countCurrentOrder() throws Exception {
@@ -278,7 +274,7 @@ public class OrderServiceImpl implements OrderService {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
             Long productOptionId = orderItem.getProductOptionId();
-            cartService.addProductToCart(userId, orderItem, 1);
+            cartItemService.addProductToCart(userId, orderItem, 1);
             int updateProductStockResult = productService.checkPurchaseAvailability(productId, productOptionId, -quantity);
             if (updateProductStockResult != 1) {
                 throw new ForbiddenAccessException();

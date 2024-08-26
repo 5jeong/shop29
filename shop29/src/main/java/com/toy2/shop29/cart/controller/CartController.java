@@ -2,7 +2,8 @@ package com.toy2.shop29.cart.controller;
 
 import com.toy2.shop29.cart.domain.request.DeleteCartItemsRequestDto;
 import com.toy2.shop29.cart.domain.response.CartDto;
-import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.cart.service.CartItemService;
+import com.toy2.shop29.cart.service.CartManagementService;
 import com.toy2.shop29.common.ProductItem;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,8 @@ public class CartController {
 
     // 예외 발생 시 추적할 수 있게 로깅 추가
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
-
-    private final CartService cartService;
+    private final CartManagementService cartManagementServiceImpl;
+    private final CartItemService cartItemService;
 
     /**
      * 장바구니 페이지 요청
@@ -50,7 +51,7 @@ public class CartController {
         // 장바구니가 존재하지 않다면 생성까지
         // 장바구니 조회 성공 시 모델 객체에 장바구니 추가
         try {
-            List<CartDto> getAllCart = cartService.getUserCartProducts(userInfo, isUser);
+            List<CartDto> getAllCart = cartManagementServiceImpl.getUserCartProducts(userInfo, isUser);
             mav.addObject("cartList", getAllCart);
             mav.addObject("isLogin", isUser);
         } catch (Exception e) {
@@ -84,7 +85,7 @@ public class CartController {
         try {
             int isUser = (userId != null) ? 1 : 0;
             // 장바구니에 상품 추가
-            cartService.addProductToCart(userInfo, addCartProductDto, isUser);
+            cartItemService.addProductToCart(userInfo, addCartProductDto, isUser);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
@@ -113,9 +114,11 @@ public class CartController {
 
         String userInfo = getUserInfo(userId, guestId);
         Map<String, String> response = new HashMap<>();
-
+        System.out.println(productItem.getProductId());
+        System.out.println(productItem.getQuantity());
+        System.out.println(productItem.getProductOptionId());
         try {
-            cartService.updateProductQuantity(userInfo, productItem);
+            cartItemService.updateProductQuantity(userInfo, productItem);
             response.put("status", "success");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -148,7 +151,7 @@ public class CartController {
         String userInfo = getUserInfo(userId, guestId);
 
         try {
-            cartService.deleteCartProducts(userInfo, deleteRequest);
+            cartItemService.deleteCartProducts(userInfo, deleteRequest);
             return ResponseEntity.ok("삭제 완료");
         } catch (Exception e) {
             logger.error("상품 삭제 중 오류", e);

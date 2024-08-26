@@ -1,5 +1,6 @@
 package com.toy2.shop29.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,7 @@ import lombok.*;
 @ToString
 public class ProductItem {
     @NotNull(message = "상품 ID 필요")
+    @JsonProperty("productId")
     private Long productId;
     @NotNull(message = "수량은 필수 입력 항목입니다.")
     @Min(value = 1, message = "수량은 최소 1이어야 합니다.")
