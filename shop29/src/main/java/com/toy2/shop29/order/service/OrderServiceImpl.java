@@ -274,14 +274,11 @@ public class OrderServiceImpl implements OrderService {
             Long productId = orderItem.getProductId();
             Long quantity = orderItem.getQuantity();
             Long productOptionId = orderItem.getProductOptionId();
-            cartItemService.addProductToCart(userId, orderItem, 1);
             int updateProductStockResult = productService.checkPurchaseAvailability(productId, productOptionId, -quantity);
             if (updateProductStockResult != 1) {
                 throw new ForbiddenAccessException();
             }
-
         }
-
 
         int deleteAddressResult = deletePayFailedOrderAddress(userId, tid);
         int deleteOrderItem = deletePayFailedOrderHistoryItem(userId, tid);
