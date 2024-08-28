@@ -16,25 +16,23 @@ public class CartMergeServiceImpl implements CartMergeService {
     private final CartItemService cartItemService;
     private final CartManagementService cartManagementService;
 
-
     /**
      * 비로그인 사용자가 담은 장바구니를 로그인 사용자에게 이전하는 메서드
      *
      * @param loginUser 로그인한 사용자의 UID
      * @param guestId   비로그인 사용자의 UID
-     * @param isUser    로그인 여부를 나타내는 플래그 (1이면 로그인, 0이면 비로그인)
      * @throws Exception 장바구니 이전 중 오류가 발생할 경우
      */
     @Override
     @Transactional
-    public void updateGuestCartToUser(String loginUser, String guestId, int isUser) throws Exception {
+    public void updateGuestCartToUser(String loginUser, String guestId) throws Exception {
         if (!isCartTransferNeeded(guestId)) {
             return;
         }
 
         List<ProductItem> guestCartProducts = cartManagementService.selectUserCartItem(guestId);
         for (ProductItem cartDto : guestCartProducts) {
-            cartItemService.addProductToCart(loginUser, cartDto, isUser);
+            cartItemService.addProductToCart(loginUser, cartDto, 1);
         }
         if (removeGuestCart(guestId) == 0) {
             throw new CartNotFoundException("해당 유저의 장바구니를 찾을 수 없음");

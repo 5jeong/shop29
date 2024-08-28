@@ -75,7 +75,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
             // 로그인한 유저uid와 비로그인 guestid가 둘다 존재한다면
             // 비로그인 장바구니를 유저 장바구니로 옮김
             if (userId != null && guestId != null) {
-                cartMergeService.updateGuestCartToUser(userId, guestId, 1);
+                cartMergeService.updateGuestCartToUser(userId, guestId);
                 Cookie myCookie = new Cookie("guestId", null);
                 myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
                 myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.

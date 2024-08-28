@@ -5,6 +5,7 @@ import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartItemService;
 import com.toy2.shop29.cart.service.CartManagementService;
 import com.toy2.shop29.common.ProductItem;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,7 +27,8 @@ public class CartController {
 
     // 예외 발생 시 추적할 수 있게 로깅 추가
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
-    private final CartManagementService cartManagementServiceImpl;
+
+    private final CartManagementService cartManagementService;
     private final CartItemService cartItemService;
 
     /**
@@ -51,7 +53,7 @@ public class CartController {
         // 장바구니가 존재하지 않다면 생성까지
         // 장바구니 조회 성공 시 모델 객체에 장바구니 추가
         try {
-            List<CartDto> getAllCart = cartManagementServiceImpl.getUserCartProducts(userInfo, isUser);
+            List<CartDto> getAllCart = cartManagementService.getUserCartProducts(userInfo, isUser);
             mav.addObject("cartList", getAllCart);
             mav.addObject("isLogin", isUser);
         } catch (Exception e) {
@@ -72,7 +74,7 @@ public class CartController {
      */
     @PostMapping("/cart-item")
     public ResponseEntity<Map<String, String>> addCartItem(
-            @SessionAttribute(name = "loginUser", required = false) String userId,
+            @Parameter(hidden = true) @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
             @Valid @RequestBody ProductItem addCartProductDto) {
 
@@ -111,12 +113,8 @@ public class CartController {
             @RequestBody ProductItem productItem,
             @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId) {
-
         String userInfo = getUserInfo(userId, guestId);
         Map<String, String> response = new HashMap<>();
-        System.out.println(productItem.getProductId());
-        System.out.println(productItem.getQuantity());
-        System.out.println(productItem.getProductOptionId());
         try {
             cartItemService.updateProductQuantity(userInfo, productItem);
             response.put("status", "success");
