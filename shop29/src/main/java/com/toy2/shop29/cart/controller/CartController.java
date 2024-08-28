@@ -5,7 +5,6 @@ import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartItemService;
 import com.toy2.shop29.cart.service.CartManagementService;
 import com.toy2.shop29.common.ProductItem;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -74,7 +73,7 @@ public class CartController {
      */
     @PostMapping("/cart-item")
     public ResponseEntity<Map<String, String>> addCartItem(
-            @Parameter(hidden = true) @SessionAttribute(name = "loginUser", required = false) String userId,
+            @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
             @Valid @RequestBody ProductItem addCartProductDto) {
 
