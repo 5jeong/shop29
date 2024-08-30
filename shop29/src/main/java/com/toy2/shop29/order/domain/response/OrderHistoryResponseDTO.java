@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class OrderHistoryDTO {
+public class OrderHistoryResponseDTO {
     private String orderId;
     private String orderTime;
     private Long totalPrice;

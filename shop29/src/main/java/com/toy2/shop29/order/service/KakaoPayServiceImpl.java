@@ -3,9 +3,12 @@ package com.toy2.shop29.order.service;
 import com.toy2.shop29.cart.controller.CartController;
 import com.toy2.shop29.cart.service.CartItemService;
 import com.toy2.shop29.common.ProductItem;
+import com.toy2.shop29.order.domain.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.pay.KakaoPayApproveResponseDTO;
+import com.toy2.shop29.order.domain.pay.KakaoPayCancelResponseDTO;
 import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
+import com.toy2.shop29.order.domain.request.OrderHistoryRefundProduct;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +45,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         List<OrderProductDto> products = orderRequest.getOrderItems();
 
         // 상품 총 개수
-        Long totalQuantity = products.stream()
-                .mapToLong(OrderProductDto::getQuantity)
-                .sum();
+        Long totalQuantity = products.stream().mapToLong(OrderProductDto::getQuantity).sum();
 
         // 상품 총 가격
         Long totalPrice = orderRequest.getTotalPrice();
@@ -101,6 +102,51 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         }
     }
 
+
+    // 카카오페이 결제 승인
+    // 사용자가 결제 수단을 선택하고 비밀번호를 입력해 결제 인증을 완료한 뒤,
+    // 최종적으로 결제 완료 처리를 하는 단계
+    @Override
+    @Transactional
+    public String payRefund(String userId, OrderHistoryRefundProduct orderHistoryRefundProduct) throws Exception {
+        try {
+            String orderId = orderHistoryRefundProduct.getOrderId();
+            List<ProductItem> productItems = orderHistoryRefundProduct.getProductItems();
+            OrderHistoryDTO orderHistory = orderService.getOrderHistoryByUserIdAndOrderId(userId, orderId);
+            String tid = orderHistory.getTid();
+            Long cancelAmount = orderService.cancelOrder(userId, orderId, productItems);
+            HttpEntity<Map<String, String>> requestEntity = getMapHttpEntity(tid, cancelAmount);
+
+            RestTemplate template = new RestTemplate();
+            String url = "https://open-api.kakaopay.com/online/v1/payment/cancel";
+            KakaoPayCancelResponseDTO cancelResponse = template.postForObject(url, requestEntity, KakaoPayCancelResponseDTO.class);
+            int orderHistoryItemSize = orderService.countUserOrderHistoryItemPaid(userId, tid);
+            if (orderHistoryItemSize > 0) {
+                String orderStatus = "부분 환불 완료";
+                orderService.updateUserOrderHistory(orderStatus, orderHistory.getTotalPrice() - cancelAmount, orderId, userId);
+                return orderStatus;
+            } else {
+                String orderStatus = "환불 완료";
+                orderService.updateUserOrderHistory(orderStatus, orderHistory.getTotalPrice() - cancelAmount, orderId, userId);
+                return orderStatus;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    private HttpEntity<Map<String, String>> getMapHttpEntity(String tid, Long cancelAmount) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("cid", "TC0ONETIME");                             // 테스트용 가맹점 코드
+        parameters.put("tid", tid);                                      // 결제 고유번호
+        parameters.put("cancel_amount", cancelAmount.toString());        // 취소 금액
+        parameters.put("cancel_tax_free_amount", "0");                  // 취소 비과세 금액
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
+        return requestEntity;
+    }
+
     private HttpEntity<Map<String, String>> getMapHttpEntity(String productName, Long totalQuantity, Long totalPrice) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("cid", "TC0ONETIME");                                    // 가맹점 코드(테스트용)
@@ -117,6 +163,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         // HttpEntity : HTTP 요청 또는 응답에 해당하는 Http Header와 Http Body를 포함하는 클래스
         return new HttpEntity<>(parameters, this.getHeaders());
     }
+
 
     private HttpEntity<Map<String, String>> getMapHttpEntity(String tid, String pgToken) {
         Map<String, String> parameters = new HashMap<>();

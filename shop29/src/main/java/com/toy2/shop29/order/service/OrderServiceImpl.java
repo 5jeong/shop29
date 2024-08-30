@@ -5,11 +5,13 @@ import com.toy2.shop29.common.ProductItem;
 import com.toy2.shop29.exception.error.ErrorCode;
 import com.toy2.shop29.exception.error.ForbiddenAccessException;
 import com.toy2.shop29.order.dao.OrderDao;
+import com.toy2.shop29.order.domain.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.OrderHistoryItemDto;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.exception.OrderException;
 import com.toy2.shop29.order.utils.GenerateId;
@@ -26,6 +28,21 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDao orderDao;
     private final CartItemService cartItemService;
     private final ProductService productService;
+
+    @Override
+    public int updateUserOrderHistory(String orderStatus, Long totalPrice, String orderId, String userId) throws Exception {
+        return orderDao.updateUserOrderHistory(orderStatus, totalPrice, orderId, userId);
+    }
+
+    @Override
+    public int countUserOrderHistoryItemPaid(String userId, String tid) throws Exception {
+        return orderDao.countUserOrderHistoryItemPaid(userId, tid);
+    }
+
+    @Override
+    public OrderHistoryDTO getOrderHistoryByUserIdAndOrderId(String userId, String orderId) throws Exception {
+        return orderDao.getOrderHistoryByUserIdAndOrderId(userId, orderId);
+    }
 
     @Override
     public int countCurrentOrder() throws Exception {
@@ -119,8 +136,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
-        return orderDao.insertUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId);
+    public int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId, Long productPrice) throws Exception {
+        return orderDao.insertUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId, productPrice);
     }
 
     @Override
@@ -245,7 +262,8 @@ public class OrderServiceImpl implements OrderService {
             if (updateProductStockResult != 1) {
                 throw new OrderException(ErrorCode.FORBIDDEN_ACCESS);
             }
-            int addItems = addUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId);
+            Long productPrice = productService.getProductPriceByProductId(productId);
+            int addItems = addUserOrderHistoryItem(orderId, userId, productId, quantity, productOptionId, productPrice);
             if (addItems != 1) {
                 throw new OrderException(ErrorCode.ADD_ITEM_ERROR);
             }
@@ -291,7 +309,7 @@ public class OrderServiceImpl implements OrderService {
     // 주문내역 가져오기
     @Override
     @Transactional
-    public List<OrderHistoryDTO> getOrderHistory(String userId) throws Exception {
+    public List<OrderHistoryResponseDTO> getOrderHistory(String userId) throws Exception {
         return orderDao.getOrderHistoryInfoById(userId);
     }
 
@@ -299,5 +317,25 @@ public class OrderServiceImpl implements OrderService {
         if (checkUserCurrentOrderExist(userId) != 1) {
             createUserCurrentOrder(userId);
         }
+    }
+
+    @Override
+    @Transactional
+    public Long cancelOrder(String userId, String orderId, List<ProductItem> productItems) throws Exception {
+        long totalRefundPrice = 0L;
+        for (ProductItem productItem : productItems) {
+            Long productId = productItem.getProductId();
+            Long quantity = productItem.getQuantity();
+            Long productOptionId = productItem.getProductOptionId();
+
+            OrderHistoryItemDto orderHistoryItem = orderDao.getOrderHistoryProduct(userId, orderId, productId, productOptionId);
+            orderDao.updateOrderHistoryItemStatus(userId, orderId, productId, productOptionId, "취소 완료");
+            int updateProductInformation = productService.checkPurchaseAvailability(productId, productOptionId, -quantity);
+            if (updateProductInformation != 1) {
+                throw new ForbiddenAccessException();
+            }
+            totalRefundPrice += orderHistoryItem.getQuantity() * orderHistoryItem.getProductPrice();
+        }
+        return totalRefundPrice;
     }
 }

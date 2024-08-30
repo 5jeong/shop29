@@ -8,6 +8,8 @@
     <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/order/styles.css}"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
 <div class="container">
@@ -136,7 +138,7 @@
             <ul class="price-details">
                 <li>총 상품 금액 <span class="total-product-price">39,900원</span></li>
                 <li>배송비 <span class="shipping-cost">+4,000원</span></li>
-                <li>쿠폰 할인 금액 <span class="coupon-discount">-3,990원</span></li>
+                <li>쿠폰 할인 금액 <span class="coupon-discount">-4,000원</span></li>
                 <li>마일리지 사용 <span class="mileage-used">0P</span></li>
                 <li>총 결제 금액 <span class="total-price">39,910원</span></li>
             </ul>
@@ -172,7 +174,7 @@
         function updateTotalPrice() {
             const totalProductPrice = calculateTotalPrice();
             const shippingCost = 4000; // Assuming shipping cost is fixed
-            const couponDiscount = 3990; // Assuming coupon discount is fixed
+            const couponDiscount = 4000; // Assuming coupon discount is fixed
             const mileageUsed = 0; // Assuming mileage used is fixed
 
 
@@ -230,7 +232,19 @@
 
             const kakaoPayCheckbox = $('#kakaoPay');
             if (!kakaoPayCheckbox.is(':checked')) {
-                alert("결제방법을 선택해주세요.");
+                Toastify({
+                    text: "결제방법을 선택해주세요.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
                 return;
             }
 
@@ -243,7 +257,19 @@
             const phone2 = $('#phone2').val().trim();
 
             if (!recipient || !shippingAddress || !detailAddress || !phone1) {
-                alert('모든 필수 정보를 입력해주세요.');
+                Toastify({
+                    text: "모든 필수 정보를 입력해주세요.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
                 return;
             }
 
@@ -257,7 +283,19 @@
             });
 
             if (!allAgreed) {
-                alert('모든 필수 동의 항목에 동의해주세요.');
+                Toastify({
+                    text: "모든 필수 동의 항목에 동의해주세요.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
                 return;
             }
 

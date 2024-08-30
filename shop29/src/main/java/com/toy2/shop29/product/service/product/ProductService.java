@@ -68,4 +68,6 @@ public interface ProductService {
     Long checkProductStock(Long productId, Long optionValueId);
 
     int checkPurchaseAvailability(Long productId, Long optionValueId, Long quantity);
+
+    Long getProductPriceByProductId(Long productId);
 }

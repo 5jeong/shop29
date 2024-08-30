@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.toy2.shop29.cart.controller.CartController;
 import com.toy2.shop29.order.domain.pay.KakaoPayReadyResponseDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
+import com.toy2.shop29.order.domain.request.OrderHistoryRefundProduct;
 import com.toy2.shop29.order.domain.request.OrderProductDto;
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.service.KakaoPayService;
 import com.toy2.shop29.order.service.OrderService;
@@ -16,13 +17,17 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -83,11 +88,9 @@ public class OrderController {
             @SessionAttribute(name = "loginUser", required = true) String userId,
             Model model) throws Exception {
 
-        List<OrderHistoryDTO> orderHistoryList = orderService.getOrderHistory(userId);
-
+        List<OrderHistoryResponseDTO> orderHistoryList = orderService.getOrderHistory(userId);
         // 주문 내역 리스트를 모델에 추가하여 뷰에 전달
         model.addAttribute("orderHistory", orderHistoryList);
-
         return "order/orderList";
     }
 
@@ -215,6 +218,23 @@ public class OrderController {
     @GetMapping("/pay/error")
     public String payError() throws Exception {
         return "pay/payError";
+    }
+
+
+    @PostMapping("/refund")
+    public ResponseEntity<Map<String, String>> refundProduct(
+            @RequestBody OrderHistoryRefundProduct orderHistoryRefundProduct,
+            @SessionAttribute(name = "loginUser", required = false) String userId
+    ) throws Exception {
+        Map<String, String> response = new HashMap<>();
+        try {
+            String result = kakaoPayService.payRefund(userId, orderHistoryRefundProduct);
+            response.put("status", "success");
+            response.put("message", result);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @ExceptionHandler(HttpSessionRequiredException.class)

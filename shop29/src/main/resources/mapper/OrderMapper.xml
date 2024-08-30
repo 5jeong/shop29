@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.toy2.shop29.order.dao.OrderDaoMapper">
     <!--    주문 처리-->
-<!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
+    <!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--주문 처리 모든 내역 조회-->
     <select id="getCurrentOrderLists" resultType="com.toy2.shop29.order.domain.CurrentOrderDTO">
         SELECT *
@@ -101,7 +101,8 @@
     <!--    주문 처리 상품 추가-->
     <insert id="insertCurrentOrderItem" parameterType="map">
         INSERT INTO CurrentOrderItem (order_id, product_id, quantity, product_option_id)
-        VALUES ((SELECT order_id FROM CurrentOrder WHERE user_id = #{userId}), #{productId}, #{quantity}, #{productOptionId});
+        VALUES ((SELECT order_id FROM CurrentOrder WHERE user_id = #{userId}), #{productId}, #{quantity},
+                #{productOptionId});
     </insert>
 
     <!--    주문 처리 상품 수량 업데이트-->
@@ -173,11 +174,18 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </delete>
 
-<!--    해당 유저의 하나의 주문내역 상품 개수 조회-->
+    <!--    해당 유저의 하나의 주문내역 상품 개수 조회-->
     <select id="countUserOrderHistoryItem" parameterType="map" resultType="int">
         SELECT count(*)
         FROM OrderHistoryItem
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
+    </select>
+
+    <select id="countUserOrderHistoryItemPaid" parameterType="map" resultType="int">
+        SELECT count(*)
+        FROM OrderHistoryItem
+        WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
+        AND product_order_status IS NULL
     </select>
 
     <select id="selectUserOrderHistoryItem" parameterType="map" resultType="com.toy2.shop29.common.ProductItem">
@@ -200,6 +208,7 @@
         WHERE order_id = (SELECT order_id FROM OrderHistory WHERE user_id = #{userId} AND tid = #{tid})
     </select>
 
+
     <!--    주문 내역-->
     <!--    ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ-->
     <!--    주문내역 생성-->
@@ -210,8 +219,8 @@
 
     <!--    주문내역 상품 추가-->
     <insert id="insertUserOrderHistoryItem" parameterType="map">
-        INSERT INTO OrderHistoryItem (order_id, product_id, quantity, product_option_id)
-        VALUES (#{orderId}, #{productId}, #{quantity}, #{productOptionId});
+        INSERT INTO OrderHistoryItem (order_id, product_id, quantity, product_option_id, user_id, product_price)
+        VALUES (#{orderId}, #{productId}, #{quantity}, #{productOptionId}, #{userId}, #{productPrice});
     </insert>
 
     <!--    주문내역 상태 업데이트-->
@@ -222,6 +231,14 @@
           AND user_id = #{userId};
     </update>
 
+    <update id="updateUserOrderHistory" parameterType="map">
+        UPDATE ORDERHISTORY
+        SET order_status = #{orderStatus},
+            updated_time = NOW(),
+            total_price  = #{totalPrice}
+        WHERE order_id = #{orderId}
+          AND user_id = #{userId};
+    </update>
 
     <!--    주문 배송지 추가-->
     <insert id="insertOrderAddress" parameterType="map">
@@ -295,6 +312,35 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!--상품 주문 상태 업데이트-->
+    <update id="updateOrderHistoryItemStatus">
+        UPDATE OrderHistoryItem
+        SET product_order_status = #{productOrderStatus},
+            updated_time          = NOW()
+        WHERE user_id = #{userId}
+          AND order_id = #{orderId}
+          AND product_id = #{productId}
+          AND product_option_id = #{productOptionId}
+    </update>
+
+    <!-- 주문내역 상품 가격 조회-->
+    <select id="getOrderHistoryProduct" parameterType="map"
+            resultType="com.toy2.shop29.order.domain.OrderHistoryItemDto">
+        SELECT *
+        FROM OrderHistoryItem
+        WHERE user_id = #{userId}
+          AND order_id = #{orderId}
+          AND product_id = #{productId}
+          AND product_option_id = #{productOptionId}
+    </select>
+
+    <!-- 주문내역 tid 조회-->
+    <select id="getOrderHistoryByUserIdAndOrderId" parameterType="map" resultType="com.toy2.shop29.order.domain.OrderHistoryDTO">
+        SELECT *
+        FROM OrderHistory
+        WHERE order_id = #{orderId}
+          AND user_id = #{userId}
+    </select>
 
     <!--    주문 내역 조회-->
     <select id="getOrderHistoryInfoById" resultMap="OrderHistoryResultMap">
@@ -303,8 +349,10 @@
                oh.total_price,
                oh.order_status,
                oh.delivery_status,
+               ohi.product_option_id,
                oh.pay_method,
                ohi.product_id,
+               ohi.product_order_status,
                p.product_name,
                ohi.quantity,
                p.price,
@@ -327,8 +375,7 @@
     </select>
 
 
-
-    <resultMap id="OrderHistoryResultMap" type="com.toy2.shop29.order.domain.response.OrderHistoryDTO">
+    <resultMap id="OrderHistoryResultMap" type="com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO">
         <id property="orderId" column="order_id"/>
         <result property="orderTime" column="order_time"/>
         <result property="totalPrice" column="total_price"/>
@@ -346,10 +393,12 @@
         </association>
         <collection property="orderItems" ofType="com.toy2.shop29.order.domain.OrderItemDTO">
             <id property="productId" column="product_id"/>
+            <id property="productOptionId" column="product_option_id"/>
             <result property="productName" column="product_name"/>
             <result property="quantity" column="quantity"/>
             <result property="price" column="price"/>
             <result property="optionValueName" column="option_value_name"/>
+            <result property="productOrderStatus" column="product_order_status"/>
         </collection>
     </resultMap>
 </mapper>

@@ -518,6 +518,12 @@
     </resultMap>
 
 
+    <!-- 상품 ID로 상품 가격 검색 -->
+    <select id="getProductPriceByProductId" resultType="Long">
+        SELECT price
+        FROM product
+        WHERE product_id = #{productId}
+    </select>
 
 
 

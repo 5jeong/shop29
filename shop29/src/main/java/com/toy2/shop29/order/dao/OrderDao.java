@@ -1,10 +1,8 @@
 package com.toy2.shop29.order.dao;
 
 import com.toy2.shop29.common.ProductItem;
-import com.toy2.shop29.order.domain.CurrentOrderDTO;
-import com.toy2.shop29.order.domain.OrderItemDTO;
-import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.*;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 
 import java.util.List;
 
@@ -40,7 +38,7 @@ public interface OrderDao {
 
     int insertOrderHistory(String orderId, String userId, String tid, Long totalPrice, Long shippingAddressId) throws Exception;
 
-    int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
+    int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId, Long productPrice) throws Exception;
 
     Long getProductPrice(Long productId);
 
@@ -50,7 +48,7 @@ public interface OrderDao {
 
     int updateUserOrderStatus(String userId, String tid, String orderStatus) throws Exception;
 
-    List<OrderHistoryDTO> getOrderHistoryInfoById(String orderId) throws Exception;
+    List<OrderHistoryResponseDTO> getOrderHistoryInfoById(String orderId) throws Exception;
 
     int deleteAllCurrentOrder() throws Exception;
 
@@ -89,4 +87,14 @@ public interface OrderDao {
     int countOrderHistory() throws Exception;
 
     int countOrderHistoryItem() throws Exception;
+
+    int updateUserOrderHistory(String orderStatus, Long totalPrice, String orderId, String userId) throws Exception;
+
+    OrderHistoryItemDto getOrderHistoryProduct(String userId, String orderId, Long productId, Long productOptionId) throws Exception;
+
+    int updateOrderHistoryItemStatus(String userId, String orderId, Long productId, Long productOptionId, String productOrderStatus) throws Exception;
+
+    OrderHistoryDTO getOrderHistoryByUserIdAndOrderId(String userId, String orderId) throws Exception;
+
+    int countUserOrderHistoryItemPaid(String userId, String tid) throws Exception;
 }

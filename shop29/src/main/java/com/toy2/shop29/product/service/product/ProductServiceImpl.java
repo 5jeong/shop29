@@ -168,7 +168,8 @@ public class ProductServiceImpl implements ProductService {
 //    }
 
 
-
-
-
+    @Override
+    public Long getProductPriceByProductId(Long productId) {
+        return productDao.getProductPriceByProductId(productId);
+    }
 }

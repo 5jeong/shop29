@@ -178,6 +178,11 @@ public class ProductDaoImpl implements ProductDao {
         params.put("quantity", quantity);
         return session.update(namespace + "updateProductStock", params);
     }
+
+    @Override
+    public Long getProductPriceByProductId(Long productId) {
+        return session.selectOne(namespace + "getProductPriceByProductId", productId);
+    }
 }
 
 

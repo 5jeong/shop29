@@ -1,6 +1,6 @@
 package com.toy2.shop29.qna.service.qna;
 
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 import com.toy2.shop29.order.service.OrderService;
 import com.toy2.shop29.product.domain.product.ProductWithCategoriesDto;
 import com.toy2.shop29.product.service.product.ProductService;
@@ -81,8 +81,8 @@ public class QnaServiceImpl implements QnaService{
         // 0. 주문ID와 상품ID가 존재하는지 확인
         if(request.getOrderId() != null){
             try{
-                List<OrderHistoryDTO> orderHistorys= orderService.getOrderHistory(userId);
-                boolean isExist = orderHistorys.stream().anyMatch(orderHistoryDTO -> orderHistoryDTO.getOrderId().equals(request.getOrderId()));
+                List<OrderHistoryResponseDTO> orderHistorys= orderService.getOrderHistory(userId);
+                boolean isExist = orderHistorys.stream().anyMatch(OrderHistoryResponseDTO -> OrderHistoryResponseDTO.getOrderId().equals(request.getOrderId()));
                 if(!isExist){
                     throw new IllegalArgumentException("주문ID가 존재하지 않습니다.");
                 }
