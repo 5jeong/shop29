@@ -20,6 +20,7 @@
             padding: 30px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
+            position: relative; /* 컨테이너를 기준으로 위치를 지정하기 위해 추가 */
         }
         h1 {
             text-align: center;
@@ -70,6 +71,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
+            position: relative;
         }
         p {
             font-size: 1.125rem;
@@ -100,6 +102,21 @@
             background-color: #212529;
             box-shadow: 0 6px 16px rgba(52, 58, 64, 0.2);
         }
+        /* 조그마한 1:1 문의하기 버튼 스타일 */
+        .small-contact-button {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            background-color: #343a40;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .small-contact-button:hover {
+            background-color: #212529;
+        }
     </style>
 </head>
 <body>
@@ -120,6 +137,8 @@
     <div class="content-box">
         <p><strong>내용:</strong></p>
         <p th:text="${faq.faqContent}"></p>
+        <!-- 조그마한 1:1 문의하기 버튼 -->
+        <a href="http://localhost:8080/qna/form" class="small-contact-button">1:1 문의하기</a>
     </div>
 
     <div class="actions">
