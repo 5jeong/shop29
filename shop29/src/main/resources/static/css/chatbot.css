@@ -15,7 +15,6 @@
 }
 
 .chatbot-toggle-btn {
-    box-shadow: rgba(255, 255, 255, 0.12) 0 0 2px 0 inset, rgba(0, 0, 0, 0.05) 0 0 2px 1px, rgba(0, 0, 0, 0.3) 0 3px 6px 2px;
     width: 56px;
     height: 56px;
     cursor: pointer;
