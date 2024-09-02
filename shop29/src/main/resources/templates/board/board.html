@@ -56,15 +56,15 @@
       font-size: 1.75rem;
       font-weight: bold;
       margin-top: 30px; /* 필수공지와 제목 사이의 간격 추가 */
-      margin-bottom: 20px; /* 제목과 작성자 사이 간격 추가 */
     }
 
     .meta-info {
-      display: flex;
-      justify-content: flex-end; /* 오른쪽 정렬 */
-      align-items: center;
-      gap: 15px; /* 작성자와 등록일 사이 간격 */
+      position: absolute;
+      bottom: 10px; /* 제목과의 간격 조정 */
+      right: 20px; /* 오른쪽에 붙여서 배치 */
       color: #555;
+      font-size: 0.875rem;
+      text-align: right; /* 텍스트 오른쪽 정렬 */
     }
 
     .content-box {
@@ -73,6 +73,11 @@
       border-radius: 8px;
       margin-bottom: 20px;
       border: 1px solid #ddd;
+    }
+    .meta-info p {
+      margin: 0;
+      margin-left: 15px; /* 작성자와 등록일 사이 간격 */
+      display: inline-block;
     }
 
     p {
