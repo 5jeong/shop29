@@ -3,11 +3,9 @@ package com.toy2.shop29.Board.Faq.domain;
 import lombok.*;
 
 import java.util.Date;
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@AllArgsConstructor
+@Data
+//@Getter, @Setter, @ToString, @EqualsAndHashCode, @AllArgsConstructor(모든 멤버변수 초기화하는 생성자 생성)
+// -> @Data 어노테이션 안에 다 포함됨.
     public class FaqDto {
     private Integer faqId;
     private String faqTypeId;
