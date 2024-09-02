@@ -33,7 +33,10 @@ public class LoginConfig implements WebMvcConfigurer {
                         "/error",
                         "/mainPage/**",
                         "/images/**",
-                        "/attachment/**"
+                        "/attachment/**",
+                        "/js/**",
+                        "/chatbot/**",
+                        "http://0.0.0.0:8082/chat"
                         );
     }
 }

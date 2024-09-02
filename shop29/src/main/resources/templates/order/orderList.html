@@ -117,10 +117,88 @@
             }
         }
 
+        .list-item {
+            list-style: none;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-item__label {
+            margin: 0 20px 0 10px;
+            width: 20px;
+        }
+
+        .list-item__checkbox {
+            transform: scale(1.5);
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .list-item__details p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .list-item__details p span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .list-item__details p.item-name {
+            font-size: 18px;
+        }
+
+        .list-item__details p.item-name span {
+            color: #555;
+        }
+
+        .list-item__details p.total-price {
+            font-size: 18px;
+            color: #007bff;
+
+            span {
+                font-size: 18px;
+                color: #007bff !important;
+            }
+        }
+
+
+        .refund-btn {
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-image: linear-gradient(to right, #FF8008 0%, #FFC837  51%, #FF8008  100%);
+            margin: 10px;
+            padding: 10px 30px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .refund-btn:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+        }
+
+
+
     </style>
 </head>
 <body><!-- HTML 헤더 부분은 이전과 동일합니다 -->
 <div class="container">
+    <div th:include="~{fragments/bot :: bot}"></div>
     <h1>주문 내역</h1>
 
     <!-- 주문 내역이 있는 경우 -->
@@ -132,17 +210,23 @@
             <div class="order-items">
                 <h3>주문 상품</h3>
                 <ul>
-                    <li th:each="item : ${order.orderItems}">
+                    <li th:each="item : ${order.orderItems}" class="list-item">
                         <!-- 체크박스 추가 -->
-                        <label>
-                            <input th:if="${item.productOrderStatus == null}" type="checkbox" name="selectedItems" th:value="${item.productId + '|' + item.productOptionId + '|' + item.quantity}">
+                        <label class="list-item__label">
+                            <input class="list-item__checkbox" th:if=" ${item.productOrderStatus== null}"
+                                   type="checkbox"
+                                   name="selectedItems" th:value="${item.productId + '|' + item.productOptionId + '|' +
+                            item.quantity}">
                         </label>
-                        <p>상품명: <span th:text="${item.productName}">[상품명]</span></p>
-                        <p>상품 옵션: <span th:text="${item.optionValueName}">[상품 설명]</span></p>
-                        <p>수량: <span th:text="${item.quantity}">1</span></p>
-                        <p>가격: <span th:text="${item.price}">39,900</span> 원</p>
-                        <p>총액: <span th:text="${item.price * item.quantity}">39,900</span> 원</p>
-                        <p th:if="${item.productOrderStatus == '취소 완료'}"><span th:text="${item.productOrderStatus}"></span></p>
+                        <div class="list-item__details">
+                            <p class="item-name">상품명: <span th:text="${item.productName}">[상품명]</span></p>
+                            <p>상품 옵션: <span th:text="${item.optionValueName}">[상품 설명]</span></p>
+                            <p>수량: <span th:text="${item.quantity}">1</span></p>
+                            <p>가격: <span th:text="${item.price}">39,900</span> 원</p>
+                            <p>총액: <span th:text="${item.price * item.quantity}">39,900</span> 원</p>
+                            <p class="total-price" th:if="${item.productOrderStatus == '취소 완료'}"><span
+                                    th:text="${item.productOrderStatus}"></span></p>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -150,7 +234,8 @@
             <div class="shipping-info">
                 <h3>배송 정보</h3>
                 <p>배송지: <span th:text="${order.shippingAddress.recipientName}">서울시 강남구</span></p>
-                <p>주소: <span th:text="${order.shippingAddress.address + ' ' + order.shippingAddress.addressDetail}">서울시 강남구</span></p>
+                <p>주소: <span th:text="${order.shippingAddress.address + ' ' + order.shippingAddress.addressDetail}">서울시 강남구</span>
+                </p>
                 <p>연락처1: <span th:text="${order.shippingAddress.contact}">서울시 강남구</span></p>
                 <p>연락처2: <span th:text="${order.shippingAddress.subContact}">서울시 강남구</span></p>
             </div>
@@ -163,7 +248,9 @@
             </div>
 
             <!-- 데이터 속성에 orderId를 저장하고, 버튼 클릭 시 JavaScript에서 가져옴 -->
-            <button th:if="${order.orderStatus != '환불 완료'}" type="button" th:data-order-id="${order.orderId}" onclick="submitRefundRequest(this)">환불 신청</button>
+            <button class="refund-btn" th:if="${order.orderStatus != '환불 완료'}" type="button" th:data-order-id="${order.orderId}"
+                    onclick="submitRefundRequest(this)">환불 신청
+            </button>
 
             <hr/>
         </div>
@@ -181,7 +268,7 @@
         var selectedItems = [];
         var checkboxes = document.querySelectorAll('input[name="selectedItems"]:checked');
 
-        checkboxes.forEach(function(checkbox) {
+        checkboxes.forEach(function (checkbox) {
             var itemData = checkbox.value.split('|');
             selectedItems.push({
                 productId: itemData[0],
