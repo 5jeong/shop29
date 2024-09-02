@@ -154,6 +154,17 @@
             margin: 20px;
             font-size: 1rem;
         }
+
+        /* 구분 박스 스타일 */
+        .category-box {
+            display: inline-block;
+            background-color: #343a40;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -186,9 +197,8 @@
         <tbody>
         <!-- FAQ 항목 출력 -->
         <tr th:each="faq, iterStat : ${list}">
-            <!-- 번호 계산: 총 항목 수 - (현재 페이지 - 1) * 페이지 크기 - 현재 항목 인덱스 -->
             <td th:text="${(totalCnt != null ? totalCnt : 0) - (((page != null && page.currentPage != null) ? page.currentPage : 1) - 1) * (pageSize != null ? pageSize : 10) - iterStat.index}"></td>
-            <td th:text="${faq.faqTypeId}"></td>
+            <td><span class="category-box" th:text="${faq.faqTypeId}"></span></td>
             <td class="title">
                 <a th:href="@{/faq/read(faqId=${faq.faqId})}" th:text="${faq.faqTitle}"></a>
             </td>
@@ -200,29 +210,20 @@
 
     <!-- 페이지네이션 -->
     <div class="pagination">
-        <!-- 이전 페이지 링크 -->
         <a th:if="${page.currentPage != null && page.currentPage > 1}"
            th:href="@{/faq/list(currentPage=${page.currentPage - 1}, option=${option}, keyword=${keyword})}"
            class="arrow">&lt;</a>
 
-        <!-- 페이지 번호 링크 -->
         <a th:each="i : ${#numbers.sequence(1, page.totalPages != null ? page.totalPages : 1)}"
            th:href="@{/faq/list(currentPage=${i}, option=${option}, keyword=${keyword})}"
            th:text="${i}"
            th:classappend="${i == page.currentPage ? 'current-page' : ''}"
            class="circle"></a>
 
-        <!-- 다음 페이지 링크 -->
         <a th:if="${page.currentPage != null && page.currentPage < page.totalPages}"
            th:href="@{/faq/list(currentPage=${page.currentPage + 1}, option=${option}, keyword=${keyword})}"
            class="arrow">&gt;</a>
     </div>
-
-    <!-- 버튼 위치 조정 -->
-<!--    <div class="footer-buttons">-->
-<!--        <a href="/faq/write" class="button">새 FAQ 작성</a>-->
-<!--        <a href="/" class="button">홈페이지로 가기</a>-->
-<!--    </div>-->
 </div>
 </body>
 </html>

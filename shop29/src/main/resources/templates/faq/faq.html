@@ -27,6 +27,16 @@
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
+        .category-box {
+            display: inline-block;
+            background-color: #343a40;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
         .title-box {
             background-color: #f8f9fa;
             padding: 20px;
@@ -43,15 +53,15 @@
         }
         .meta-info {
             position: absolute;
-            bottom: 10px; /* 제목과의 간격 조정 */
-            right: 20px; /* 오른쪽에 붙여서 배치 */
+            bottom: 10px;
+            right: 20px;
             color: #555;
             font-size: 0.875rem;
-            text-align: right; /* 텍스트 오른쪽 정렬 */
+            text-align: right;
         }
         .meta-info p {
             margin: 0;
-            margin-left: 15px; /* 작성자와 등록일 사이 간격 */
+            margin-left: 15px;
             display: inline-block;
         }
         .content-box {
@@ -95,6 +105,9 @@
 <body>
 <div class="container">
     <h1>FAQ 상세</h1>
+
+    <!-- 구분 항목 박스 -->
+    <div class="category-box" th:text="${faq.faqTypeId}"></div>
 
     <div class="title-box">
         <h2 th:text="${faq.faqTitle}"></h2>
