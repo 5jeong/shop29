@@ -191,6 +191,16 @@
         </thead>
         <tbody>
         <!-- FAQ 항목 출력 -->
+        <tr th:if="${#lists.isEmpty(list)}">
+            <td colspan="5" style="text-align: center; padding: 20px;">
+                검색 결과가 없습니다.
+                <div style="margin-top: 20px;">
+                    <a href="http://localhost:8080/qna/form" class="btn btn-dark" style="background-color: #343a40; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none;">
+                        1:1 문의
+                    </a>
+                </div>
+            </td>
+        </tr>
         <tr th:each="faq, iterStat : ${list}">
             <td th:text="${(totalCnt != null ? totalCnt : 0) - (((page != null && page.currentPage != null) ? page.currentPage : 1) - 1) * (pageSize != null ? pageSize : 10) - iterStat.index}"></td>
             <td class="category"><span class="category-box" th:text="${faq.faqTypeId}"></span></td>
@@ -204,19 +214,22 @@
     </table>
 
     <!-- 페이지네이션 -->
-    <div class="pagination">
+    <div class="pagination" th:if="${!#lists.isEmpty(list)}">
+        <!-- 이전 페이지 링크 -->
         <a th:if="${page.currentPage != null && page.currentPage > 1}"
-           th:href="@{/faq/list(currentPage=${page.currentPage - 1}, option=${option}, keyword=${keyword})}"
+           th:href="@{/faq/list(currentPage=${page.currentPage - 1}, searchQuery=${searchQuery}, option=${option})}"
            class="arrow">&lt;</a>
 
+        <!-- 페이지 번호 링크 -->
         <a th:each="i : ${#numbers.sequence(1, page.totalPages != null ? page.totalPages : 1)}"
-           th:href="@{/faq/list(currentPage=${i}, option=${option}, keyword=${keyword})}"
+           th:href="@{/faq/list(currentPage=${i}, searchQuery=${searchQuery}, option=${option})}"
            th:text="${i}"
            th:classappend="${i == page.currentPage ? 'current-page' : ''}"
            class="circle"></a>
 
+        <!-- 다음 페이지 링크 -->
         <a th:if="${page.currentPage != null && page.currentPage < page.totalPages}"
-           th:href="@{/faq/list(currentPage=${page.currentPage + 1}, option=${option}, keyword=${keyword})}"
+           th:href="@{/faq/list(currentPage=${page.currentPage + 1}, searchQuery=${searchQuery}, option=${option})}"
            class="arrow">&gt;</a>
     </div>
 </div>
