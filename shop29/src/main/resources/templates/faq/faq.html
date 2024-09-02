@@ -33,20 +33,26 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
+            position: relative;
         }
         h2 {
             color: #343a40;
             font-size: 1.75rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin: 0;
         }
         .meta-info {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 15px;
+            position: absolute;
+            bottom: 10px; /* 제목과의 간격 조정 */
+            right: 20px; /* 오른쪽에 붙여서 배치 */
             color: #555;
-            margin-bottom: 20px;
+            font-size: 0.875rem;
+            text-align: right; /* 텍스트 오른쪽 정렬 */
+        }
+        .meta-info p {
+            margin: 0;
+            margin-left: 15px; /* 작성자와 등록일 사이 간격 */
+            display: inline-block;
         }
         .content-box {
             background-color: #f8f9fa;
