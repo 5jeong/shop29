@@ -58,7 +58,9 @@
         table td {
             text-align: center;
         }
-
+        table td.category{
+            text-align: left
+        }
         table td.title {
             text-align: left;
         }
@@ -74,13 +76,6 @@
             text-decoration: none; /* 호버 시에도 밑줄 없음 */
         }
 
-        .fixed-notice {
-            background-color: #f9f9f9; /* 상단 고정 공지사항 구분 색상 */
-        }
-
-        .center-text {
-            text-align: center;
-        }
 
         .pagination {
             display: flex;
@@ -198,7 +193,7 @@
         <!-- FAQ 항목 출력 -->
         <tr th:each="faq, iterStat : ${list}">
             <td th:text="${(totalCnt != null ? totalCnt : 0) - (((page != null && page.currentPage != null) ? page.currentPage : 1) - 1) * (pageSize != null ? pageSize : 10) - iterStat.index}"></td>
-            <td><span class="category-box" th:text="${faq.faqTypeId}"></span></td>
+            <td class="category"><span class="category-box" th:text="${faq.faqTypeId}"></span></td>
             <td class="title">
                 <a th:href="@{/faq/read(faqId=${faq.faqId})}" th:text="${faq.faqTitle}"></a>
             </td>
