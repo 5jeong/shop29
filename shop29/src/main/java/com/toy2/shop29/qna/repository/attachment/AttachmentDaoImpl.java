@@ -58,7 +58,7 @@ public class AttachmentDaoImpl implements AttachmentDao{
     }
 
     @Override
-    public List<AttachmentDto> selectAllBy(int tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException {
+    public List<AttachmentDto> selectAllBy(String tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException {
         Map<String, Object> map = new HashMap<>();
         map.put("tableId", tableId);
         map.put("tableName", tableName);
