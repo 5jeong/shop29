@@ -1,6 +1,7 @@
 package com.toy2.shop29.qna.util;
 
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,10 +14,18 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@SpringBootTest(
+        properties = {
+                "file.upload.file-path=test-static/uploads/",
+                "file.upload.temp-file-path=test-static/temp/",
+                "file.upload.test-file-path=test-static/test/",
+                "file.upload.test-file-name=sample-img.PNG"
+        }
+)
 public class FileUploadHandlerTest {
 
     @Autowired
@@ -35,7 +44,21 @@ public class FileUploadHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        fileUploadHandler.deleteAllFiles();
+        cleanFileStorage();
+    }
+
+    @AfterEach
+    void after() throws IOException {
+        cleanFileStorage();
+    }
+
+    private void cleanFileStorage() throws IOException {
+        List<String> filePathList = List.of(FILE_PATH, TEMP_FILE_PATH);
+        fileUploadHandler.deleteAllFilesFrom(filePathList);
+        File[] fileArr = Paths.get(FILE_PATH).toFile().listFiles();
+        assertTrue(fileArr.length == 0);
+        File[] tempFileArr = Paths.get(TEMP_FILE_PATH).toFile().listFiles();
+        assertTrue(tempFileArr.length == 0);
     }
 
     @DisplayName("파일 저장 테스트 - 성공")

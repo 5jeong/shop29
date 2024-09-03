@@ -10,6 +10,7 @@ import com.toy2.shop29.qna.util.FileUploadHandler;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(
+        properties = {
+                "file.upload.file-path=test-static/uploads/",
+                "file.upload.temp-file-path=test-static/temp/",
+                "file.upload.test-file-path=test-static/test/",
+                "file.upload.test-file-name=sample-img.PNG"
+        }
+)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AttachmentServiceTest {
 
@@ -55,6 +63,8 @@ public class AttachmentServiceTest {
     @SpyBean
     FileUploadHandler fileUploadHandler;
 
+    @Value("${file.upload.temp-file-path}")
+    private String TEMP_FILE_PATH;
     @Value("${file.upload.test-file-name}")
     private String TEST_FILE_NAME;
     @Value("${file.upload.test-file-path}")
@@ -147,9 +157,22 @@ public class AttachmentServiceTest {
         assertTrue(attachmentDao.count() == 0);
 
         // 파일 저장소 초기화
-        fileUploadHandler.deleteAllFiles();
+        cleanFileStorage();
+    }
+
+    @AfterEach
+    void after() throws IOException {
+        // 파일 저장소 초기화
+        cleanFileStorage();
+    }
+
+    private void cleanFileStorage() throws IOException {
+        List<String> filePathList = List.of(FILE_PATH, TEMP_FILE_PATH);
+        fileUploadHandler.deleteAllFilesFrom(filePathList);
         File[] fileArr = Paths.get(FILE_PATH).toFile().listFiles();
         assertTrue(fileArr.length == 0);
+        File[] tempFileArr = Paths.get(TEMP_FILE_PATH).toFile().listFiles();
+        assertTrue(tempFileArr.length == 0);
     }
 
     @DisplayName("파일 저장소에 파일 저장 - 성공")

@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Component
 public class FileUploadHandler {
@@ -183,23 +184,17 @@ public class FileUploadHandler {
      * <strong>테스트 목적으로만 사용할 것</strong>
      * @throws IOException
      */
-    public void deleteAllFiles() throws IOException {
-        Path filePath = Paths.get(FILE_PATH);
-        Files.list(filePath).forEach(p -> {
-            try {
-                Files.delete(p);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        Path tempFilePath = Paths.get(TEMP_FILE_PATH);
-        Files.list(tempFilePath).forEach(p -> {
-            try {
-                Files.delete(p);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public void deleteAllFilesFrom(List<String> filePathList) throws IOException {
+        for(String filePathStr : filePathList){
+            Path filePath = Paths.get(filePathStr);
+            Files.list(filePath).forEach(p -> {
+                try {
+                    Files.delete(p);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
 //    /**
