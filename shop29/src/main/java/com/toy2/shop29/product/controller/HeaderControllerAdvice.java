@@ -4,22 +4,22 @@ import com.toy2.shop29.product.domain.category.MajorCategoryDto;
 import com.toy2.shop29.product.domain.category.MajorMiddleDto;
 import com.toy2.shop29.product.service.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
-public class CategoryController {
+@ControllerAdvice
+public class HeaderControllerAdvice {
 
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping("/product/mainpage")
-    public String home(Model model) {
+    @ModelAttribute
+    public void addAttributes(Model model) {
 
         // 모든 대분류 가져오기
         List<MajorCategoryDto> majorCategories = categoryService.findAllMajors();
@@ -34,6 +34,5 @@ public class CategoryController {
         // 모델에 데이터 추가
         model.addAttribute("majorWithMiddleCategories", majorWithMiddleCategories);
 
-        return "product/mainpage"; // home.html 템플릿으로 이동
     }
 }
