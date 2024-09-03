@@ -42,10 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Transactional
 @SpringBootTest(
         properties = {
-                "file.upload.file-path=test-static/uploads/",
-                "file.upload.temp-file-path=test-static/temp/",
-                "file.upload.test-file-path=test-static/test/",
-                "file.upload.test-file-name=sample-img.PNG"
+                "file.upload.file-path=test/",
+                "file.upload.temp-file-path=test/temp/",
         }
 )
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -185,8 +183,8 @@ public class QnaServiceTest {
 
         // 3. 파일 저장소에 샘플 첨부파일 저장
         savedFileNames = new ArrayList<>();
-        fileUploadHandler.saveFile(createTestFile(), TEST_FILE_NAME);
-        assertTrue(fileUploadHandler.getFile(TEST_FILE_NAME) != null);
+        String fileUrl = fileUploadHandler.saveFile(createTestFile(), TEST_FILE_NAME);
+        assertTrue(fileUploadHandler.getFileFromUrl(fileUrl) != null);
         savedFileNames.add(TEST_FILE_NAME);
     }
 
@@ -208,10 +206,6 @@ public class QnaServiceTest {
     private void cleanFileStorage() throws IOException {
         List<String> filePathList = List.of(FILE_PATH, TEMP_FILE_PATH);
         fileUploadHandler.deleteAllFilesFrom(filePathList);
-        File[] fileArr = Paths.get(FILE_PATH).toFile().listFiles();
-        assertTrue(fileArr.length == 0);
-        File[] tempFileArr = Paths.get(TEMP_FILE_PATH).toFile().listFiles();
-        assertTrue(tempFileArr.length == 0);
     }
 
     @DisplayName("1:1 문의 전체조회(유저) - 성공 - 자신의 1:1 문의만 조회")
@@ -228,7 +222,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -241,7 +235,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-2-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(), ADMIN_ID,"답변" + i);
         }
@@ -338,7 +332,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -352,7 +346,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -472,7 +466,7 @@ public class QnaServiceTest {
         // 1-2 답변 등록
         qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변");
         // 1-3 첨부파일 등록
-        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
+        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, savedFileNames);
 
         // 2단계 데이터 처리
         QnaDto selectedQna = qnaDao.selectWith(qnaDto.getQnaId());
@@ -584,6 +578,6 @@ public class QnaServiceTest {
     }
 
     File createTestFile() {
-        return Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+        return fileUploadHandler.downloadFile(TEST_FILE_PATH, TEST_FILE_NAME);
     }
 }

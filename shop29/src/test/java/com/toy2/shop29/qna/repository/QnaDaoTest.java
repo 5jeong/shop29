@@ -131,7 +131,7 @@ public class QnaDaoTest {
             qnaAnswerDao.insert(qnaAnswerDto);
 
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .tableId(dto.getQnaId())
+                    .tableId(dto.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")
@@ -257,7 +257,7 @@ public class QnaDaoTest {
         int attachmentSize = 2;
         for(int i = 0; i < attachmentSize; i++){
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .tableId(dto.getQnaId())
+                    .tableId(dto.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")
