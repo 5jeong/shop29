@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AttachmentServiceTest {
@@ -82,8 +84,8 @@ public class AttachmentServiceTest {
             (미완료)4) 롤백 & 예외 - 테이블 레코드 생성 중 예외 발생시
      */
 
-    @PostConstruct
-    void init(){
+    @BeforeEach
+    void before() throws IOException {
         qnaTypeDao.deleteAll();
         assertTrue(qnaTypeDao.count() == 0);
         parentQnaTypeDao.deleteAll();
@@ -139,10 +141,7 @@ public class AttachmentServiceTest {
                 .build();
         assertTrue(qnaDao.insert(qDto) == 1);
         qnaDto = qDto;
-    }
 
-    @BeforeEach
-    void before() throws IOException {
         // 첨부파일 테이블 초기화
         attachmentDao.deleteAll();
         assertTrue(attachmentDao.count() == 0);
@@ -233,7 +232,7 @@ public class AttachmentServiceTest {
         assertTrue(savedAttachments.size() == multipartFiles.size());
     }
 
-    @DisplayName("첨부파일 여러건 저장 - 성공 - 첨부파일이 파일 저장소에 없을 경우, 하당 파일은 무시")
+    @DisplayName("첨부파일 여러건 저장 - 성공 - 첨부파일이 파일 저장소에 없을 경우, 해당 파일은 무시")
     @Test
     void createAttachments_3() throws IOException, InterruptedException {
         // given -> 첨부파일 저장소에 2개 파일 저장 & 존재하지 않는 파일명 생성

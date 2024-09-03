@@ -20,6 +20,7 @@ import com.toy2.shop29.qna.util.FileUploadHandler;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -36,6 +38,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class QnaServiceTest {
@@ -181,6 +184,11 @@ public class QnaServiceTest {
         attachmentDao.deleteAll();
         qnaAnswerDao.deleteAll();
         qnaDao.deleteAll();
+    }
+
+    @AfterEach
+    void after() throws IOException {
+        fileUploadHandler.deleteAllFiles();
     }
 
     @DisplayName("1:1 문의 전체조회(유저) - 성공 - 자신의 1:1 문의만 조회")
