@@ -21,24 +21,6 @@
     p.product_id = #{productId}
     </select>
 
-
-    <!-- OptionKey값이 어떤 Value값을 가지고 있는지 검색 -->
-    <select id="selectValuesByKey" parameterType="int" resultType="com.toy2.shop29.product.domain.option.OptionKeyValue">
-        SELECT
-            ok.option_key_id,
-            ok.option_key_name,
-            ov.option_value_id,
-            ov.option_value_name
-        FROM
-            optionkey ok
-                JOIN
-            optionvalue ov ON ok.option_key_id = ov.option_key_id
-        WHERE
-            ok.option_key_id = #{optionKeyId};
-
-    </select>
-
-
     <!-- productId로 해당 상품의 옵션 value 검색 -->
     <select id="selectOptionValues" parameterType="int" resultType="com.toy2.shop29.product.domain.option.ProductOptionValueDto">
 
@@ -59,10 +41,5 @@
             p.product_id = #{productId};
 
     </select>
-
-
-
-
-
 
 </mapper>

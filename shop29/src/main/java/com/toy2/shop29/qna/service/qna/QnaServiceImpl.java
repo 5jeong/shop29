@@ -92,7 +92,7 @@ public class QnaServiceImpl implements QnaService{
         }
 
         if (request.getProductId() != null) {
-            ProductWithCategoriesDto product = productService.getProductWithCategories(request.getProductId());
+            ProductWithCategoriesDto product = productService.findProductWithCategories(request.getProductId());
             if (product == null) {
                 throw new IllegalArgumentException("상품ID가 존재하지 않습니다.");
             }
