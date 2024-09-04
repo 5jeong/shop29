@@ -65,7 +65,7 @@
         INSERT INTO product
         (product_id, small_category_id, product_name, brand_id, price, sale_ratio, rating, is_exclusive, size_table, start_date, created_date, created_id, updated_date, updated_id)
         VALUES
-            (#{productId}, #{smallCategoryId}, #{productName}, #{brandId}, #{price}, #{saleRatio}, #{rating}, #{isExclusive}, #{sizeTable}, #{startDate}, #{createdDate}, #{createdId}, #{updatedDate}, #{updatedId})
+            (#{productId}, #{smallCategoryId}, #{productName}, #{brandId}, #{price}, #{saleRatio}, #{rating}, #{isExclusive}, #{sizeTable}, #{startDate}, #{created_date}, #{createdId}, #{updatedDate}, #{updatedId})
     </insert>
 
 
