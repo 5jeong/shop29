@@ -1,7 +1,7 @@
-<div th:insert="fragments/header :: header"></div>
+<div th:fragment="header" th:replace="~{fragments/header :: header}"></div>
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title>Product Board</title>
@@ -113,7 +113,7 @@
 <button th:id="${product.productId}" class="add-to-cart" type="submit">장바구니 담기</button>
 
 <!-- 결제 버튼 -->
-<button th:id="${product.productId}" th:data-login="${session.loginUser!=null?1:0}" class="buy-btn">구매하기</button>
+<button th:id="${product.productId}" sec:authorize="isAuthenticated()" class="buy-btn">구매하기</button>
 <script>
     $('.add-to-cart').click(function () {
         var productId = $(this).attr('id'); // 클릭된 버튼의 ID를 가져옴

@@ -10,12 +10,14 @@ import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 import com.toy2.shop29.order.service.KakaoPayService;
 import com.toy2.shop29.order.service.OrderService;
+import com.toy2.shop29.users.domain.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.HttpSessionRequiredException;
@@ -46,7 +48,7 @@ public class OrderController {
      */
     @GetMapping("")
     public String order(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserDto user,
             Model model,
             HttpServletResponse response) throws Exception {
         // 응답에 대한 모든 데이터를 디스크, 메모리에 저장하지 않음. 모든 요청이 서버로 직접 전달
@@ -57,7 +59,7 @@ public class OrderController {
         response.setDateHeader("Expires", 0);
 
         // 주문에 필요한 데이터 모델에 추가하여 뷰로 전달
-        OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(userId);
+        OrderPageResponseDTO orderInfo = orderService.getCurrentOrderInfo(user.getUserId());
 
         // 주문 상품이 비어져있다는건 오류나 이미 결제 시도한 상태
         // 주문 상품이 비어있다면 장바구니로 리다이렉트
@@ -78,10 +80,10 @@ public class OrderController {
      */
     @GetMapping("/history")
     public String orderHistory(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserDto user,
             Model model) throws Exception {
 
-        List<OrderHistoryDTO> orderHistoryList = orderService.getOrderHistory(userId);
+        List<OrderHistoryDTO> orderHistoryList = orderService.getOrderHistory(user.getUserId());
 
         // 주문 내역 리스트를 모델에 추가하여 뷰에 전달
         model.addAttribute("orderHistory", orderHistoryList);
@@ -99,19 +101,19 @@ public class OrderController {
      */
     @PostMapping("/update-order")
     public String updateOrderProducts(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserDto user,
             @RequestParam("orderItems") String orderItemsJson,
             RedirectAttributes rattr) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if (!logInCheck(userId)) {
+        if (!logInCheck(user.getUserId())) {
             return "redirect:/login";
         }
         try {
             List<OrderProductDto> orderItems = objectMapper.readValue(orderItemsJson, new TypeReference<>() {
             });
-            orderService.addProducts(userId, orderItems);
+            orderService.addProducts(user.getUserId(), orderItems);
         } catch (IllegalArgumentException e) {
             logger.error("상품 수량 수정 오류");
             rattr.addFlashAttribute("msg", "ORDER_ERR");
@@ -130,13 +132,13 @@ public class OrderController {
      */
     @PostMapping("/pay/ready")
     public @ResponseBody KakaoPayReadyResponseDto payReady(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserDto user,
             Model model,
             @RequestBody OrderCompletedRequestDTO orderRequest,
             HttpServletRequest request) {
         // 카카오 결제 준비하기
         try {
-            KakaoPayReadyResponseDto KakaoPayReadyResponseDto = kakaoPayService.payReady(userId, orderRequest);
+            KakaoPayReadyResponseDto KakaoPayReadyResponseDto = kakaoPayService.payReady(user.getUserId(), orderRequest);
             // 세션에 결제 고유번호(tid) 저장
             HttpSession session = request.getSession(true);
             session.setAttribute("tid", KakaoPayReadyResponseDto.getTid());
@@ -159,7 +161,7 @@ public class OrderController {
      */
     @GetMapping("/pay/completed")
     public String payCompleted(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserDto user,
             @RequestParam("pg_token") String pgToken,
             HttpServletRequest request) {
         HttpSession session = request.getSession(true);
@@ -169,7 +171,7 @@ public class OrderController {
 
         // 카카오 결제 요청하기
         try {
-            kakaoPayService.payApprove(userId, tid, pgToken);
+            kakaoPayService.payApprove(user.getUserId(), tid, pgToken);
             // TODO : 테스트
         } catch (Exception e) {
             return "redirect:/order/pay/error";

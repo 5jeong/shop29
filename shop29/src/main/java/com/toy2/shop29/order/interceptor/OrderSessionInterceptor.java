@@ -4,6 +4,8 @@ import com.toy2.shop29.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -17,14 +19,19 @@ public class OrderSessionInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         HttpSession session = request.getSession();
-        String userId = (String) session.getAttribute("loginUser");
+
+        Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext()
+                .getAuthentication();
+
+        String userId = authentication.getName();
         String tid = (String) session.getAttribute("tid");
 
-        if (userId == null) {
-            response.sendRedirect("/");
-        }
+//        if (userId == null) {
+//            response.sendRedirect("/");
+//        }
 
         if (tid != null) {
             orderService.deleteOrderHistory(userId, tid);
