@@ -3,8 +3,11 @@ package com.toy2.shop29.users.controller;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
+import com.toy2.shop29.users.domain.UserWithdrawalDto;
 import com.toy2.shop29.users.service.email.EmailVerificationService;
 import com.toy2.shop29.users.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -118,4 +122,25 @@ public class UserController {
         return "user/findPasswordForm";
     }
 
+
+    @GetMapping("/delete")
+    public String delete(@ModelAttribute UserWithdrawalDto userWithdrawalDto) {
+        return "user/withdrawalDto";
+    }
+
+    @PostMapping("/delete")
+    public String delete(@ModelAttribute(name = "userWithdrawalDto") UserWithdrawalDto userWithdrawalDto,
+                         @AuthenticationPrincipal UserDto user, HttpServletRequest request) {
+        userService.insertWithdrawalUser(user.getUserId(),userWithdrawalDto);
+        HttpSession session = request.getSession();
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/";
+    }
+
+    @GetMapping("/mypage")
+    public String mypage(@AuthenticationPrincipal UserDto user,Model model){
+        model.addAttribute("user",user);
+        return "user/mypage";
+    }
 }
