@@ -19,35 +19,28 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryDao categoryDao;
 
     @Override
-    public List<MajorCategoryDto> getAllMajorCategories(){
-        return categoryDao.findAllMajorCategories();
+    public MiddleCategoryDto findMiddleBySmall(int smallCategoryId) {
+        return categoryDao.selectMiddleBySmall(smallCategoryId);
     }
 
     @Override
-    public List<MajorMiddleDto> getMiddleByMajor(int majorId){
-        return categoryDao.getMiddleByMajor(majorId);
+    public List<SmallCategoryDto> findSmallsByMiddle(int middleCategoryId) {
+        return categoryDao.selectSmallsByMiddle(middleCategoryId);
     }
 
     @Override
-    public List<SmallCategoryDto> getSmallCategoriesByMiddle(int middleCategoryId) {
-        return categoryDao.getSmallCategoriesByMiddle(middleCategoryId);
+    public List<MiddleCategoryDto> findRelatedMiddles(int middleCategoryId) {
+        return categoryDao.selectRelatedMiddles(middleCategoryId);
     }
 
     @Override
-    public List<MiddleCategoryDto> getRelatedMiddleCategories(int middleCategoryId) {
-        return categoryDao.getRelatedMiddleCategories(middleCategoryId);
+    public List<MajorCategoryDto> findAllMajors(){
+        return categoryDao.selectAllMajors();
     }
 
     @Override
-    public MiddleCategoryDto getMiddleCategoryBySmall(int smallCategoryId) {
-        return categoryDao.getMiddleCategoryBySmall(smallCategoryId);
+    public List<MajorMiddleDto> findMiddleMajor(int majorId){
+        return categoryDao.selectMiddleMajor(majorId);
     }
-
-
-
-
-
-
-
 
 }
