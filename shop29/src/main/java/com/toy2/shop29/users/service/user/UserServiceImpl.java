@@ -6,8 +6,8 @@ import com.toy2.shop29.users.domain.UserUpdateDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 @Slf4j
@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto findById(String userId) {
@@ -33,11 +34,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int insertUser(UserRegisterDto userRegisterDto) {
+        userRegisterDto.setPassword(passwordEncoder.encode(userRegisterDto.getPassword()));
         return userMapper.insertUser(userRegisterDto);
     }
 
     @Override
     public int updateUser(String userId, UserUpdateDto userUpdateDto) {
+        userUpdateDto.setPassword(passwordEncoder.encode(userUpdateDto.getPassword()));
         return userMapper.updateUser(userId, userUpdateDto);
     }
 
@@ -61,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updatePassword(String userId, String tempPassword) {
-        return userMapper.updatePassword(userId,tempPassword);
+        return userMapper.updatePassword(userId, passwordEncoder.encode(tempPassword));
     }
 
     public boolean isUserIdDuplicated(String userId) {
