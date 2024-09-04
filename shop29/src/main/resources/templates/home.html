@@ -1,6 +1,4 @@
 <!-- 새 구문 -->
-<div th:fragment="header" th:replace="~{fragments/header :: header}"></div>
-
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
@@ -75,6 +73,7 @@
     <title>쇼핑몰 메인페이지</title>
 </head>
 <body>
+<div th:insert="fragments/header :: header"></div>
 <div class="container-fluid" style="max-width: 500px;">
 
     <div class="container-fluid" style="max-width: 500px;">

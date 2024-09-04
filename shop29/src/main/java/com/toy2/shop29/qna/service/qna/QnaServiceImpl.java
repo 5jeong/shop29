@@ -92,7 +92,7 @@ public class QnaServiceImpl implements QnaService{
         }
 
         if (request.getProductId() != null) {
-            ProductWithCategoriesDto product = productService.getProductWithCategories(request.getProductId());
+            ProductWithCategoriesDto product = productService.findProductWithCategories(request.getProductId());
             if (product == null) {
                 throw new IllegalArgumentException("상품ID가 존재하지 않습니다.");
             }
@@ -125,7 +125,7 @@ public class QnaServiceImpl implements QnaService{
         }
 
         // 2-4. 첨부파일 등록
-        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, attachmentNames);
+        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, attachmentNames);
     }
 
     // [DELETE] 1:1 문의 삭제 <- softDelete
@@ -150,6 +150,6 @@ public class QnaServiceImpl implements QnaService{
         }
 
         // 4. 첨부파일 삭제
-        attachmentService.deleteAttachmentsBy(userId, qnaId, AttachmentTableName.QNA);
+        attachmentService.deleteAttachmentsBy(userId, Integer.toString(qnaId), AttachmentTableName.QNA);
     }
 }

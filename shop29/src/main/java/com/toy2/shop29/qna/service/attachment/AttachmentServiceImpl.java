@@ -1,11 +1,15 @@
 package com.toy2.shop29.qna.service.attachment;
 
+import com.toy2.shop29.product.dao.product.ProductDao;
+import com.toy2.shop29.product.domain.ProductDto;
 import com.toy2.shop29.qna.domain.AttachmentDto;
 import com.toy2.shop29.qna.domain.AttachmentTableName;
 import com.toy2.shop29.qna.domain.QnaDto;
 import com.toy2.shop29.qna.repository.attachment.AttachmentDao;
 import com.toy2.shop29.qna.repository.qna.QnaDao;
 import com.toy2.shop29.qna.util.FileUploadHandler;
+import com.toy2.shop29.users.domain.UserDto;
+import com.toy2.shop29.users.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -16,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AttachmentService 는 QnaService에서 사용될 목적으로 만들어짐
@@ -26,41 +32,26 @@ import java.util.List;
 @Service
 public class AttachmentServiceImpl implements AttachmentService{
 
-    @Value("${file.upload.file-path}")
-    private String FILE_PATH;
-    @Value("${file.upload.temp-file-path}")
-    private String TEMP_FILE_PATH;
     @Value("${file.default-mime-type}")
     private String DEFAULT_MIME_TYPE;
 
     FileUploadHandler fileUploadHandler;
     AttachmentDao attachmentDao;
     QnaDao qnaDao;
+    UserMapper userMapper;
+    ProductDao productDao;
+    private final String USER_ROLE_ADMIN = "관리자";
 
-    public AttachmentServiceImpl(FileUploadHandler fileUploadHandler, AttachmentDao attachmentDao, QnaDao qnaDao) {
+    public AttachmentServiceImpl(FileUploadHandler fileUploadHandler,
+                                 AttachmentDao attachmentDao,
+                                 QnaDao qnaDao,
+                                 UserMapper userMapper,
+                                 ProductDao productDao) {
         this.fileUploadHandler = fileUploadHandler;
         this.attachmentDao = attachmentDao;
         this.qnaDao = qnaDao;
-    }
-
-    @Override
-    public String getMimeType(Resource resource) {
-        String mimeType = null;
-        try{
-            mimeType = Files.probeContentType(resource.getFile().toPath());
-        }catch (IOException e) {
-            mimeType = DEFAULT_MIME_TYPE;
-        }
-        return mimeType;
-    }
-
-    @Override
-    public Resource getResourceFromFile(String fileName) {
-        File file = fileUploadHandler.getFile(fileName);
-        if(file == null || !file.exists()){
-            return null;
-        }
-        return new FileSystemResource(file);
+        this.userMapper = userMapper;
+        this.productDao = productDao;
     }
 
     /**
@@ -77,43 +68,41 @@ public class AttachmentServiceImpl implements AttachmentService{
         String savedFileName = fileUploadHandler.generateTimestampedFileName(multipartFile.getOriginalFilename());
 
         // 3. 파일 저장소에 파일 저장
+        String filePath;
         try{
-            fileUploadHandler.saveMultipartFile(multipartFile, savedFileName);
+            return fileUploadHandler.saveMultipartFile(multipartFile, savedFileName);
         }catch (IOException e){
             e.printStackTrace();
             throw new RuntimeException("파일 저장 중 오류가 발생했습니다.",e);
         }
-
-        // 4. 저장된 파일명 반환
-        return savedFileName;
     }
 
     @Transactional
     @Override
     public void createAttachments(
             String userId,
-            int tableId,
+            String tableId,
             AttachmentTableName tableName,
-            List<String> attachmentNames) throws RuntimeException {
-        // 1. 첨부파일 이름 리스트가 비어있을 경우, 종료
-        if(attachmentNames == null || attachmentNames.isEmpty()){
+            List<String> attachmentURLs) throws RuntimeException {
+        // 1. 첨부파일 URL 리스트가 비어있을 경우, 종료
+        if(attachmentURLs == null || attachmentURLs.isEmpty()){
             return;
         }
 
-        // 2. 첨부파일 이름 리스트를 순회하며, 첨부파일이 파일 저장소에 저장되있는지 확인
+        // 2. 첨부파일 URL 리스트를 순회하며, 첨부파일이 파일 저장소에 저장되있는지 확인
         // 첨부파일이 존재하지 않을 경우, 해당 첨부파일은 제외함 -> 즉, 존재하는 첨부파일에 대해서만 작업 수행
-        List<File> savedFileList = new LinkedList<>();
-        for(String attachmentName : attachmentNames){
-            File file = fileUploadHandler.getFile(attachmentName);
+        Map<String, File> savedFileMap = new HashMap<>();
+        for(String attachmentURL : attachmentURLs){
+            File file = fileUploadHandler.getFileFromUrl(attachmentURL);
             if(file != null && file.exists()){
-                savedFileList.add(file);
+                savedFileMap.put(attachmentURL, file);
             }
         }
 
         // 3. 만약 첨부파일이 이미 첨부파일 테이블의 레코드에 저장된 상태라면,
         // 하나의 첨부파일에 대해 여러 레코드가 연결될 수 있기 때문에, 예외 던짐
-        for(File file : savedFileList){
-            String savedFileName = file.getName();
+        for(String fileUrl : savedFileMap.keySet()){
+            String savedFileName = fileUploadHandler.extractFileNameFromUrl(fileUrl);
             AttachmentDto attachmentDto = attachmentDao.selectByFileName(savedFileName);
             if(attachmentDto != null){
                 throw new IllegalArgumentException("첨부파일이 이미 다른 레코드에 연결되어 있습니다.");
@@ -127,13 +116,15 @@ public class AttachmentServiceImpl implements AttachmentService{
         // 파일 저장소에 저장된 파일은, 유효성 검사가 완료된 파일이기 때문에,
         // 별도의 파일 유효성 검사는 수행하지 않음
         List<AttachmentDto> attachmentDtos = new LinkedList<>();
-        for(File file : savedFileList){
+        for(Map.Entry<String, File> entry : savedFileMap.entrySet()){
+            String fileURL = entry.getKey();
+            File file = entry.getValue();
             Integer[] widthAndHeight = fileUploadHandler.getImageSize(file);
             AttachmentDto dto = AttachmentDto.builder()
                     .tableId(tableId)
                     .tableName(tableName)
-                    .fileName(file.getName())
-                    .filePath(fileUploadHandler.createFileUrl(file.getName()))
+                    .fileName(fileUploadHandler.extractFileNameFromUrl(fileURL))
+                    .filePath(fileURL)
                     .width(widthAndHeight[0])
                     .height(widthAndHeight[1])
                     .size(fileUploadHandler.getFileSize(file))
@@ -152,15 +143,45 @@ public class AttachmentServiceImpl implements AttachmentService{
         }
     }
 
-    private void checkTableIdValidate(String userId, int tableId, AttachmentTableName tableName) throws IllegalArgumentException {
+    @Override
+    public List<AttachmentDto> findAttachmentsBy(String tableId, AttachmentTableName tableName) throws RuntimeException {
+        // tableId와 tableName에 해당하는 첨부파일 리스트를 조회
+        return attachmentDao.selectAllBy(tableId, tableName,true);
+    }
+
+    private void checkTableIdValidate(String userId, String tableId, AttachmentTableName tableName) throws IllegalArgumentException {
         switch (tableName){
             case QNA:
-                QnaDto qnaDto = qnaDao.select(tableId, null);
+                QnaDto qnaDto = qnaDao.select(Integer.parseInt(tableId), null);
                 if(qnaDto == null){
                     throw new IllegalArgumentException("존재하지 않는 문의글입니다.");
                 }
                 if(!qnaDto.getUserId().equals(userId)){
                     throw new IllegalArgumentException("첨부파일 생성권한이 없습니다.");
+                }
+                break;
+            case USER:
+                UserDto userDto = userMapper.findById(tableId);
+                if(userDto == null){
+                    throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+                }
+
+                if(!userDto.getUserId().equals(userId)){
+                    throw new IllegalArgumentException("본인의 프로필 이미지만 등록할 수 있습니다.");
+                }
+                break;
+            case PRODUCT:
+                ProductDto productDto = productDao.select(Integer.parseInt(tableId));
+                if(productDto == null){
+                    throw new IllegalArgumentException("존재하지 않는 상품입니다.");
+                }
+
+                UserDto userDto1 = userMapper.findById(userId);
+                if(userDto1 == null){
+                    throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+                }
+                if(!userDto1.getUserRole().equals(USER_ROLE_ADMIN)){
+                    throw new IllegalArgumentException("관리자만 상품의 이미지를 등록할 수 있습니다.");
                 }
                 break;
             default:
@@ -170,7 +191,7 @@ public class AttachmentServiceImpl implements AttachmentService{
 
     @Transactional
     @Override
-    public void deleteAttachmentsBy(String userId, int tableId, AttachmentTableName tableName) throws RuntimeException {
+    public void deleteAttachmentsBy(String userId, String tableId, AttachmentTableName tableName) throws RuntimeException {
         // 1. tableName에 해당하는 테이블에서 tableId에 해당하는 레코드가 있는지 확인
         checkTableIdValidate(userId, tableId, tableName);
 
