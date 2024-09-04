@@ -13,12 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AttachmentDaoTest {
@@ -97,7 +99,7 @@ public class AttachmentDaoTest {
     void insert_1(){
         // 1단계 데이터 선택
         AttachmentDto dto = AttachmentDto.builder()
-                .tableId(sampleQna.getQnaId())
+                .tableId(sampleQna.getQnaId().toString())
                 .tableName(AttachmentTableName.QNA)
                 .fileName("fileName")
                 .filePath("filePath")
@@ -125,7 +127,7 @@ public class AttachmentDaoTest {
         int size = 5;
         for(int i = 0; i < size; i++){
             AttachmentDto dto = AttachmentDto.builder()
-                    .tableId(sampleQna.getQnaId())
+                    .tableId(sampleQna.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .fileName("fileName")
                     .filePath("filePath")
@@ -154,7 +156,7 @@ public class AttachmentDaoTest {
         String[] fileNames = {"fileName1", "fileName2"};
         for(String fileName : fileNames){
             AttachmentDto dto = AttachmentDto.builder()
-                    .tableId(sampleQna.getQnaId())
+                    .tableId(sampleQna.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .fileName(fileName)
                     .filePath("filePath")
@@ -180,7 +182,7 @@ public class AttachmentDaoTest {
     void update_1(){
         // 1단계 데이터 선택
         AttachmentDto dto = AttachmentDto.builder()
-                .tableId(sampleQna.getQnaId())
+                .tableId(sampleQna.getQnaId().toString())
                 .tableName(AttachmentTableName.QNA)
                 .fileName("fileName")
                 .filePath("filePath")
@@ -214,7 +216,7 @@ public class AttachmentDaoTest {
         // select order by 추가 여부 확인 -> select 순서 및 요소 일치여부 확인
         for(int i = 0; i < size; i++){
             AttachmentDto dto = AttachmentDto.builder()
-                    .tableId(sampleQna.getQnaId())
+                    .tableId(sampleQna.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .fileName("fileName")
                     .filePath("filePath")
