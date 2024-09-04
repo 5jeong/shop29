@@ -4,11 +4,11 @@ import com.toy2.shop29.product.domain.category.MajorCategoryDto;
 import com.toy2.shop29.product.domain.category.MajorMiddleDto;
 import com.toy2.shop29.product.service.category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.ui.Model;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class HeaderControllerAdvice {
         List<MajorCategoryDto> majorCategories = categoryService.findAllMajors();
 
         // 각 대분류에 속한 중분류를 매핑
-        Map<MajorCategoryDto, List<MajorMiddleDto>> majorWithMiddleCategories = new HashMap<>();
+        Map<MajorCategoryDto, List<MajorMiddleDto>> majorWithMiddleCategories = new LinkedHashMap<>();
         for (MajorCategoryDto major : majorCategories) {
             List<MajorMiddleDto> majorMiddles = categoryService.findMiddleMajor(major.getMajorCategoryId());
             majorWithMiddleCategories.put(major, majorMiddles);

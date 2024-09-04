@@ -50,6 +50,7 @@
     <!-- 모든 대분류 select -->
     <select id="selectAllMajors" resultType="com.toy2.shop29.product.domain.category.MajorCategoryDto">
         SELECT * FROM majorcategory
+        ORDER BY major_category_id
     </select>
 
     <resultMap id="MajorMiddleMap" type="com.toy2.shop29.product.domain.category.MajorMiddleDto">
@@ -69,7 +70,8 @@
             majorcategory mc
                 LEFT JOIN middlecategory midc ON mc.major_category_id = midc.major_category_id
         WHERE
-            mc.major_category_id = #{majorCategoryId};
+            mc.major_category_id = #{majorCategoryId}
+        ORDER BY mc.major_category_id
     </select>
 
 </mapper>
