@@ -23,7 +23,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public int remove(Integer noticeId, String noticeCreatorId) {
-        int result = boardDao.delete(noticeId, noticeCreatorId);
+
         return boardDao.delete(noticeId, noticeCreatorId);
     }
 
@@ -63,5 +63,9 @@ public class BoardServiceImpl implements BoardService {
         return boardDao.selectFixedNotices();
     }
 
-
+        @Override
+        @Transactional
+        public int updateFixedNoticePriority(Integer noticeId, int priority) {
+            return boardDao.updateFixedNoticePriority(noticeId, priority);
+        }
 }

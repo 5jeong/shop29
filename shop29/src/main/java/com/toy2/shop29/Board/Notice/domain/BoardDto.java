@@ -1,18 +1,13 @@
 package com.toy2.shop29.Board.Notice.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.AllArgsConstructor;
+import lombok.*;
+
 import java.util.Date;
 // Lombok으로 애너테이션 사용
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@AllArgsConstructor
+@Data
+//@Getter, @Setter, @ToString, @EqualsAndHashCode, @AllArgsConstructor(모든 멤버변수 초기화하는 생성자 생성)
+// -> @Data 어노테이션 안에 다 포함됨.
+
 public class BoardDto {
     private Integer noticeId;
     private String noticeTitle;

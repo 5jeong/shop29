@@ -33,4 +33,6 @@ public interface BoardDao {
 
     // 상단 고정 공지사항 목록을 가져오는 메서드
     List<BoardDto> selectFixedNotices();
+    // 상단 고정 공지사항의 우선순위를 업데이트하는 메서드
+    int updateFixedNoticePriority(Integer noticeId, int priority);
 }

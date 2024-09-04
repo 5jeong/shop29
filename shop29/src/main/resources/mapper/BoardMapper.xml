@@ -96,8 +96,14 @@
                top_fixed_priority
         FROM Notice
         WHERE top_fixed = 1
-        ORDER BY top_fixed_priority ASC
+        ORDER BY top_fixed_priority ASC, notice_creation_time DESC
     </select>
+
+    <update id="updateFixedNoticePriority" parameterType="com.toy2.shop29.Board.Notice.domain.BoardDto">
+        UPDATE Notice
+        SET top_fixed_priority = #{priority}
+        WHERE notice_id = #{noticeId}
+    </update>
 
 
 
