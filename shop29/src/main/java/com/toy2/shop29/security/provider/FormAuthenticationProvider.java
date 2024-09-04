@@ -52,8 +52,13 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
 
         UserContext userContext = (UserContext) userDetailsService.loadUserByUsername(userId);
 
-        // 비밀번호 확인
-        if (!passwordEncoder.matches(password, userContext.getPassword())) {
+        // 비밀번호 확인( 실제 서비스에는 이렇게 해야됨 )
+//        if (!passwordEncoder.matches(password, userContext.getPassword())) {
+//            throw new BadCredentialsException("비밀번호를 잘못 입력");
+//        }
+
+        // SQL insert문에 암호화 안된 비밀번호도 작동하게끔 설정
+        if (!password.equals(user.getPassword()) && !passwordEncoder.matches(password, userContext.getPassword())) {
             throw new BadCredentialsException("비밀번호를 잘못 입력");
         }
 
