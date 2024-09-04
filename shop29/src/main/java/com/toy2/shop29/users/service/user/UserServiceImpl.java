@@ -3,6 +3,7 @@ package com.toy2.shop29.users.service.user;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
+import com.toy2.shop29.users.domain.UserWithdrawalDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,12 @@ public class UserServiceImpl implements UserService {
 
     public boolean isPhoneNumberDuplicated(String phoneNumber) {
         return findByPhoneNumber(phoneNumber) != null;
+    }
+
+    @Override
+    public int insertWithdrawalUser(String userId, UserWithdrawalDto withdrawalDto) {
+        deleteUser(userId);
+        return userMapper.insertWithdrawalUser(userId, withdrawalDto);
     }
 
 }
