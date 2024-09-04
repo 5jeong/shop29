@@ -17,6 +17,13 @@
         WHERE email = #{email};
     </select>
 
+    <insert id="insertWithdrawalUser" parameterType="map">
+        INSERT INTO UserWithdrawal (user_id, reason_primary, reason_secondary)
+        VALUES (#{userId},
+                #{withdrawalDto.reasonPrimary},
+                #{withdrawalDto.reasonSecondary})
+    </insert>
+
 
     <!-- 핸드폰번호 조회-->
     <select id="findByPhoneNumber" resultType="String">
