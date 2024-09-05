@@ -111,10 +111,16 @@
     <div class="text-center">
         <h2>로그인</h2>
     </div>
-    <form th:action th:object="${loginForm}" method="post">
+    <form th:action = "@{/login}" th:object="${loginForm}" method="post">
 
-        <div th:if="${loginError != null}">
-            <p class="field-error" th:text="${loginError}"></p>
+<!--        &lt;!&ndash; 인증 실패 시 에러 메시지 표시 &ndash;&gt;-->
+<!--        <div th:if="${error != null}">-->
+<!--            <p class="field-error" th:text="${error}"></p>-->
+<!--        </div>-->
+
+        <!-- 로그인 예외 발생 시 상세한 에러 메시지 표시 -->
+        <div th:if="${param.error}">
+            <p class="field-error" th:text="${exception}"></p>
         </div>
 
         <div class="mb-3">

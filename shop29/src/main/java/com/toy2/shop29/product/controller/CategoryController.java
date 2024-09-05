@@ -22,12 +22,12 @@ public class CategoryController {
     public String home(Model model) {
 
         // 모든 대분류 가져오기
-        List<MajorCategoryDto> majorCategories = categoryService.getAllMajorCategories();
+        List<MajorCategoryDto> majorCategories = categoryService.findAllMajors();
 
         // 각 대분류에 속한 중분류를 매핑
         Map<MajorCategoryDto, List<MajorMiddleDto>> majorWithMiddleCategories = new HashMap<>();
         for (MajorCategoryDto major : majorCategories) {
-            List<MajorMiddleDto> majorMiddles = categoryService.getMiddleByMajor(major.getMajorCategoryId());
+            List<MajorMiddleDto> majorMiddles = categoryService.findMiddleMajor(major.getMajorCategoryId());
             majorWithMiddleCategories.put(major, majorMiddles);
         }
 

@@ -3,6 +3,7 @@ package com.toy2.shop29.users.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.toy2.shop29.users.domain.UserRegisterDto;
+import com.toy2.shop29.users.domain.UserWithdrawalDto;
 import com.toy2.shop29.users.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -109,5 +110,17 @@ class UserServiceImplTest {
         userService.validateDuplicatedInfo(newUserDto, bindingResult);
         // Then: 중복 에러가 발생했는지 확인
         assertThat(bindingResult.hasFieldErrors("phoneNumber")).isTrue();
+    }
+    @DisplayName("회원 탈퇴 테스트")
+    @Test
+    void deleteTest(){
+        UserWithdrawalDto userWithdrawalDto = new UserWithdrawalDto();
+        userWithdrawalDto.setReasonPrimary("탈퇴 후 재가입을 위해서");
+        userWithdrawalDto.setReasonPrimary("맘에 안듬");
+        int rowCnt = userService.insertWithdrawalUser(userRegisterDto.getUserId(), userWithdrawalDto);
+        assertThat(rowCnt).isEqualTo(1);
+
+
+
     }
 }

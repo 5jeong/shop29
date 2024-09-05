@@ -16,7 +16,7 @@ public interface AttachmentDao {
     AttachmentDto select(int attachmentId, Boolean isActive) throws DataAccessException;
     AttachmentDto selectByFileName(String fileName) throws DataAccessException;
     List<AttachmentDto> selectAll(Boolean isActive) throws DataAccessException;
-    List<AttachmentDto> selectAllBy(int tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException;
+    List<AttachmentDto> selectAllBy(String tableId, AttachmentTableName tableName, Boolean isActive) throws DataAccessException;
     int count() throws DataAccessException;
 
     // Update

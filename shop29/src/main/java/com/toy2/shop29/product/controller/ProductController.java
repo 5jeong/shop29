@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-
 public class ProductController {
 
     @Autowired
@@ -37,7 +36,7 @@ public class ProductController {
     public String getProductDetail(@PathVariable("productId") int productId, Model model) {
         // 상품과 관련된 카테고리 정보를 포함한 상세 정보를 가져옵니다
         try {
-            ProductWithCategoriesDto product = productService.getProductWithCategories(productId);
+            ProductWithCategoriesDto product = productService.findProductWithCategories(productId);
             // 모델에 해당 상품 정보를 추가하여 뷰에 전달
             model.addAttribute("product", product);
             // 상세 페이지로 이동
@@ -48,13 +47,13 @@ public class ProductController {
         }
 
         // 옵션 관련 로직
-        List<ProductOptionDto> productOptions = optionService.getProductOptions(productId);
-        List<ProductOptionValueDto> productOptionValues = optionService.getProductOptionValues(productId);
+        List<ProductOptionDto> productOptions = optionService.findProductOptions(productId);
+        List<ProductOptionValueDto> productOptionValues = optionService.findProductOptionValues(productId);
         model.addAttribute("productOptions", productOptions);
         model.addAttribute("productOptionValues", productOptionValues);
 
 
-        ProductWithCategoriesDto product = productService.getProductWithCategories(productId);
+        ProductWithCategoriesDto product = productService.findProductWithCategories(productId);
         model.addAttribute("product", product);
 
         return "product/detail";
@@ -89,7 +88,7 @@ public class ProductController {
         // smallCategoryId가 null일때 : home에서 들어왔을때, 다른 중분류 목록의 이름을 눌렀을때
         // smallCategoryId가 null아닐때: 중분류에 대한 소분류 목록의 이름을 눌렀을때
         if (smallCategoryId != null) {
-            MiddleCategoryDto middleCategoryDto = categoryService.getMiddleCategoryBySmall(smallCategoryId);
+            MiddleCategoryDto middleCategoryDto = categoryService.findMiddleBySmall(smallCategoryId);
             //소분류 이름을 눌러 middleCategoryId가 null이어도 소분류Id로 중분류Id를 뽑아와서 써야한다.
             //'해당 중분류와 같은 대분류를 가진 중분류 목록'과 '선택한 중분류에 해당하는 소분류 목록'을 보여주려면 계속 null이어선 안된다. (둘다 middleId를 인자로 가진다)
             middleCategoryId = middleCategoryDto.getMiddleCategoryId();
@@ -98,15 +97,15 @@ public class ProductController {
 
 
         // 중분류와 소분류 목록 가져오기
-        List<SmallCategoryDto> smallCategories = categoryService.getSmallCategoriesByMiddle(middleCategoryId); // 중복된 카테고리 로딩 제거
+        List<SmallCategoryDto> smallCategories = categoryService.findSmallsByMiddle(middleCategoryId); // 중복된 카테고리 로딩 제거
         model.addAttribute("smallCategories", smallCategories);
 
-        List<MiddleCategoryDto> relatedMiddleCategories = categoryService.getRelatedMiddleCategories(middleCategoryId); // 중복된 카테고리 로딩 제거
+        List<MiddleCategoryDto> relatedMiddleCategories = categoryService.findRelatedMiddles(middleCategoryId); // 중복된 카테고리 로딩 제거
         model.addAttribute("relatedMiddleCategories", relatedMiddleCategories);
 
 
-        int totalCnt = smallCategoryId != null ? productService.getCountBySmallCategory(smallCategoryId) :
-                productService.getCountByMiddleCategory(middleCategoryId);
+        int totalCnt = smallCategoryId != null ? productService.countProductBySmall(smallCategoryId) :
+                productService.countProductByMiddle(middleCategoryId);
 
         //pageHandler에 계산된 totalCnt와 param으로 가져온 page,PasgeSize보내기
         PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
@@ -138,11 +137,11 @@ public class ProductController {
             case "highDiscount": //높은 할인율순
                 list = productService.sortByHighDiscount(paramMap);
                 break;
-            case "ratings": //높은 별점순
-                list = productService.sortedByRating(paramMap);
+            case "rating": //높은 별점순
+                list = productService.sortByRating(paramMap);
                 break;
             default: //기본 정렬
-                list = productService.getPage(paramMap);
+                list = productService.sortDefault(paramMap);
                 break;
         }
 
