@@ -7,11 +7,20 @@ def get_order(user_id):
     query = text("SELECT order_id FROM OrderHistory WHERE user_id = :user_id")
     try:
         histories = db.execute(query, {"user_id": user_id}).fetchall()
+        if not histories:
+            html_template = """<div><strong>주문내역이 없습니다.</strong></div>"""
+            
+            template = Template(html_template)
+            rendered_html = template.render()
+            
+            return rendered_html
         order_ids = [history[0] for history in histories]
         # HTML template
         html_template = """
         <div class="select-container">
+        <strong>
             {{user_id}}님의 주문내역입니다.
+            </strong>
             <div class="btn-container">
                 {% for order_id in order_ids %}
                 <button onclick="requestUserOrderHistory(this)" class="select-btn order-history" id="{{ order_id }}">{{ order_id }}</button>
@@ -27,7 +36,7 @@ def get_order(user_id):
         return rendered_html
     except Exception as e:
         print(e)
-        return f"해당 주문번호는 존재하지 않는 주문번호입니다."
+        return f"<strong>해당 주문번호는 존재하지 않는 주문번호입니다.</strong>"
     
     
 def get_order_history(user_id, order_id):
