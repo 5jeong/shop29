@@ -1,10 +1,6 @@
 package com.toy2.shop29.exception;
 
 import com.toy2.shop29.exception.error.ErrorCode;
-import com.toy2.shop29.users.exception.loginException.IncorrectPasswordException;
-import com.toy2.shop29.users.exception.loginException.UserAccountLockedException;
-import com.toy2.shop29.users.exception.loginException.UserNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +13,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
     /**
-     * javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다.
-     * HttpMessageConverter 에서 등록한 HttpMessageConverter binding 못할경우 발생
-     * 주로 @RequestBody, @RequestPart 어노테이션에서 발생
+     * javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다. HttpMessageConverter 에서 등록한 HttpMessageConverter
+     * binding 못할경우 발생 주로 @RequestBody, @RequestPart 어노테이션에서 발생
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
@@ -35,11 +29,11 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * enum type 일치하지 않아 binding 못할 경우 발생
-     * 주로 @RequestParam enum으로 binding 못했을 경우 발생
+     * enum type 일치하지 않아 binding 못할 경우 발생 주로 @RequestParam enum으로 binding 못했을 경우 발생
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException e) {
         log.error("handleMethodArgumentTypeMismatchException", e);
         final ErrorResponse response = ErrorResponse.of(e);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -51,17 +45,6 @@ public class GlobalExceptionHandler {
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse response = ErrorResponse.of(errorCode);
         return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
-    }
-
-    @ExceptionHandler({UserNotFoundException.class, UserAccountLockedException.class, IncorrectPasswordException.class})
-    public String handleLoginExceptions(RuntimeException ex, RedirectAttributes rttr, Model model,
-                                        HttpServletRequest request) {
-        // 예외 메시지를 모델에 추가하여 뷰에 전달
-
-        rttr.addFlashAttribute("loginError", ex.getMessage());
-        rttr.addFlashAttribute("loginForm", request.getAttribute("loginForm"));
-        log.error("[exceptionHandler] ex : ", request.getAttribute("loginForm"));
-        return "redirect:/login";
     }
 
     @ExceptionHandler(Exception.class)

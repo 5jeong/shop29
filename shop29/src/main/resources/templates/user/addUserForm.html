@@ -128,12 +128,17 @@
         <div>
             <label for="sample6_postcode">기본주소</label>
             <div class="input-group">
-                <input type="text" id="sample6_postcode" th:field="*{postalCode}" class="form-control" placeholder="우편번호">
-                <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
+                <input type="text" id="sample6_postcode" th:field="*{postalCode}" class="form-control"
+                       placeholder="우편번호">
+                <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기
+                </button>
             </div>
-            <input type="text" id="sample6_address" th:field="*{addressLine1}" class="form-control mt-2" placeholder="주소">
-            <input type="text" id="sample6_detailAddress" th:field="*{addressLine2}" class="form-control mt-2" placeholder="상세주소">
-            <input type="text" id="sample6_extraAddress" th:field="*{addressReference}" class="form-control mt-2" placeholder="참고항목">
+            <input type="text" id="sample6_address" th:field="*{addressLine1}" class="form-control mt-2"
+                   placeholder="주소">
+            <input type="text" id="sample6_detailAddress" th:field="*{addressLine2}" class="form-control mt-2"
+                   placeholder="상세주소">
+            <input type="text" id="sample6_extraAddress" th:field="*{addressReference}" class="form-control mt-2"
+                   placeholder="참고항목">
         </div>
 
         <div>
@@ -148,8 +153,10 @@
 
         <div id="emailVerification" style="display: none;">
             <label for="verificationCode">인증번호</label>
-            <input type="text" id="verificationCode" class="form-control" placeholder="이메일로 받은 인증번호 입력">
-            <button type="button" class="btn btn-outline-secondary" onclick="verifyEmail()">인증 확인</button>
+            <div class="input-group">
+                <input type="text" id="verificationCode" class="form-control" placeholder="이메일로 받은 인증번호 입력">
+                <button type="button" class="btn btn-outline-secondary" onclick="verifyEmail()">인증 확인</button>
+            </div>
         </div>
 
 

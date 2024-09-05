@@ -3,6 +3,8 @@ package com.toy2.shop29.users.service.user;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
+import com.toy2.shop29.users.domain.UserWithdrawalDto;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.validation.BindingResult;
 
 public interface UserService {
@@ -30,4 +32,7 @@ public interface UserService {
     boolean isEmailDuplicated(String email);
 
     boolean isPhoneNumberDuplicated(String phoneNumber);
+
+    // 회원 탈퇴시 탈퇴테이블에 회원 추가
+    int insertWithdrawalUser(String userId, UserWithdrawalDto withdrawalDto);
 }

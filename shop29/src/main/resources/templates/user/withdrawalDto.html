@@ -1,0 +1,141 @@
+<div th:insert="fragments/header :: header"></div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">
+    <title>회원 탈퇴</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 70%; /* 양옆의 공간을 줄이기 위해 width를 70%로 수정 */
+            margin: 30px auto;
+            padding: 40px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            text-align: center;
+        }
+        .section-title {
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-bottom: 2px solid black;
+            padding-bottom: 10px;
+        }
+        .reason-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .reason {
+            width: 45%;
+            margin: 10px 0;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+            gap: 10px; /* 버튼 간의 간격을 추가 */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .btn-cancel {
+            background-color: #ccc;
+        }
+        .btn-submit {
+            background-color: #333;
+            color: white;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+    </style>
+
+    <script>
+        function confirmDeletion() {
+            return confirm("정말 탈퇴하시겠습니까?");
+        }
+
+        function validateForm() {
+            var isRadioChecked = document.querySelector('input[name="reasonPrimary"]:checked') !== null;
+            if (!isRadioChecked) {
+                document.getElementById('error-message').textContent = '탈퇴 사유를 선택해 주세요.';
+                return false; // 폼 제출을 방지
+            }
+            return confirmDeletion();
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>회원탈퇴</h2>
+    <p>의견을 남겨주시면 소중히 새겨듣고 오래 이용할 수 있는 서비스로 개선하겠습니다.</p>
+
+    <div class="section-title">탈퇴 사유(필수)</div>
+
+    <form th:action="@{/user/delete}" th:object="${userWithdrawalDto}" method="post" onsubmit="return validateForm()">
+        <div class="reason-container">
+            <div class="reason">
+                <input type="radio" id="reason1" th:field="*{reasonPrimary}" name="reasonPrimary" value="탈퇴 후 재가입을 위해서">
+                <label for="reason1">탈퇴 후 재가입을 위해서</label>
+            </div>
+            <div class="reason">
+                <input type="radio" id="reason2" th:field="*{reasonPrimary}" name="reasonPrimary" value="사고 싶은 상품이 없어서">
+                <label for="reason2">사고 싶은 상품이 없어서</label>
+            </div>
+            <div class="reason">
+                <input type="radio" id="reason3" th:field="*{reasonPrimary}" name="reasonPrimary" value="자주 이용하지 않아서">
+                <label for="reason3">자주 이용하지 않아서</label>
+            </div>
+            <div class="reason">
+                <input type="radio" id="reason4" th:field="*{reasonPrimary}" name="reasonPrimary" value="서비스 및 고객지원이 만족스럽지 않아서">
+                <label for="reason4">서비스 및 고객지원이 만족스럽지 않아서</label>
+            </div>
+            <div class="reason">
+                <input type="radio" id="reason5" th:field="*{reasonPrimary}" name="reasonPrimary" value="광고성 알림이 너무 많이 와서">
+                <label for="reason5">광고성 알림이 너무 많이 와서</label>
+            </div>
+            <div class="reason">
+                <input type="radio" id="reason6" th:field="*{reasonPrimary}" name="reasonPrimary" value="기타">
+                <label for="reason6">기타</label>
+            </div>
+        </div>
+
+        <div>
+            <textarea th:field="*{reasonSecondary}" placeholder="이 외에 불편하셨던 점을 알려주세요. (선택)" maxlength="100"></textarea>
+        </div>
+
+        <div class="error-message" id="error-message"></div> <!-- 에러 메시지 표시 영역 -->
+
+        <div class="button-container">
+            <button type="button" class="btn-cancel" onclick="window.history.back()">취소하기</button>
+            <button type="submit" class="btn-submit">탈퇴</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
