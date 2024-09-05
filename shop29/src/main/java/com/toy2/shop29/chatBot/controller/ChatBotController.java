@@ -27,7 +27,7 @@ public class ChatBotController {
 
     @GetMapping("/order-history")
     public ChatBotRequestDto requestOrderHistory(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = true, name = "id") String orderId
     ) throws JsonProcessingException {
@@ -38,7 +38,7 @@ public class ChatBotController {
 
     @GetMapping("/refund")
     public ChatBotRequestDto getRefundableOrder(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @SessionAttribute(name = "loginUser", required = false) String userId,
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = false, name = "orderId") String orderId
     ) throws JsonProcessingException {

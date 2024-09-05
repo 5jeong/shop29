@@ -36,6 +36,7 @@ def get_refundable_orders(user_id):
         return rendered_html
     except Exception as e:
         print(e)
+        return f"해당 주문번호는 존재하지 않는 주문번호입니다."
     
 def get_refundable_order_history(user_id, order_id):
     db = next(get_db())

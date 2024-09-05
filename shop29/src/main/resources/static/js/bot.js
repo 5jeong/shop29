@@ -8,23 +8,25 @@ document.querySelector('.chatbot-toggle-btn').addEventListener('click', function
 });
 
 function handleUserInput(event) {
-    event.preventDefault(); // 폼의 기본 동작(페이지 리로드)을 막습니다.
+    event.preventDefault();
     const submitButton = document.querySelector(".chatbot-submit-btn");
     const inputField = document.querySelector(".chatbot-input");
     const userMessage = inputField.value.trim();
     const messagesContainer = document.querySelector(".chatbot-messages");
     const scrollElement = document.querySelector(".chatbot-chatbox");
 
-    if (userMessage === "") return; // 빈 메시지는 처리하지 않음
+    if (userMessage === "") return;
 
     const userMessageDiv = document.createElement("div");
     userMessageDiv.classList.add("message", "user");
     userMessageDiv.innerHTML = `<strong>사용자</strong><p>${userMessage}</p>`;
     messagesContainer.appendChild(userMessageDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    scrollElement.scrollTop = scrollElement.scrollHeight;
 
-    // POST 요청을 위해 Fetch API를 사용합니다.
+    messagesContainer.scrollTo({
+        top: messagesContainer.scrollHeight,
+        behavior: 'smooth'
+    });
+
     fetch("/chatbot", {
         method: "POST",
         headers: {
@@ -38,23 +40,23 @@ function handleUserInput(event) {
             tempDiv.innerHTML = data.message.trim();
             messagesContainer.appendChild(tempDiv);
 
-            // 어시스턴트 메시지 추가 후에도 스크롤을 맨 아래로 이동시킵니다.
-            scrollElement.scrollTop = scrollElement.scrollHeight;
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         })
         .catch(error => {
             console.error("Error:", error);
         });
 
-    // 입력 필드를 비웁니다.
     inputField.value = "";
 }
 
-// 버튼 클릭 시 메시지 처리 함수 호출
 document.querySelector(".chatbot-submit-btn").addEventListener("click", handleUserInput);
 
 document.querySelector(".chatbot-input").addEventListener("keyup", function (event) {
     if (event.key === "Enter") {
-        event.preventDefault(); // 기본 동작 방지
+        event.preventDefault();
         handleUserInput(event);
     }
 });
@@ -63,7 +65,6 @@ function requestUserOrderHistory(event) {
     const messagesContainer = document.querySelector(".chatbot-messages");
     const scrollElement = document.querySelector(".chatbot-chatbox");
     const requestId = event.id;
-    // POST 요청을 위해 Fetch API를 사용합니다.
     fetch(`/chatbot/order-history?id=${requestId}`, {
         method: "GET",
     })
@@ -73,8 +74,10 @@ function requestUserOrderHistory(event) {
             tempDiv.innerHTML = data.message.trim();
             messagesContainer.appendChild(tempDiv);
 
-            // 어시스턴트 메시지 추가 후에도 스크롤을 맨 아래로 이동시킵니다.
-            scrollElement.scrollTop = scrollElement.scrollHeight;
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         })
         .catch(error => {
             console.error("Error:", error);
@@ -82,11 +85,9 @@ function requestUserOrderHistory(event) {
 }
 
 document.querySelector('.menu-btn').addEventListener('click', function () {
-    // 1. chatbot-message 클래스의 자식 요소 모두 제거
     const chatbotMessage = document.querySelector('.chatbot-messages');
     const scrollElement = document.querySelector(".chatbot-chatbox");
 
-    // 2. 새로운 HTML 구조 추가
     chatbotMessage.insertAdjacentHTML('beforeend', `
                 <div class="select-option-container">
                     <div class="option-container">
@@ -101,14 +102,17 @@ document.querySelector('.menu-btn').addEventListener('click', function () {
                     </div>
                 </div>
     `);
-    scrollElement.scrollTop = scrollElement.scrollHeight;
+
+    chatbotMessage.scrollTo({
+        top: chatbotMessage.scrollHeight,
+        behavior: 'smooth'
+    });
 });
 
 function requestUserAllHistory(event) {
     const messagesContainer = document.querySelector(".chatbot-messages");
     const scrollElement = document.querySelector(".chatbot-chatbox");
 
-    // POST 요청을 위해 Fetch API를 사용합니다.
     fetch("/chatbot", {
         method: "POST",
         headers: {
@@ -122,8 +126,10 @@ function requestUserAllHistory(event) {
             tempDiv.innerHTML = data.message.trim();
             messagesContainer.appendChild(tempDiv);
 
-            // 어시스턴트 메시지 추가 후에도 스크롤을 맨 아래로 이동시킵니다.
-            scrollElement.scrollTop = scrollElement.scrollHeight;
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         })
         .catch(error => {
             console.error("Error:", error);
@@ -135,14 +141,11 @@ function requestUserRefundableList(event) {
     const scrollElement = document.querySelector(".chatbot-chatbox");
     const requestId = event.id;
 
-    // 기본 URL 설정
     let url = `/chatbot/refund`;
 
-    // requestId가 존재하면 URL에 쿼리 파라미터로 추가
     if (requestId) {
         url += `?orderId=${encodeURIComponent(requestId)}`;
     }
-    // POST 요청을 위해 Fetch API를 사용합니다.
     fetch(url, {
         method: "GET",
     })
@@ -152,8 +155,10 @@ function requestUserRefundableList(event) {
             tempDiv.innerHTML = data.message.trim();
             messagesContainer.appendChild(tempDiv);
 
-            // 어시스턴트 메시지 추가 후에도 스크롤을 맨 아래로 이동시킵니다.
-            scrollElement.scrollTop = scrollElement.scrollHeight;
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         })
         .catch(error => {
             console.error("Error:", error);
@@ -162,7 +167,6 @@ function requestUserRefundableList(event) {
 
 
 function buttonSelected(button) {
-    // 클릭된 버튼에 active 클래스를 토글
     button.classList.toggle('active');
 }
 
@@ -205,10 +209,8 @@ function refundRequest(button) {
         contentType: 'application/json',
         data: JSON.stringify(refundData),
         success: function (response) {
-            // 응답이 JSON 형식일 경우 그대로 사용하고, 문자열일 경우 파싱
             const res = typeof response === 'string' ? JSON.parse(response) : response;
 
-            // 응답의 status 값이 success일 경우
             if (res.status === 'success') {
                 checkboxes.forEach(function (checkbox) {
                     const div = document.createElement('div');
@@ -218,7 +220,6 @@ function refundRequest(button) {
                 });
                 alert(res.message);
             } else {
-                // status가 success가 아닌 경우 (옵션 처리)
                 alert(res.message);
             }
         },
@@ -226,7 +227,6 @@ function refundRequest(button) {
 }
 function requestProductInput(el, event) {
     const code = event.code;
-    console.log(event)
     if (code === 'Enter'){
         requestProduct(el)
     }
@@ -234,17 +234,13 @@ function requestProductInput(el, event) {
 
 function requestProduct(event) {
     const messagesContainer = document.querySelector(".chatbot-messages");
-    const scrollElement = document.querySelector(".chatbot-chatbox");
     const productId = event.value;
 
-    // 기본 URL 설정
     let url = `/chatbot/product`;
 
-    // requestId가 존재하면 URL에 쿼리 파라미터로 추가
     if (productId) {
         url += `?productId=${encodeURIComponent(productId)}`;
     }
-    // POST 요청을 위해 Fetch API를 사용합니다.
     fetch(url, {
         method: "GET",
     })
@@ -254,8 +250,10 @@ function requestProduct(event) {
             tempDiv.innerHTML = data.message.trim();
             messagesContainer.appendChild(tempDiv);
 
-            // 어시스턴트 메시지 추가 후에도 스크롤을 맨 아래로 이동시킵니다.
-            scrollElement.scrollTop = scrollElement.scrollHeight;
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         })
         .catch(error => {
             console.error("Error:", error);
@@ -264,4 +262,8 @@ function requestProduct(event) {
 
 function goToProductPage(event) {
     window.location.href = `/product/${event}`;
+}
+
+function scrollToTag(target) {
+    target.scrollIntoView({ behavior: 'smooth' }); // 부드러운 스크롤
 }

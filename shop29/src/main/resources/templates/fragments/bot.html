@@ -17,6 +17,11 @@
         <div class="chatbot-chatbox resize-drag">
             <div class="chatbot-messages">
                 <div class="select-option-container">
+                    <div class="message assistant">
+                        <strong>Assistant:</strong>
+                        <p>안녕하세요! 29CM 쇼핑몰입니다.</p>
+                        <p>무엇을 도와드릴까요?</p>
+                    </div>
                     <div class="option-container">
                         <button onclick="requestProduct(this)" class="option-btn">상품 검색
                         </button>
@@ -66,7 +71,7 @@
                     // minimum size
                     interact.modifiers.restrictSize({
                         min: {width: 350, height: 500},
-                        max: {width: 700, height: 700}
+                        // max: {width: 700, height: 700}
                     }),
                 ],
 
