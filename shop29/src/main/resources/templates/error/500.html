@@ -1,0 +1,53 @@
+<div th:replace="~{fragments/header :: header}"></div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서버 오류</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 100px;
+        }
+        h1 {
+            color: #dc3545;
+        }
+        p {
+            font-size: 18px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>500 - 서버 내부 오류</h1>
+    <p>죄송합니다. 서버에서 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.</p>
+    <a href="javascript:window.history.back()" class="back-button">뒤로 가기</a>
+</div>
+</body>
+</html>

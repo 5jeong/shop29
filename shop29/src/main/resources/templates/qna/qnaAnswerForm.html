@@ -1,0 +1,259 @@
+<div th:insert="fragments/header :: header"></div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <title>문의 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        .table-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: right; /* 버튼 우측 정렬 */
+        }
+        .btn {
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-left: 5px; /* 버튼 간격 추가 */
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #cccccc; /* 비활성화된 버튼 색상 */
+            cursor: not-allowed;
+        }
+    </style>
+    <script>
+        function enableAnswerInputForEdit(qnaAnswerId, currentContent) {
+            // 답변 내용 행을 찾기
+            const answerRow = document.getElementById('answer-row');
+
+            if(answerRow.style.display == 'none') {
+                return;
+            }
+
+            // 답변 내용 행을 숨기기
+            answerRow.style.display = 'none';
+
+            // 입력 폼 생성
+            const inputContainer = document.createElement('div');
+            inputContainer.id = 'answer-input-container';
+            inputContainer.innerHTML = `
+                <textarea id="answer-input" rows="4" cols="50">${currentContent}</textarea>
+                <button onclick="updateAnswer(${qnaAnswerId})">수정</button>
+                <button onclick="cancelEdit()">취소</button>
+            `;
+            answerRow.parentNode.insertBefore(inputContainer, answerRow.nextSibling);
+        }
+
+        function updateAnswer(qnaAnswerId) {
+            const answerContent = document.getElementById('answer-input').value;
+            console.log(`답변 수정: QnA Answer ID=${qnaAnswerId}, 내용=${answerContent}`);
+
+            const formData = new FormData();
+            formData.append('qnaAnswerId', qnaAnswerId);           // qnaId 추가
+            formData.append('answerContent', answerContent);  // answerContent 추가
+
+            fetch(`/qna/answer`, {
+                method: 'PUT',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('답변 수정에 실패했습니다.');
+                }
+            });
+        }
+
+        function enableAnswerInput(qnaId, currentContent) {
+            // 답변 내용 행을 찾기
+            const answerRow = document.getElementById('answer-row');
+
+            if(answerRow.style.display == 'none') {
+                return;
+            }
+
+            // 답변 내용 행을 숨기기
+            answerRow.style.display = 'none';
+
+            // 입력 폼 생성
+            const inputContainer = document.createElement('div');
+            inputContainer.id = 'answer-input-container';
+            inputContainer.innerHTML = `
+                <textarea id="answer-input" rows="4" cols="50">${currentContent}</textarea>
+                <button onclick="postAnswer(${qnaId})">제출</button>
+                <button onclick="cancelEdit()">취소</button>
+            `;
+            answerRow.parentNode.insertBefore(inputContainer, answerRow.nextSibling);
+        }
+
+        function postAnswer(qnaId) {
+            const answerContent = document.getElementById('answer-input').value;
+            console.log(`답변 제출: QnA ID=${qnaId}, 내용=${answerContent}`);
+
+            const formData = new FormData();
+            formData.append('qnaId', qnaId);           // qnaId 추가
+            formData.append('answerContent', answerContent);  // answerContent 추가
+
+            fetch(`/qna/answer`, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('답변 제출에 실패했습니다.');
+                }
+            });
+        }
+
+        function cancelEdit() {
+            const answerRow = document.getElementById('answer-row');
+            const inputContainer = document.getElementById('answer-input-container');
+            if (inputContainer) {
+                inputContainer.remove(); // 입력 폼 제거
+            }
+            answerRow.style.display = ''; // 원래의 답변 내용 행 표시
+        }
+    </script>
+</head>
+<body>
+
+<div class="table-container">
+    <h2>문의 정보</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>항목</th>
+            <th>값</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>문의 유형 ID</td>
+            <td th:text="${response.getQnaTypeId()}"></td>
+        </tr>
+        <tr>
+            <td>문의 유형 이름</td>
+            <td th:text="${response.getQnaTypeName()}"></td>
+        </tr>
+        <tr>
+            <td>문의 유형 활성화</td>
+            <td th:text="${response.getQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
+        </tr>
+        <tr>
+            <td>부모 문의 유형 ID</td>
+            <td th:text="${response.getParentQnaTypeId()}"></td>
+        </tr>
+        <tr>
+            <td>부모 문의 유형 이름</td>
+            <td th:text="${response.getParentQnaTypeName()}"></td>
+        </tr>
+        <tr>
+            <td>부모 문의 유형 활성화</td>
+            <td th:text="${response.getParentQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
+        </tr>
+        <tr>
+            <td>주문 ID</td>
+            <td th:text="${response.getOrderId()}"></td>
+        </tr>
+        <tr>
+            <td>상품 ID</td>
+            <td th:text="${response.getProductId()}"></td>
+        </tr>
+        <tr>
+            <td>1:1 문의 ID</td>
+            <td th:text="${response.getQnaId()}"></td>
+        </tr>
+        <tr>
+            <td>문의자 ID</td>
+            <td th:text="${response.getUserId()}"></td>
+        </tr>
+        <tr>
+            <td>문의자 이름</td>
+            <td th:text="${response.getUserName()}"></td>
+        </tr>
+        <tr>
+            <td>1:1문의글 생성일시</td>
+            <td th:text="${response.getCreatedTime()}"></td>
+        </tr>
+        <tr>
+            <td>제목</td>
+            <td th:text="${response.getTitle()}"></td>
+        </tr>
+        <tr>
+            <td>문의내용</td>
+            <td><pre th:text="${response.getContent()}"></pre></td>
+        </tr>
+        <tr>
+            <td>첨부파일</td>
+            <td>
+                <ul>
+                    <li th:each="path, stat : ${response.getAttachmentPaths()}">
+                        <a th:href="${path}" target="_blank" th:text="'이미지 링크 ' + ${stat.count}"></a>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>답변자 ID</td>
+            <td th:text="${response.getAdminId()}"></td>
+        </tr>
+        <tr>
+            <td>답변일시</td>
+            <td th:text="${response.getAnswerCreatedTime()}"></td>
+        </tr>
+        <tr>
+            <td>답변내용</td>
+            <td id="answer-row" ><pre th:text="${response.getAnswerContent()}"></pre></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="button-container">
+        <a class="btn" href="/qna/admin/qna-list">목록</a>
+        <button class="btn" th:if="${response.getAdminId() != null}"
+                th:onclick="enableAnswerInputForEdit([[${response.getAnswerId()}]], [[${response.getAnswerContent()}]])">수정하기</button>
+        <button class="btn" th:if="${response.getAdminId() == null}"
+                th:onclick="enableAnswerInput([[${response.getQnaId()}]],'')">답변하기</button>
+    </div>
+</div>
+
+</body>
+</html>

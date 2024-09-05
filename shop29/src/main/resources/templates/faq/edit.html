@@ -1,0 +1,90 @@
+<div th:insert="fragments/header :: header"></div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ 수정</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>FAQ 수정</h1>
+    <form th:action="@{/faq/edit}" method="post">
+        <input type="hidden" name="faqId" th:value="${faq.faqId}" />
+
+        <label for="faqTitle">제목:</label>
+        <input type="text" id="faqTitle" name="faqTitle" th:value="${faq.faqTitle}" />
+
+        <label for="faqCreatorId">작성자:</label>
+        <input type="text" id="faqCreatorId" name="faqCreatorId" th:value="${faq.faqCreatorId}" required />
+
+        <label for="faqContent">내용:</label>
+        <textarea id="faqContent" name="faqContent" rows="6" required th:text="${faq.faqContent}"></textarea>
+
+        <button type="submit">수정 완료</button>
+    </form>
+
+    <div class="actions">
+        <a href="/faq/list">목록으로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

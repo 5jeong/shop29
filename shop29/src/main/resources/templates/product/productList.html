@@ -1,96 +1,109 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Product Board</title>
-    <link rel="stylesheet" th:href="@{/menu.css}">
+
+    <!-- Bootstrap CSS 추가 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- 사용자 정의 스타일 추가 -->
+    <link rel="stylesheet" th:href="@{/css/product/styles.css}"/>
 </head>
+
 <body>
 
-<div id="menu">
-    <ul>
-        <li id="logo">fastcampus</li>
-        <li><a th:href="@{/}">Home</a></li>
-        <li><a th:href="@{/board/list}">Board</a></li>
-        <li><a th:href="@{/login/login}">Login</a></li>
-        <li><a th:href="@{/register/add}">Sign in</a></li>
-        <li><a href=""><i class="fas fa-search small"></i></a></li>
-    </ul>
+<div class="container">
+    <!-- related-middle-categories 왼쪽 정렬 -->
+    <div id="related-middle-categories">
+        <h2>Related Middle Categories</h2>
+        <ul>
+            <li th:each="middleCategory : ${relatedMiddleCategories}">
+                <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
+                   th:text="${middleCategory.middleCategoryName}"></a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- small-category와 sort-filter를 가로 정렬 -->
+    <div id="category-and-sort">
+        <div id="category-and-sort-container">
+            <!-- 소분류 필터 -->
+            <div id="small-category-filters">
+                <h2>Small Categories</h2>
+                <ul>
+                    <li th:each="smallCategory : ${smallCategories}">
+                        <a th:href="@{/product/list(smallCategoryId=${smallCategory.smallCategoryId}, middleCategoryId=${middleCategoryId})}"
+                           th:text="${smallCategory.smallCategoryName}"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 정렬 옵션 버튼 -->
+            <div id="sort-option-filters">
+                <h2>Sort by</h2>
+                <ul>
+                    <li><a th:href="@{/product/list(sortOption='priceDesc', middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">높은 가격순</a></li>
+                    <li><a th:href="@{/product/list(sortOption='priceAsc', middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">낮은 가격순</a></li>
+                    <li><a th:href="@{/product/list(sortOption='rating', middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">평점 높은순</a></li>
+                    <li><a th:href="@{/product/list(sortOption='newest', middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">신상품순</a></li>
+                    <li><a th:href="@{/product/list(sortOption='highDiscount', middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">높은 할인순</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 게시물 -->
+        <div id="product-list">
+            <table border="1" class="table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>상품이름</th>
+                    <th>브랜드</th>
+                    <th>할인율</th>
+                    <th>정가</th>
+                    <th>할인가</th>
+                    <th>별점</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="productDto, status : ${list}">
+                    <td th:text="${status.index + 1}"></td>
+                    <td><a th:href="@{/product/{productId}(productId=${productDto.productId})}"
+                           th:text="${productDto.productName}"></a></td>
+                    <td th:text="${productDto.brandId}"></td>
+                    <td th:text="${productDto.saleRatio}"></td>
+                    <td th:text="${productDto.price}"></td>
+                    <td th:text="${productDto.price - (productDto.price * productDto.saleRatio / 100)}"></td>
+                    <td th:text="${productDto.rating}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!--<div th:if="${middleCategoryId}">-->
-<!--    <p>Showing products for middle category ID: <span th:text="${middleCategoryId}"></span></p>-->
-<!--</div>-->
-
-<!-- 정렬 옵션 버튼들 -->
-<div style="text-align:right; margin-right: 10px;">
-    <a th:href="@{/product/list(sortOption='priceDesc')}" class="btn">높은 가격순</a>
-    <a th:href="@{/product/list(sortOption='priceAsc')}" class="btn">낮은 가격순</a>
-    <a th:href="@{/product/list(sortOption='rating')}" class="btn">별점 높은순</a>
-    <a th:href="@{/product/list(sortOption='newest')}" class="btn">신규순</a>
-    <a th:href="@{/product/list(sortOption='highDiscount')}" class="btn">할인율 높은순</a>
-</div>
-
-
-
-<div style="text-align:center">
-    <table border="1">
-        <thead>
-        <tr>
-            <td>번호</td>
-            <!-- <td>상품이미지</td>-->
-            <td>상품이름</td>
-            <td>브랜드</td>
-            <td>할인율</td>
-            <td>정가</td>
-            <td>할인가</td>
-            <td>별점</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="productDto, status: ${list}">
-            <td th:text="${status.index+1}"></td>
-            <!-- 이미지컬럼 fk로 받는거 필요할듯 -->
-            <td><a th:href="@{/product/{productId}(productId=${productDto.getProductId()})}" th:text="${productDto.getProductName()}"></a></td>
-            <td th:text="${productDto.getBrandId()}"></td>
-            <td th:text="${productDto.getSaleRatio()}"></td>
-            <td th:text="${productDto.getPrice()}"></td>
-            <!-- 할인율과 정가로 할인가 계산 -->
-            <td th:text="${#numbers.formatDecimal(productDto.getPrice() * (1 - productDto.getSaleRatio() / 100), 1, 2)}"></td>
-            <td th:text="${productDto.getRating()}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-
-<!--<div>-->
-<!--    &lt;!&ndash; 이전 페이지 링크 &ndash;&gt;-->
-<!--    <a th:if="${pageHandler.showPrev}" th:href="@{/product/board(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize})}">&lt;</a>-->
-
-<!--    &lt;!&ndash; 페이지 번호 링크 &ndash;&gt;-->
-<!--    <a th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"-->
-<!--       th:href="@{/product/board(page=${i}, pageSize=${pageHandler.pageSize})}"-->
-<!--       th:text="${i}"></a>-->
-
-<!--    &lt;!&ndash; 다음 페이지 링크 &ndash;&gt;-->
-<!--    <a th:if="${pageHandler.showNext}" th:href="@{/product/board(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize})}">&gt;</a>-->
-<!--</div>-->
-
-
-<div>
+<!-- 페이지 핸들러 -->
+<div id="page-handler">
     <!-- 이전 페이지 링크 -->
-    <a th:if="${pageHandler != null and pageHandler.showPrev}" th:href="@{/product/board(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize})}">&lt;</a>
+    <a th:if="${pageHandler != null and pageHandler.showPrev}"
+       th:href="@{/product/list(page=${pageHandler.beginPage - 1}, pageSize=${pageHandler.pageSize}, sortOption=${sortOption}, middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">&lt;</a>
 
     <!-- 페이지 번호 링크 -->
-    <a th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"
-       th:href="@{/product/list(page=${i}, pageSize=${pageHandler.pageSize})}"
+    <a th:if="${pageHandler != null}"
+       th:each="i : ${#numbers.sequence(pageHandler.beginPage, pageHandler.endPage)}"
+       th:href="@{/product/list(page=${i}, pageSize=${pageHandler.pageSize}, sortOption=${sortOption}, middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}"
        th:text="${i}"></a>
 
     <!-- 다음 페이지 링크 -->
-    <a th:if="${pageHandler != null and pageHandler.showNext}" th:href="@{/product/board(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize})}">&gt;</a>
+    <a th:if="${pageHandler != null and pageHandler.showNext}"
+       th:href="@{/product/list(page=${pageHandler.endPage + 1}, pageSize=${pageHandler.pageSize}, sortOption=${sortOption}, middleCategoryId=${middleCategoryId}, smallCategoryId=${smallCategoryId})}">&gt;</a>
 </div>
-
-
 </body>
+
 </html>
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.toy2.shop29.users.mapper.UserMapper">
+
+    <!-- 회원 조회-->
+    <select id="findById" resultType="com.toy2.shop29.users.domain.UserDto">
+        select *
+        from user
+        where user_id = #{userId};
+    </select>
+
+
+    <!-- 이메일 조회-->
+    <select id="findByEmail" resultType="String">
+        SELECT user_id
+        FROM user
+        WHERE email = #{email};
+    </select>
+
+
+    <!-- 핸드폰번호 조회-->
+    <select id="findByPhoneNumber" resultType="String">
+        SELECT user_id
+        FROM user
+        WHERE phone_number = #{phoneNumber};
+    </select>
+
+    <!-- 회원가입폼에서 회원가입 -->
+    <insert id="insertUser" parameterType="com.toy2.shop29.users.domain.UserRegisterDto">
+        INSERT INTO user (user_id, password, user_name, email, phone_number, postal_code, address_line1, address_line2,
+                          address_reference, birth_date, gender)
+        VALUES (#{userId}, #{password}, #{userName}, #{email}, #{phoneNumber}, #{postalCode}, #{addressLine1},
+                #{addressLine2}, #{addressReference}, #{birthDate}, #{gender})
+    </insert>
+
+    <!-- 회원 삭제 -->
+    <delete id="deleteUser" parameterType="string">
+        delete
+        from user
+        where user_id = #{userId};
+    </delete>
+
+    <!-- 회원수정 폼에서 수정 -->
+    <update id="updateUser" parameterType="map">
+        UPDATE user
+        SET password          = #{userUpdateDto.password},
+            user_name         = #{userUpdateDto.userName},
+            birth_date        = #{userUpdateDto.birthDate},
+            phone_number      = #{userUpdateDto.phoneNumber},
+            gender            = #{userUpdateDto.gender},
+            postal_code       = #{userUpdateDto.postalCode},
+            address_line1     = #{userUpdateDto.addressLine1},
+            address_line2     = #{userUpdateDto.addressLine2},
+            address_reference = #{userUpdateDto.addressReference},
+            email             = #{userUpdateDto.email}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 총 회원 수 조회 -->
+    <select id="userCount" resultType="int">
+        select count(*)
+        from user
+    </select>
+
+    <!--로그인 실패횟수 증가-->
+    <update id="increaseLoginFailureCount" parameterType="string">
+        UPDATE user
+        SET login_failure_count     = login_failure_count + 1,
+            last_login_failure_time = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 계정 잠금 시간 설정 -->
+    <update id="lockAccount" parameterType="string">
+        UPDATE user
+        SET lock_expiry_time = DATE_ADD(NOW(), INTERVAL 10 MINUTE)
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 로그인 성공 시 초기화 -->
+    <update id="resetLoginFailureCount" parameterType="string">
+        UPDATE user
+        SET login_failure_count     = 0,
+            lock_expiry_time        = NULL,
+            last_login_failure_time = NULL
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 비밀번호 찾기 -->
+    <update id="updatePassword" parameterType="map">
+        UPDATE user
+        SET password = #{tempPassword}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 테스트용. 작성자 : 김정민(24.08.16) -->
+    <update id="updateUserRoleForTest" parameterType="map">
+        UPDATE user
+        SET `user_role` = #{userRole}
+        WHERE `user_id` = #{userId}
+    </update>
+
+</mapper>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let data = {
+            productName: '상품명',    // 카카오페이에 보낼 대표 상품명
+            totalPrice: 100 // 총 결제금액
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/order/pay/ready',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: function (response) {
+                location.href = response.next_redirect_pc_url;
+            }
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

@@ -1,42 +1,91 @@
+<div th:insert="fragments/header :: header"></div>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Product Board</title>
+    <!-- Bootstrap CSS 추가 -->
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- 사용자 정의 스타일 추가 -->
+    <style>
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff !important;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .nav-link {
+            color: #ffffff !important;
+        }
+        .nav-link.active {
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            color: #d4d4d4 !important;
+        }
+        .btn-outline-success {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+        .btn-outline-success:hover {
+            background-color: #ffffff;
+            color: #343a40;
+        }
+    </style>
     <link rel="stylesheet" th:href="@{/menu.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
+
+
 <body>
 
-<div id="menu">
-    <ul>
-        <li id="logo">fastcampus</li>
-        <li><a th:href="@{/}">Home</a></li>
-        <li><a th:href="@{/board/list}">Board</a></li>
-        <li><a th:href="@{/login/login}">Login</a></li>
-        <li><a th:href="@{/register/add}">Sign in</a></li>
-        <li><a href=""><i class="fas fa-search small"></i></a></li>
-    </ul>
-</div>
-
-
-
 <!-- 카테고리 링크들 -->
-<p>대분류: <span th:text="${product.majorCategoryName}"></span></p>
-<p>중분류: <span th:text="${product.middleCategoryName}"></span></p>
-<p>소분류: <span th:text="${product.smallCategoryName}"></span></p>
-
+<p>대분류: <a
+        th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}"
+        th:text="${product.majorCategoryName}"></a></p>
+<p>중분류: <a
+        th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}"
+        th:text="${product.middleCategoryName}"></a></p>
+<p>소분류: <a
+        th:href="@{/product/list(middleCategoryId=${product.middleCategoryId},smallCategoryId=${product.smallCategoryId})}"
+        th:text="${product.smallCategoryName}"></a></p>
 
 
 <!-- 제품 상세 정보 -->
-<p>브랜드: <span th:text="${product.brandId}">브랜드</span></p>
+<p>브랜드: <span th:text="${product.brandName}">브랜드</span></p>
 <h1 th:text="${product.productName}">상품 이름</h1>
 <p>별점: <span th:text="${product.rating}">별점</span></p>
 <p>할인율: <span th:text="${product.saleRatio}">할인율</span></p>
 <p>정가: <span th:text="${product.price}">정가</span></p>
-<p>할인가: <span th:text="${#numbers.formatDecimal(product.price * (1 - product.saleRatio / 100), 1, 2)}">할인가</span></p>
-<p>상품 사이즈 측정 표: <span th:text="${product.sizeTable}">상품 사이즈 측정 표</span></p>
+<p>할인가: <span
+        th:text="${(product.price * (1 - product.saleRatio / 100)).intValue() - ((product.price * (1 - product.saleRatio / 100)).intValue() % 100)}">할인가</span>
+</p>
+<p>상품 사이즈 측정 표: <span th:text="${product.sizeTable != null ? product.sizeTable : ''}">상품 사이즈 측정 표</span></p>
 
 
+<!-- 옵션 키와 해당 옵션 값들 나열 -->
+<div th:each="option : ${productOptions}">
+    <!-- 옵션 키 이름을 표시하는 영역 -->
+    <h3 th:text="${option.optionKeyName}">옵션 키 이름</h3>
+
+    <!-- 옵션 값들을 나열하는 영역 -->
+    <ul>
+        <li th:each="value : ${productOptionValues}" th:if="${value.optionKeyId == option.optionKeyId}">
+            <input type="radio" th:name="'option_' + ${value.optionKeyId}" th:value="${value.optionValueId}"
+                   th:id="'optionValue_' + ${value.optionValueId}"/>
+            <label th:for="'optionValue_' + ${value.optionValueId}" th:text="${value.optionValueName}"></label>
+            <span th:text="'추가 비용: ' + ${value.extraFee}"></span>
+            <span th:text="'재고: ' + ${value.stock}"></span>
+        </li>
+    </ul>
+</div>
 
 
 <!-- 옵션 선택 버튼 -->
@@ -44,18 +93,77 @@
     <input type="hidden" name="Option">
     <button type="submit">옵션</button>
 </form>
+<form id="hidden-order-form" action="/order/update-order" method="POST" style="display:none;">
+    <input type="hidden" name="orderItems" id="orderItems">
+</form>
 
 <!-- 장바구니 버튼 -->
-<form action="/cart/add" method="post">
-    <input type="hidden" name="productId" th:value="${product.productId}" />
-    <button type="submit">장바구니</button>
-</form>
+<button th:id="${product.productId}" class="add-to-cart" type="submit">장바구니 담기</button>
 
 <!-- 결제 버튼 -->
-<form action="/checkout" method="post">
-    <input type="hidden" name="productId" th:value="${product.productId}" />
-    <button type="submit">구매</button>
-</form>
+<button th:id="${product.productId}" th:data-login="${session.loginUser!=null?1:0}" class="buy-btn">구매하기</button>
+<script>
+    $('.add-to-cart').click(function () {
+        var productId = $(this).attr('id'); // 클릭된 버튼의 ID를 가져옴
+        var selectedRadio = $('input[type=radio]:checked');
+
+        if (selectedRadio.length === 0) {
+            alert('옵션을 선택해주세요')
+            return
+        }
+        var productOptionId = selectedRadio.attr('value');
+        $.ajax({
+            url: '/cart/cart-item',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                productId: Number(productId),
+                quantity: 1, // 수량을 2로 설정
+                productOptionId: Number(productOptionId)
+
+            }),
+            success: function (response) {
+                // 요청이 성공하면 페이지 새로고침
+                alert("해당 상품이 장바구니에 추가되었습니다.")
+            },
+            error: function (xhr, status, error) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.errors && response.errors.length > 0) {
+                    const reason = response.errors[0].reason; // 첫 번째 오류의 reason 값
+                    alert(reason); // 알림창으로 reason 표시
+                }
+            }
+        });
+    });
+
+    // BUY NOW 버튼 클릭 시 실행
+    $('.buy-btn').on('click', function () {
+        if ($('.buy-btn').data('login') === 0) {
+            alert('로그인 후 주문 가능합니다.');
+            window.location.href = '/login?redirectURI=/cart';
+            return
+        }
+        var productId = $(this).attr('id'); // 클릭된 버튼의 ID를 가져옴
+        var selectedRadio = $('input[type=radio]:checked');
+
+        if (selectedRadio.length === 0) {
+            alert('옵션을 선택해주세요')
+            return
+        }
+        var productOptionId = selectedRadio.attr('value');
+
+        const orderItems = [{
+            productId: productId,
+            quantity: 1,
+            productOptionId: Number(productOptionId)
+        }];
+
+        $('#orderItems').val(JSON.stringify(orderItems));
+
+        // 폼 제출
+        $('#hidden-order-form').submit();
+    });
+</script>
 </body>
 </html>
 
@@ -63,33 +171,4 @@
 
 
 
-
-
-
-<div style="text-align:center">
-    <table border="1">
-        <thead>
-        <tr>
-            <td>번호</td>
-            <td>상품이름</td>
-            <td>브랜드</td>
-            <td>할인율</td>
-            <td>정가</td>
-            <td>할인가</td>
-            <td>별점</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="productDto, status: ${list}">
-            <td th:text="${status.index + 1}"></td>
-            <td><a th:href="@{/product/{productId}(productId=${productDto.productId})}" th:text="${productDto.productName}"></a></td>
-            <td th:text="${productDto.brandId}"></td>
-            <td th:text="${productDto.saleRatio}"></td>
-            <td th:text="${productDto.price}"></td>
-            <td th:text="${#numbers.formatDecimal(productDto.price * (1 - productDto.saleRatio / 100), 1, 2)}"></td>
-            <td th:text="${productDto.rating}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 

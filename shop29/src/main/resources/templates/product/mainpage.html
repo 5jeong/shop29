@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+</head>
+<body>
+<h1>Major Categories</h1>
+<ul>
+    <li th:each="entry : ${majorWithMiddleCategories}">
+        <!-- 대분류 이름 -->
+        <h2 th:text="${entry.key.majorCategoryName}"></h2>
+        <ul>
+            <!-- 중분류 이름들 -->
+            <li th:each="middleCategory : ${entry.value}">
+                <a th:href="@{/product/list(middleCategoryId=${middleCategory.middleCategoryId})}"
+                   th:text="${middleCategory.middleCategoryName}"></a>
+            </li>
+        </ul>
+    </li>
+</ul>
+</body>
+</html>

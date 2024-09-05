@@ -1,0 +1,260 @@
+<div th:insert="fragments/header :: header"></div>
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <title>1:1 문의 내역</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            /*padding: 20px;*/
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .details {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            margin-top: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* 중앙 정렬 */
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px; /* 버튼 크기 조정 */
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination button.active {
+            background-color: #0056b3; /* 현재 페이지 버튼 색상 */
+            font-weight: bold;
+        }
+
+        .delete-button {
+            background-color: skyblue;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: blue;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            background-color: lightgray; /* 기본 배경색 */
+        }
+
+        .dot:hover {
+            background-color: gray; /* 마우스 오버 시 색상 변경 */
+        }
+    </style>
+    <script>
+        function toggleDetails(event) {
+            const row = event.currentTarget;
+            const detailsId = 'details' + row.dataset.qnaId;
+            let detailsElement = document.getElementById(detailsId);
+
+            // 첨부파일 정보 가져오기
+
+            const attachmentsStr = row.dataset.attachments;
+
+            let attachments = [];
+            if(attachmentsStr !== '[]'){
+                // 대괄호 제거 후, 쉼표로 분리하여 배열로 변환
+                const attachmentPaths = attachmentsStr.slice(1, -1).split(", ");
+                // 각 요소를 큰따옴표로 감싸기
+                attachments = attachmentPaths.map(path => `"${path}"`);
+            }
+
+            // 이미지 HTML 생성
+            let imagesHtml = '';
+            attachments.forEach(file => {
+                imagesHtml += `<img src=${file} alt="첨부파일" style="max-width: 400px; max-height: 400px; margin-right: 5px;">`;
+            });
+
+            // 상세 내용이 이미 존재하는지 확인
+            if (!detailsElement) {
+                // 상세 내용 행 생성
+                detailsElement = document.createElement('tr');
+                detailsElement.id = detailsId;
+                detailsElement.className = 'details';
+                detailsElement.innerHTML = `
+                    <td colspan="4">
+                        <div>
+                            <div>${imagesHtml}</div>
+                <h5>상세 내용</h5>
+                <p>${row.dataset.content}</p>
+                <h5>답변 내용</h5>
+                <p>${row.dataset.answer}</p>
+                </div>
+                </td>
+                `;
+                // 클릭한 행 다음에 추가
+                row.after(detailsElement);
+            }
+
+            // 상세 내용 표시/숨기기
+            if (detailsElement.style.display === "none" || detailsElement.style.display === "") {
+                detailsElement.style.display = "table-row";
+            } else {
+                detailsElement.style.display = "none";
+            }
+        }
+
+        async function deleteRow(event) {
+            event.stopPropagation();
+            if(confirm('정말 삭제하시겠습니까?') === false) return;
+
+            const row = event.currentTarget.closest('tr');
+
+            // 로딩 표시와 오버레이 보이기
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+
+            try {
+                const response = await fetch('/qna?qnaId=' + row.dataset.qnaId , {
+                    method: 'DELETE',
+                });
+
+                if(response.status === 200){
+                    move('/qna/qna-list');
+                }else{
+                    throw new Error('파일 삭제 실패');
+                }
+            } catch (error) {
+                alert(error.message);
+                return null;
+            }finally{
+                // 로딩 표시와 오버레이 숨기기
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+        }
+
+        function move(url){
+            window.location.href = url;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>1:1 문의 내역</h1>
+    <button onclick="move('/qna/form')">1:1문의하기</button>
+    <div id="overlay" style="display: none;"></div>
+    <div id="loading" style="display: none;">
+        <p>로딩 중...</p>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>상담구분</th>
+            <th>상담제목</th>
+            <th>작성일</th>
+            <th>답변유무</th>
+            <th>삭제</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="qna : ${qnaResponses}"
+            th:data-qna-id="${qna.getQnaId()}"
+            th:data-content="${qna.getContent()}"
+            th:data-answer="${qna.getAnswerContent() == null ? '답변 없음' : qna.getAnswerContent()}"
+            th:data-attachments="${qna.getAttachmentPaths() != null ? qna.getAttachmentPaths() : '[]'}"
+            onclick="toggleDetails(event)">
+            <td th:text="${qna.getQnaTypeName()}">상담구분</td>
+            <td th:text="${qna.getTitle()}">상담제목</td>
+            <td th:text="${qna.getCreatedTime()}">작성일</td>
+            <td th:text="${qna.getAnswerContent() == null ? 'NO' : 'YES'}">답변유무</td>
+            <td>
+                <button class="delete-button" onclick="deleteRow(event)">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="pagination" id="paging-buttons">
+        <button th:if="${(ph.bottomPageCnt - ph.curPage) < 0}"
+                th:onclick="'move(\'?pageNo=1&pageSize=' + ${ph.showBoardCnt} + '&toggleSize=' + ${ph.bottomPageCnt} + '\')'">첫페이지</button>
+
+        <button th:if="${ph.firstFirstPage != ph.curPage}"
+                th:onclick="'move(\'?pageNo=' + (${ph.curPage} - 1) + '&pageSize=' + ${ph.showBoardCnt} + '&toggleSize=' + ${ph.bottomPageCnt} + '\')'">이전</button>
+
+        <span th:each="num : ${#numbers.sequence(ph.firstPage, ph.lastPage)}">
+            <button th:class="${num == ph.curPage} ? 'active' : ''"
+                    th:onclick="'move(\'?pageNo=' + ${num} + '&pageSize=' + ${ph.showBoardCnt} + '&toggleSize=' + ${ph.bottomPageCnt} + '\')'">
+                <span th:text="${num}">${num}</span>
+            </button>
+        </span>
+
+        <button th:if="${ph.lastLastPage != ph.curPage}"
+                th:onclick="'move(\'?pageNo=' + (${ph.curPage} + 1) + '&pageSize=' + ${ph.showBoardCnt} + '&toggleSize=' + ${ph.bottomPageCnt} + '\')'">다음</button>
+
+        <button th:if="${ph.firstPage + ph.bottomPageCnt - 1 < ph.lastLastPage}"
+                th:onclick="'move(\'?pageNo=' + ${ph.totalPageCnt} + '&pageSize=' + ${ph.showBoardCnt} + '&toggleSize=' + ${ph.bottomPageCnt} + '\')'">끝페이지</button>
+    </div>
+</div>
+</body>
+</html>

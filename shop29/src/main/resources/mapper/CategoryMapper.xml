@@ -7,163 +7,71 @@
 
 
 
-    <resultMap id="CategoryHierarchyResultMap" type="com.toy2.shop29.product.domain.CategoryDto">
-        <association property="majorCategory" javaType="com.toy2.shop29.product.domain.MajorCategoryDto">
-            <id property="majorCategoryId" column="major_category_id"/>
-            <result property="majorCategoryName" column="major_category_name"/>
-        </association>
-        <association property="middleCategory" javaType="com.toy2.shop29.product.domain.MiddleCategoryDto">
-            <id property="middleCategoryId" column="middle_category_id"/>
-            <result property="middleCategoryName" column="middle_category_name"/>
-            <result property="majorCategoryId" column="major_category_id"/>
-        </association>
-        <association property="smallCategory" javaType="com.toy2.shop29.product.domain.SmallCategoryDto">
-            <id property="smallCategoryId" column="small_category_id"/>
-            <result property="smallCategoryName" column="small_category_name"/>
-            <result property="middleCategoryId" column="middle_category_id"/>
-        </association>
-    </resultMap>
-
-    <!-- Id로 select -->
-    <select id="selectCategory" parameterType="map" resultMap="CategoryHierarchyResultMap">
+    <!-- 소분류 ID로 중분류 정보를 가져오는 쿼리 -->
+    <select id="selectMiddleBySmall" parameterType="int" resultType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
         SELECT
-            majorcategory.major_category_id,
-            majorcategory.major_category_name,
-            middlecategory.middle_category_id,
-            middlecategory.middle_category_name,
-            smallcategory.small_category_id,
-            smallcategory.small_category_name
+            mc.middle_category_id AS middleCategoryId,
+            mc.major_category_id AS majorCategoryId,
+            mc.middle_category_name AS middleCategoryName
         FROM
-            majorcategory
-                LEFT JOIN
-            middlecategory ON majorcategory.major_category_id = middlecategory.major_category_id
-                LEFT JOIN
-            smallcategory ON middlecategory.middle_category_id = smallcategory.middle_category_id
+            middlecategory mc
+                JOIN smallcategory sc ON mc.middle_category_id = sc.middle_category_id
         WHERE
-            majorcategory.major_category_id = #{majorCategoryId}
-          AND middlecategory.middle_category_id = #{middleCategoryId}
-          AND smallcategory.small_category_id = #{smallCategoryId}
+            sc.small_category_id = #{smallCategoryId};
     </select>
 
 
+    <!-- 중분류 ID로 해당 소분류를 가져오는 쿼리 -->
+    <select id="selectSmallsByMiddle" parameterType="int" resultType="com.toy2.shop29.product.domain.category.SmallCategoryDto">
+        SELECT
+            small_category_id AS smallCategoryId,
+            small_category_name AS smallCategoryName
+        FROM
+            smallcategory
+        WHERE
+            middle_category_id = #{middleCategoryId}
+    </select>
 
-
-
-
-    <!-- insert (done individually for each category table) -->
-    <insert id="insertMajorCategory" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
-        INSERT INTO majorcategory (major_category_id, major_category_name, created_date, created_id, updated_date, updated_id)
-        VALUES (#{majorCategoryId}, #{majorCategoryName}, #{createdDate}, #{createdId}, #{updatedDate}, #{updatedId})
-    </insert>
-
-    <insert id="insertMiddleCategory" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
-        INSERT INTO middlecategory (middle_category_id, major_category_id, middle_category_name, created_date, created_id, updated_date, updated_id)
-        VALUES (#{middleCategoryId}, #{majorCategoryId}, #{middleCategoryName}, #{createdDate}, #{createdId}, #{updatedDate}, #{updatedId})
-    </insert>
-
-    <insert id="insertSmallCategory" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
-        INSERT INTO smallcategory (small_category_id, middle_category_id, small_category_name, created_date, created_id, updated_date, updated_id)
-        VALUES (#{smallCategoryId}, #{middleCategoryId}, #{smallCategoryName}, #{createdDate}, #{createdId}, #{updatedDate}, #{updatedId})
-    </insert>
-
-
-    <!-- update (done individually for each category table) -->
-    <update id="updateMajorCategory" parameterType="com.toy2.shop29.product.domain.MajorCategoryDto">
-        UPDATE majorcategory
-        SET major_category_name = #{majorCategoryName},
-            updated_date = #{updatedDate},
-            updated_id = #{updatedId}
-        WHERE major_category_id = #{majorCategoryId}
-    </update>
-
-    <update id="updateMiddleCategory" parameterType="com.toy2.shop29.product.domain.MiddleCategoryDto">
-        UPDATE middlecategory
-        SET middle_category_name = #{middleCategoryName},
-            updated_date = #{updatedDate},
-            updated_id = #{updatedId}
-        WHERE middle_category_id = #{middleCategoryId}
-    </update>
-
-    <update id="updateSmallCategory" parameterType="com.toy2.shop29.product.domain.SmallCategoryDto">
-        UPDATE smallcategory
-        SET small_category_name = #{smallCategoryName},
-            updated_date = #{updatedDate},
-            updated_id = #{updatedId}
-        WHERE small_category_id = #{smallCategoryId}
-    </update>
-
-    <!-- delete -->
-    <delete id="deleteMajorCategory" parameterType="int">
-        DELETE FROM majorcategory WHERE major_category_id = #{majorCategoryId}
-    </delete>
-
-    <delete id="deleteMiddleCategory" parameterType="int">
-        DELETE FROM middlecategory WHERE middle_category_id = #{middleCategoryId}
-    </delete>
-
-    <delete id="deleteSmallCategory" parameterType="int">
-        DELETE FROM smallcategory WHERE small_category_id = #{smallCategoryId}
-    </delete>
-
-    <!-- deleteall -->
-    <delete id="deleteAllCategories">
-        DELETE FROM smallcategory;
-        DELETE FROM middlecategory;
-        DELETE FROM majorcategory;
-    </delete>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <!-- 특정 중분류와 같은 대분류를 가지는 다른 중분류를 가져오는 쿼리 -->
+    <select id="selectRelatedMiddles" parameterType="int" resultType="com.toy2.shop29.product.domain.category.MiddleCategoryDto">
+        SELECT
+            middle_category_id AS middleCategoryId,
+            middle_category_name AS middleCategoryName
+        FROM
+            middlecategory
+        WHERE
+            major_category_id = (
+                SELECT major_category_id
+                FROM middlecategory
+                WHERE middle_category_id = #{middleCategoryId}
+            )
+    </select>
 
     <!-- 모든 대분류 select -->
-    <select id="findAllMajorCategories" resultType="com.toy2.shop29.product.domain.MajorCategoryDto">
+    <select id="selectAllMajors" resultType="com.toy2.shop29.product.domain.category.MajorCategoryDto">
         SELECT * FROM majorcategory
+        ORDER BY major_category_id
     </select>
 
-    <!-- 대분류에 맞는 모든 중분류 select -->
-    <select id="findMiddleCategoriesByMajorId" parameterType="int" resultType="com.toy2.shop29.product.domain.MiddleCategoryDto">
-        SELECT * FROM middlecategory WHERE major_category_id = #{majorCategoryId}
+    <resultMap id="MajorMiddleMap" type="com.toy2.shop29.product.domain.category.MajorMiddleDto">
+        <id property="majorCategoryId" column="major_category_id"/>
+        <result property="majorCategoryName" column="major_category_name"/>
+        <result property="middleCategoryId" column="middle_category_id"/>
+        <result property="middleCategoryName" column="middle_category_name"/>
+    </resultMap>
+
+    <select id="selectMiddleMajor" parameterType="int" resultMap="MajorMiddleMap">
+        SELECT
+            mc.major_category_id,
+            mc.major_category_name,
+            midc.middle_category_id,
+            midc.middle_category_name
+        FROM
+            majorcategory mc
+                LEFT JOIN middlecategory midc ON mc.major_category_id = midc.major_category_id
+        WHERE
+            mc.major_category_id = #{majorCategoryId}
+        ORDER BY mc.major_category_id
     </select>
-
-    <!-- 중분류에 맞는 모든 소분류 select -->
-    <select id="findSmallCategoriesByMiddleId" parameterType="int" resultType="com.toy2.shop29.product.domain.SmallCategoryDto">
-        SELECT * FROM smallcategory WHERE middle_category_id = #{middleCategoryId}
-    </select>
-
-    <!-- 소분류에 맞는 모든 제품 select -->
-    <select id="findProductsBySmallId" parameterType="int" resultType="com.toy2.shop29.product.domain.ProductDto">
-        SELECT product_id AS productId, small_category_id AS smallCategoryId, product_name AS productName,
-               brand_name AS brandName, price, sale_ratio AS saleRatio, rating
-        FROM product
-        WHERE small_category_id = #{smallCategoryId}
-</select>
-
-    <!-- 대분류와 중분류 JOIN 테이블 -->
-    <select id="findMajorMiddle" resultType="com.toy2.shop29.product.domain.CategoryDto">
-        SELECT *
-        FROM middlecategory as middle
-        JOIN majorcategory as major
-        ON middle.major_category_id = major.major_category_id
-    </select>
-
-
-
-
 
 </mapper>
