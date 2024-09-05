@@ -20,13 +20,16 @@ import com.toy2.shop29.qna.util.FileUploadHandler;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -36,7 +39,13 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@Transactional
+@SpringBootTest(
+        properties = {
+                "file.upload.file-path=test/",
+                "file.upload.temp-file-path=test/temp/",
+        }
+)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class QnaServiceTest {
 
@@ -65,8 +74,14 @@ public class QnaServiceTest {
     private String USER_ID = "test1";
     private String OTHER_USER_ID = "test2";
 
-    private final String TEST_FILE_NAME = "sample-img.PNG";
-    private final String TEST_FILE_PATH = "static/test/";
+    @Value("${file.upload.temp-file-path}")
+    private String TEMP_FILE_PATH;
+    @Value("${file.upload.file-path}")
+    private String FILE_PATH;
+    @Value("${file.upload.test-file-name}")
+    private String TEST_FILE_NAME;
+    @Value("${file.upload.test-file-path}")
+    private String TEST_FILE_PATH;
 
     private ParentQnaTypeDto parentQnaTypeActive;
     private QnaTypeDto qnaTypeActive;
@@ -77,7 +92,7 @@ public class QnaServiceTest {
         // 부모 문의유형, 문의유형 초기화
         parentQnaTypeDao.deleteAll();
         qnaTypeDao.deleteAll();
-        fileUploadHandler.deleteAllFiles();
+        cleanFileStorage();
         userMapper.deleteUser(ADMIN_ID);
         userMapper.deleteUser(USER_ID);
         userMapper.deleteUser("admin2");
@@ -168,8 +183,8 @@ public class QnaServiceTest {
 
         // 3. 파일 저장소에 샘플 첨부파일 저장
         savedFileNames = new ArrayList<>();
-        fileUploadHandler.saveFile(createTestFile(), TEST_FILE_NAME);
-        assertTrue(fileUploadHandler.getFile(TEST_FILE_NAME) != null);
+        String fileUrl = fileUploadHandler.saveFile(createTestFile(), TEST_FILE_NAME);
+        assertTrue(fileUploadHandler.getFileFromUrl(fileUrl) != null);
         savedFileNames.add(TEST_FILE_NAME);
     }
 
@@ -181,6 +196,16 @@ public class QnaServiceTest {
         attachmentDao.deleteAll();
         qnaAnswerDao.deleteAll();
         qnaDao.deleteAll();
+    }
+
+    @AfterEach
+    void after() throws IOException {
+        cleanFileStorage();
+    }
+
+    private void cleanFileStorage() throws IOException {
+        List<String> filePathList = List.of(FILE_PATH, TEMP_FILE_PATH);
+        fileUploadHandler.deleteAllFilesFrom(filePathList);
     }
 
     @DisplayName("1:1 문의 전체조회(유저) - 성공 - 자신의 1:1 문의만 조회")
@@ -197,7 +222,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -210,7 +235,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-2-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(), ADMIN_ID,"답변" + i);
         }
@@ -307,7 +332,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -321,7 +346,7 @@ public class QnaServiceTest {
             String fileName = Math.random() + TEST_FILE_NAME;
             saveTestFile(fileName);
             List<String> fileNames = List.of(fileName);
-            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, fileNames);
+            attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, fileNames);
             // 1-1-2. 답변 등록
             qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변" + i);
         }
@@ -441,7 +466,7 @@ public class QnaServiceTest {
         // 1-2 답변 등록
         qnaAnswerService.createQnaAnswer(qnaDto.getQnaId(),ADMIN_ID, "답변");
         // 1-3 첨부파일 등록
-        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId(), AttachmentTableName.QNA, savedFileNames);
+        attachmentService.createAttachments(qnaDto.getUserId(),qnaDto.getQnaId().toString(), AttachmentTableName.QNA, savedFileNames);
 
         // 2단계 데이터 처리
         QnaDto selectedQna = qnaDao.selectWith(qnaDto.getQnaId());
@@ -553,6 +578,6 @@ public class QnaServiceTest {
     }
 
     File createTestFile() {
-        return Paths.get(TEST_FILE_PATH + TEST_FILE_NAME).toFile();
+        return fileUploadHandler.downloadFile(TEST_FILE_PATH, TEST_FILE_NAME);
     }
 }

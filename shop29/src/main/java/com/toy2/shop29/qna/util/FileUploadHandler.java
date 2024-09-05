@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 public class FileUploadHandler {
@@ -34,17 +36,23 @@ public class FileUploadHandler {
     @Value("${file.upload.temp-file-path}")
     private String TEMP_FILE_PATH;
 
-    @Value("${file.base-url}")
-    private String FILE_BASE_URL;
+    private final FirebaseStorage firebaseStorage;
 
-    /**
-     * 파일 URL 생성. DB 테이블에 저장할 URL 생성 목적.
-     * @param fileName 파일명
-     * @return 파일 URL
-     */
-    public String createFileUrl(String fileName){
-        return FILE_BASE_URL + fileName;
+    public FileUploadHandler(FirebaseStorage firebaseStorage) {
+        this.firebaseStorage = firebaseStorage;
     }
+
+//    @Value("${file.base-url}")
+//    private String FILE_BASE_URL;
+
+//    /**
+//     * 파일 URL 생성. DB 테이블에 저장할 URL 생성 목적.
+//     * @param fileName 파일명
+//     * @return 파일 URL
+//     */
+//    public String createFileUrl(String fileName){
+//        return FILE_BASE_URL + fileName;
+//    }
 
     /**
      * MultipartFile 유효성 검사. 크기, MIME 타입, 확장자 검사
@@ -98,46 +106,50 @@ public class FileUploadHandler {
         return isPermitMimeType;
     }
 
-    public void saveMultipartFile(MultipartFile multipartFile, String savedFileName) throws IOException {
+    /**
+     * @return 저장된 파일의 URL 경로 반환
+     */
+    public String saveMultipartFile(MultipartFile multipartFile, String savedFileName) throws IOException {
         // 1. MultipartFile 이 null이거나 비어있다면 예외
         if(multipartFile == null || multipartFile.isEmpty()){
             throw new IllegalArgumentException("MultipartFile이 비어있습니다.");
         }
 
-        // FILE_PATH 경로에 파일 저장
-        Files.copy(multipartFile.getInputStream(), Paths.get(FILE_PATH + savedFileName));
-    }
-
-    /**
-     * 파일 저장
-     * @param file 저장할 파일. MultiPartFile로 받은 파일을 File로 변환하여 사용
-     * @throws URISyntaxException
-     */
-    public void saveFile(File file, String savedFileName) throws IOException, IllegalStateException {
-        if(file == null || !file.exists()) {
-            throw new IllegalStateException("파일이 존재하지 않습니다.");
-        }
-
-        Path path = Paths.get(FILE_PATH + savedFileName);
-
-        // 파일명 중복시, 예외 던짐
-        if(Files.exists(path)) {
+        // 2. 파일명 중복여부 체크
+        if(firebaseStorage.isExist(FILE_PATH, savedFileName)){
             throw new IllegalStateException("이미 존재하는 파일명입니다.");
         }
 
-        Files.copy(file.toPath(), path);
+        // Firebase Storage 에 파일 저장
+        return firebaseStorage.uploadMultipartFile(multipartFile, FILE_PATH, savedFileName);
+    }
+
+    public String saveFile(File file, String savedFileName) throws IOException {
+        // 2. 파일명 중복여부 체크
+        if(firebaseStorage.isExist(FILE_PATH, savedFileName)){
+            throw new IllegalStateException("이미 존재하는 파일명입니다.");
+        }
+
+        // Firebase Storage 에 파일 저장
+        return firebaseStorage.uploadFile(file, FILE_PATH, savedFileName);
+    }
+
+    public File downloadFile(String filePath, String fileName) {
+        try{
+            return firebaseStorage.downloadFile(filePath, fileName);
+        }catch (IOException e) {
+            return null;
+        }
     }
 
     /**
      * TEMP_FILE_PATH 경로에 파일 복사
-     * @param originFile 복사할 파일
+     * @param fileName 복사할 파일명
      */
-    public void copyFile(File originFile) throws RuntimeException{
-        Path originPath = originFile.toPath();
-        Path copiedPath = Paths.get(TEMP_FILE_PATH + originFile.getName());
-
+    public void copyFile(String fileName) throws RuntimeException{
         try {
-            Files.copy(originPath, copiedPath);
+            File originFile = firebaseStorage.downloadFile(FILE_PATH, fileName);
+            firebaseStorage.uploadFile(originFile,TEMP_FILE_PATH,fileName);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("파일 복사 중 오류가 발생했습니다.", e);
@@ -149,75 +161,45 @@ public class FileUploadHandler {
      * @param fileName 백업할 파일명
      */
     public void restoreFileFromBackup(String fileName) throws IOException{
-        Path backupPath = Paths.get(TEMP_FILE_PATH + fileName);
-        Path restorePath = Paths.get(FILE_PATH + fileName);
-
         try {
-            Files.copy(backupPath, restorePath);
+            File tempFile = firebaseStorage.downloadFile(TEMP_FILE_PATH, fileName);
+            firebaseStorage.uploadFile(tempFile,FILE_PATH,fileName);
         } catch (IOException e) {
             e.printStackTrace();
-            throw e;
+            throw new RuntimeException("파일 복구 중 오류가 발생했습니다.", e);
         }
     }
 
     /**
      * FILE_PATH 경로에서 지정된 이름의 파일 삭제
      * @param fileName 삭제하고자 하는 파일명
-     * @throws IOException - 파일이 존재하지 않거나, 삭제 실패시 발생
+     * @return 파일 삭제 성공 여부
      */
-    public void deleteFile(String fileName, String filePath) throws IOException {
-        Path path = Paths.get(filePath + fileName);
-        Files.delete(path);
+    public boolean deleteFile(String fileName, String filePath) {
+        return firebaseStorage.deleteFile(filePath + fileName);
     }
 
     public String generateTimestampedFileName(String fileName) {
-        // 현재시각 + 특수문자가 제외된 파일명
-        return System.currentTimeMillis() + "_" + sanitizeFileName(fileName);
+        // 랜덤숫자 + 특수문자가 제외된 파일명
+        UUID uuid = UUID.randomUUID();
+        return uuid + "_" + sanitizeFileName(fileName);
     }
 
     // 특정 폴더 內 파일 전체 삭제
 
     /**
-     * FILE_PATH 경로 內 모든 파일 삭제 <br/>
+     * 주어진 경로 內 모든 파일 삭제 <br/>
      * 주의: 폴더 내 모든 파일이 삭제됨 <br/>
      * <strong>테스트 목적으로만 사용할 것</strong>
      * @throws IOException
      */
-    public void deleteAllFiles() throws IOException {
-        Path filePath = Paths.get(FILE_PATH);
-        Files.list(filePath).forEach(p -> {
-            try {
-                Files.delete(p);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        Path tempFilePath = Paths.get(TEMP_FILE_PATH);
-        Files.list(tempFilePath).forEach(p -> {
-            try {
-                Files.delete(p);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public void deleteAllFilesFrom(List<String> filePathList) {
+        for(String filePathStr : filePathList){
+            firebaseStorage.getFileNames(filePathStr).forEach(fileName -> {
+                firebaseStorage.deleteFile(fileName);
+            });
+        }
     }
-
-//    /**
-//     * MultipartFile을 File로 변환 <br/>
-//     * MultipartFile은 Form에서 전송된 파일을 받는 객체
-//     * @param multipartFile 변환하고자 하는 MultipartFile 객체
-//     * @return 변환된 File 객체
-//     * @throws IllegalArgumentException multipartFile이 존재하지 않을 경우
-//     * @throws IOException
-//     */
-//    public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-//        if(multipartFile.isEmpty()) {
-//            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
-//        }
-//        File file = new File(multipartFile.getOriginalFilename());
-//        multipartFile.transferTo(file);
-//        return file;
-//    }
 
     /**
      * 파일명에 포함된 특수문자를 '_'로 치환 <br/>
@@ -240,19 +222,19 @@ public class FileUploadHandler {
         파일 메타정보 추출
      */
 
-    /**
-     * 파일명으로 파일을 찾아 File 객체 생성 <br/>
-     * 파일경로는 `FILE_PATH : 프로젝트루트/static/uploads`를 따름
-     * @param fileName 찾고자하는 실제 파일명
-     * @return File을 반환, 파일이 존재하지 않을 경우 null 반환
-     */
-    public File getFile(String fileName) {
-        Path path = Paths.get(FILE_PATH + fileName);
-        if(Files.exists(path)){
-            return path.toFile();
-        }else{
+    public File getFileFromUrl(String fileURL) {
+        try{
+            String fileName = extractFileNameFromUrl(fileURL);
+            return firebaseStorage.downloadFile(FILE_PATH, fileName);
+        }catch (IOException e) {
             return null;
         }
+    }
+
+    public String extractFileNameFromUrl(String fileURL) {
+        String cleanUrl = fileURL.split("\\?")[0];
+        String decodedFileName = cleanUrl.replace("%2F", "/");
+        return decodedFileName.substring(decodedFileName.lastIndexOf("/") + 1);
     }
 
     /**

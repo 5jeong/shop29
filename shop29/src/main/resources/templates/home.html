@@ -1,7 +1,7 @@
-<div th:insert="fragments/header :: header"></div>
-
+<!-- 새 구문 -->
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="utf-8">
     <link th:href="@{/css/bootstrap.min.css}"
@@ -73,35 +73,40 @@
     <title>쇼핑몰 메인페이지</title>
 </head>
 <body>
+<div th:insert="fragments/header :: header"></div>
 <div class="container-fluid" style="max-width: 500px;">
 
     <div class="container-fluid" style="max-width: 500px;">
         <div class="py-5 text-center">
-            <h4 class="mb-3" th:if="${session.loginUser != null}" th:text="|${user.userName}님 환영합니다!|">로그인 사용자 이름</h4>
+            <h4 class="mb-3" sec:authorize="isAuthenticated()"
+                th:text="|${user.userName}  님 환영합니다!|">
+                로그인 사용자 이름
+            </h4>
         </div>
+
         <div class="row justify-content-center">
-            <div class="col-6" th:if="${session.loginUser == null}">
+            <div class="col-6" sec:authorize="isAnonymous()">
                 <button class="w-100 btn btn-secondary btn-lg" type="button"
                         th:onclick="|location.href='@{/user/signup}'|">
                     회원 가입
                 </button>
             </div>
-            <div class="col-6" th:if="${session.loginUser == null}">
-                <form th:action="@{/login}" method="post">
-                    <button class="w-100 btn btn-dark btn-lg" type="submit">로그인</button>
-                </form>
+            <div class="col-6" sec:authorize="isAnonymous()">
+                <button class="w-100 btn btn-dark btn-lg mb-2" type="button"
+                        th:onclick="|location.href='@{/login}'|">로그인
+                </button>
             </div>
 
             <!-- 로그인된 사용자를 위한 영역 -->
-            <div class="col-6" th:if="${session.loginUser != null}">
+            <div class="col-6" sec:authorize="isAuthenticated()">
                 <button class="w-100 btn btn-dark btn-lg mb-2" type="button"
-                        th:onclick="|location.href='@{/user/update}'|">회원 수정
+                        th:onclick="|location.href='@{/user/mypage}'|">마이 페이지
                 </button>
             </div>
-            <div class="col-6" th:if="${session.loginUser != null}">
-                <form th:action="@{/logout}" method="post">
-                    <button class="w-100 btn btn-dark btn-lg" type="submit">로그아웃</button>
-                </form>
+            <div class="col-6" sec:authorize="isAuthenticated()">
+                <button class="w-100 btn btn-dark btn-lg mb-2" type="button"
+                        th:onclick="|location.href='@{/logout}'|">로그아웃
+                </button>
             </div>
         </div>
         <hr class="my-4">

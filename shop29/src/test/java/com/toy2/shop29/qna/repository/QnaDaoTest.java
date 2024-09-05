@@ -14,13 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class QnaDaoTest {
@@ -130,7 +131,7 @@ public class QnaDaoTest {
             qnaAnswerDao.insert(qnaAnswerDto);
 
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .tableId(dto.getQnaId())
+                    .tableId(dto.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")
@@ -256,7 +257,7 @@ public class QnaDaoTest {
         int attachmentSize = 2;
         for(int i = 0; i < attachmentSize; i++){
             AttachmentDto attachmentDto = AttachmentDto.builder()
-                    .tableId(dto.getQnaId())
+                    .tableId(dto.getQnaId().toString())
                     .tableName(AttachmentTableName.QNA)
                     .filePath("path")
                     .fileName("name")

@@ -1,7 +1,9 @@
 package com.toy2.shop29.qna.domain;
 
 public enum AttachmentTableName {
-    QNA("qna");
+    QNA("qna"),
+    USER("user"),
+    PRODUCT("product");
 
     private final String value;
 

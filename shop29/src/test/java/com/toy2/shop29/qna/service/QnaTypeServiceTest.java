@@ -8,11 +8,13 @@ import com.toy2.shop29.qna.service.qnatype.QnaTypeService;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.mapper.UserMapper;
 import jakarta.annotation.PostConstruct;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class QnaTypeServiceTest {
@@ -43,7 +46,7 @@ public class QnaTypeServiceTest {
 
     final String ADMIN_ID = "admin";
 
-    @PostConstruct
+    @BeforeEach
     void init(){
         parentQnaTypeDao.deleteAll();
         qnaTypeDao.deleteAll();

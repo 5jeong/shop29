@@ -3,6 +3,7 @@ package com.toy2.shop29.users.mapper;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
+import com.toy2.shop29.users.domain.UserWithdrawalDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,6 +25,9 @@ public interface UserMapper {
 
     // id로 회원 삭제
     int deleteUser(String userId);
+
+    // 회원탈퇴 테이블에 회원추가
+    int insertWithdrawalUser(@Param("userId") String userId, @Param("withdrawalDto") UserWithdrawalDto withdrawalDto);
 
     //회원수정 폼에서 수정
     int updateUser(@Param("userId") String userId, @Param("userUpdateDto") UserUpdateDto userUpdateDto);

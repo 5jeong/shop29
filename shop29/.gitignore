@@ -39,3 +39,4 @@ out/
 .DS_STOREapplication.properties
 application.properties
 /src/main/resources/application.properties
+/src/main/resources/firebase-admin-key.json

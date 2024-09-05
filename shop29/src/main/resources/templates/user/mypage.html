@@ -1,0 +1,101 @@
+<div th:insert="fragments/header :: header"></div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">
+    <title>마이페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .user-info div {
+            margin-bottom: 10px;
+        }
+        .user-info label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .button-container a {
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            background-color: #343a40;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            width: 22%;
+        }
+        .button-container a:hover {
+            background-color: #495057;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>마이페이지</h2>
+
+    <div class="user-info">
+        <div>
+            <label>회원 이름:</label>
+            <span th:text="${user.userName}"></span>
+        </div>
+        <div>
+            <label>전화번호:</label>
+            <span th:text="${user.phoneNumber}"></span>
+        </div>
+        <div>
+            <label>생년월일:</label>
+            <span th:text="${user.birthDate}"></span>
+        </div>
+        <div>
+            <label>주소:</label>
+            <span th:text="${user.postalCode}"></span>
+            <span th:text="${user.addressLine1}"></span>,
+            <span th:text="${user.addressLine2}"></span>
+            (<span th:text="${user.addressReference}"></span>)
+        </div>
+        <div>
+            <label>이메일:</label>
+            <span th:text="${user.email}"></span>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <a th:href="@{/user/update}">회원 수정</a>
+        <a th:href="@{/user/delete}">회원 탈퇴</a>
+        <a th:href="@{/order/history}">주문 내역</a>
+        <a th:href="@{/qna/qna-list}">1:1 문의</a>
+    </div>
+</div>
+
+</body>
+</html>
