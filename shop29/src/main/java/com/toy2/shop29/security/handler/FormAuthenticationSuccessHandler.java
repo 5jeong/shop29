@@ -25,19 +25,33 @@ public class FormAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        String redirectUrl = "/";
+
         // 사용자가 접근하려던 url이 저장된 객체
+        String redirectUrl = determineRedirectUrl(request, response);
+        redirectStrategy.sendRedirect(request, response, redirectUrl);
+    }
+
+    private String determineRedirectUrl(HttpServletRequest request, HttpServletResponse response) {
+
+        // 인증이 필요한 페이지 접근시, 사용자가 원래 요청했던 URL을 얻어옴
         SavedRequest savedRequest = requestCache.getRequest(request, response);
-        System.out.println("원래 URL = " + savedRequest);
+
         if (savedRequest != null) {
-            redirectUrl = savedRequest.getRedirectUrl();
-            redirectStrategy.sendRedirect(request, response, redirectUrl);
+            return savedRequest.getRedirectUrl();
         }
+
         // savedRequest가 없고 Referer 헤더가 있으면 Referer URL로 리다이렉트
-        else {
-            redirectUrl = (String) request.getSession().getAttribute("redirectUrl");
-            request.getSession().removeAttribute("redirectUrl");  // URL을 사용 후 세션에서 제거
-            redirectStrategy.sendRedirect(request, response, redirectUrl);
+        String sessionRedirectUrl = (String) request.getSession().getAttribute("redirectUrl");
+        if (isInvalidRedirectUrl(sessionRedirectUrl)) {
+            return "/";
         }
+        // 세션에서 URL 제거 후 반환
+
+        request.getSession().removeAttribute("redirectUrl");  // URL을 사용 후 세션에서 제거
+        return sessionRedirectUrl;
+    }
+
+    private boolean isInvalidRedirectUrl(String redirectUrl) {
+        return redirectUrl == null || redirectUrl.contains("/login");
     }
 }

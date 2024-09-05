@@ -19,13 +19,15 @@ public class LoginController {
                             @RequestParam(value = "exception", required = false) String exception, Model model,
                             HttpServletRequest request) {
 
-        String redirectUrl = request.getHeader("Referer");
-        if (redirectUrl != null) {
-            request.getSession().setAttribute("redirectUrl", redirectUrl);
+        // 로그인 실패가 아닌경우에만 redirectUrl 저장
+        if(error == null){
+            String redirectUrl = request.getHeader("Referer");
+            if (redirectUrl != null) {
+                request.getSession().setAttribute("redirectUrl", redirectUrl);
+            }
         }
         model.addAttribute("error", error);
         model.addAttribute("exception", exception);
-
         model.addAttribute("loginForm", new LoginFormDto());
 
         return "login/loginForm";
