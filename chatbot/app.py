@@ -9,6 +9,7 @@ from sqlalchemy import text
 from database import get_db
 from refund import get_refundable_orders, get_refundable_order_history
 from product import get_product_search, search_product
+from qna.qna import get_qna_search
 
 load_dotenv()
 
@@ -17,39 +18,41 @@ app = Flask(__name__)
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
-messages = []
 
-# OpenAI API를 사용해 대화 응답을 생성하는 함수
-def make_prompt(user_input):
-    res = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=user_input,
-    )
-    
-    return res.choices[0].message.content
-
-@app.route('/chat', methods=['GET','POST'])
+@app.route('/chat', methods=['POST'])
 def chat():
-    if request.method == "POST":
-        user_info = request.form.get('userInfo')
-        message = request.form.get('message')
+    user_info = request.form.get('userInfo')
+    message = request.form.get('message')
 
-        if "구매내역" in message or "주문내역" in message:
-            if not is_user(user_info):
-                html_template = """
-                <div class="message assistant">
-                <strong>Assistant:</strong>
-                <p>로그인 후 내역을 확인할 수 있습니다.</p>
-                </div>"""
-                template = Template(html_template)
-                rendered_html = template.render()
-                return Response(rendered_html, content_type="text/plain; charset=utf-8")
-            return Response(get_order(user_info), content_type="text/plain; charset=utf-8")
-        else:
-            response_message = process_question(user_info, message)
-            return Response(response_message, content_type="text/plain; charset=utf-8")
-
-    return render_template("index.html", messages=messages)
+    if "구매내역" in message or "주문내역" in message:
+        if not is_user(user_info):
+            html_template = """
+            <div class="message assistant">
+            <strong>Assistant:</strong>
+            <p>로그인 후 내역을 확인할 수 있습니다.</p>
+            </div>"""
+            template = Template(html_template)
+            rendered_html = template.render()
+            return Response(rendered_html, content_type="text/plain; charset=utf-8")
+        return Response(get_order(user_info), content_type="text/plain; charset=utf-8")
+    elif "문의" in message:
+        if not is_user(user_info):
+            html_template = """
+            <div class="message assistant">
+            <strong>Assistant:</strong>
+            <p>로그인 후 1:1문의 관련 조회가 가능합니다.</p>
+            </div>"""
+            template = Template(html_template)
+            rendered_html = template.render()
+            return Response(rendered_html, content_type="text/plain; charset=utf-8")
+        # 만약 주어진 질문이 1:1문의와 관련있지 않은 답변이라면, 답변을 넘김
+        qna_search_rst = get_qna_search(user_info, message)
+        chat_answer, can_answer = qna_search_rst['chat_answer'], qna_search_rst['can_answer']
+        if can_answer == True:
+            return Response(chat_answer, content_type="text/plain; charset=utf-8")
+        
+    response_message = process_question(user_info, message)
+    return Response(response_message, content_type="text/plain; charset=utf-8")
 
 @app.route('/order-history', methods=['GET'])
 def order_history():
