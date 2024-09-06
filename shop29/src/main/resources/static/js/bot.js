@@ -136,6 +136,36 @@ function requestUserAllHistory(event) {
         });
 }
 
+function requestQnaList(event) {
+    const messagesContainer = document.querySelector(".chatbot-messages");
+
+    const tempDiv = document.createElement('div', {class: 'chatbot-message'});
+    tempDiv.innerText = "1:1문의내역을 조회합니다."
+    messagesContainer.appendChild(tempDiv);
+
+    fetch("/chatbot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({message: "최근 1:1문의내역 3건 조회"}),
+    })
+        .then(response => response.json())
+        .then(data => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data.message.trim();
+            messagesContainer.appendChild(tempDiv);
+
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
 function requestUserRefundableList(event) {
     const messagesContainer = document.querySelector(".chatbot-messages");
     const scrollElement = document.querySelector(".chatbot-chatbox");
