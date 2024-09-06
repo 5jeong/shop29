@@ -4,7 +4,6 @@
 
 <mapper namespace="com.toy2.shop29.product.dao.ProductMapper">
 
-
     <!-- product+category 합친 Dto 반환 -->
     <select id="selectProductWithCategories" resultMap="ProductCategoryResultMap">
         SELECT
@@ -369,5 +368,13 @@
     <select id="count" resultType="int">
         SELECT count(*) FROM product
     </select>
+
+    <!-- 새 product 등록 -->
+    <insert id="insert" parameterType="com.toy2.shop29.product.domain.ProductDto">
+        INSERT INTO product
+        (product_id, small_category_id, product_name, brand_id, price, sale_ratio, rating, is_exclusive, size_table, start_date, created_date, created_id, updated_date, updated_id)
+        VALUES
+            (#{productId}, #{smallCategoryId}, #{productName}, #{brandId}, #{price}, #{saleRatio}, #{rating}, #{isExclusive}, #{sizeTable}, #{startDate}, #{createdDate}, #{createdId}, #{updatedDate}, #{updatedId})
+    </insert>
 
 </mapper>

@@ -9,7 +9,6 @@ import java.util.Map;
 
 public interface ProductDao {
 
-
     //제품ID로 상품의 분류 정보까지 조회
     ProductWithCategoriesDto selectProductWithCategories(int productId);
 
@@ -48,4 +47,6 @@ public interface ProductDao {
 
     int count();
 
+    // write
+    int insert(ProductDto product);
 }
