@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template,Response
 from openai import OpenAI
-from socket import *
 import os
 from dotenv import load_dotenv
 from faq import process_question  # faq.py에서 process_question 함수 import

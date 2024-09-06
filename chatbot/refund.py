@@ -66,15 +66,6 @@ def get_refundable_order_history(user_id, order_id):
     """)
     try:
         purchases = db.execute(query, {"user_id": user_id, "order_id" : order_id}).fetchall()
-        print(purchases)
-        purchases_detail = "\n".join(
-        [
-            f"해당 주문 내역입니다.\n",
-            f"주문 번호 : {purchases[0][0]}",
-            f"주문 일자 : {purchases[0][1]}",
-            "\n".join([f"\n상품명 : {p[2]}\n옵션 : {p[3]}\n구매 수량 : {p[4]}\n개당 가격 : {p[5]}\n주문 상태 : {p[6] if p[6] else '결제 완료'}" for p in purchases])
-        ]
-        )
         html_template="""
         <div class="message assistant">
     <strong>Assistant:</strong>
