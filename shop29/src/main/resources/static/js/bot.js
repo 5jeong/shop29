@@ -93,7 +93,7 @@ document.querySelector('.menu-btn').addEventListener('click', function () {
                     <div class="option-container">
                         <button onclick="requestProduct(this)" class="option-btn">상품 검색
                         </button>
-                        <button onclick="" class="option-btn">회원 정보
+                        <button onclick="" class="option-btn">1:1 문의
                         </button>
                         <button onclick="requestUserAllHistory(this)" class="option-btn">주문 내역
                         </button>

@@ -39,7 +39,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 
@@ -57,7 +57,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 
@@ -74,7 +74,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 
@@ -91,7 +91,7 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 
@@ -107,7 +107,7 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 
@@ -124,7 +124,7 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        System.out.println(response.getBody());
+        
         return response.getBody();
     }
 }

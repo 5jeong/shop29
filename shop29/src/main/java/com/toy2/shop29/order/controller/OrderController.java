@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -165,7 +164,7 @@ public class OrderController {
     /**
      * 카카오페이 완료 페이지
      *
-     * @param userId  유저 uid(로그인, 비로그인 포함)
+     * @param user  유저 uid(로그인, 비로그인 포함)
      * @param pgToken 결제승인 요청 인증 토큰
      * @return 결제 성공, 실패, 취소, 오류에 대한 페이지로 리다이렉트
      * @throws Exception .
@@ -229,11 +228,11 @@ public class OrderController {
     @PostMapping("/refund")
     public ResponseEntity<Map<String, String>> refundProduct(
             @RequestBody OrderHistoryRefundProduct orderHistoryRefundProduct,
-            @SessionAttribute(name = "loginUser", required = false) String userId
+            @AuthenticationPrincipal UserDto user
     ) throws Exception {
         Map<String, String> response = new HashMap<>();
         try {
-            String result = kakaoPayService.payRefund(userId, orderHistoryRefundProduct);
+            String result = kakaoPayService.payRefund(user.getUserId(), orderHistoryRefundProduct);
             response.put("status", "success");
             response.put("message", result);
             return ResponseEntity.status(HttpStatus.OK).body(response);
