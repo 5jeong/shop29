@@ -40,9 +40,15 @@ public class QnaServiceImpl implements QnaService{
         this.productService = productService;
     }
 
+    // [READ] 1:1 문의 전체조회
+    @Override
+    public List<QnaResponse> findQnaListAll(String userId) throws RuntimeException {
+        return findQnaList(userId, null, null);
+    }
+
     // [READ] 1:1 문의 전체조회(유저) <- 유저 페이지 정보제공 목적
     @Override
-    public List<QnaResponse> findQnaList(String userId, int limit, int offset) throws RuntimeException {
+    public List<QnaResponse> findQnaList(String userId, Integer limit, Integer offset) throws RuntimeException {
         // 유저는 삭제된(isActive = false) 1:1 문의를 볼 수 없음
         List<QnaDto> qnaDtos = qnaDao.selectAllWith(userId, limit, offset,true);
         List<QnaResponse> qnaResponses = qnaDtos.stream().map(QnaResponse::of).toList();

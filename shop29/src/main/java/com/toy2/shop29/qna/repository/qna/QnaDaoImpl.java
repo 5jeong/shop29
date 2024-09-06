@@ -28,13 +28,11 @@ public class QnaDaoImpl implements QnaDao{
     }
 
 
-
     /*
         READ
     */
-
     @Override
-    public List<QnaDto> selectAllWith(String userId, int limit, int offset, Boolean isActive) throws DataAccessException {
+    public List<QnaDto> selectAllWith(String userId, Integer limit, Integer offset, Boolean isActive) throws DataAccessException {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("limit", limit);
@@ -69,12 +67,6 @@ public class QnaDaoImpl implements QnaDao{
 
         return session.selectOne(namespace + "select", map);
     }
-
-//    // 테스트용
-//    @Override
-//    public List<QnaDto> selectAll() throws DataAccessException {
-//        return List.of();
-//    }
 
     @Override
     public int countByUserId(String userId) {

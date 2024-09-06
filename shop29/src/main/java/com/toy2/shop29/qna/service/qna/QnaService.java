@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface QnaService {
 
+    List<QnaResponse> findQnaListAll(String userId) throws RuntimeException;
+
     // [READ] 1:1 문의 전체조회
-    List<QnaResponse> findQnaList(String userId, int limit, int offset) throws RuntimeException;
+    List<QnaResponse> findQnaList(String userId, Integer limit, Integer offset) throws RuntimeException;
 
     // [READ] 1:1 문의 전체조회 <- 관리자 페이지 정보제공 목적
     List<QnaAdminResponse> findQnaListWithFilter(int limit, int offset, String qnaTypeId, Boolean isAnswered) throws RuntimeException;

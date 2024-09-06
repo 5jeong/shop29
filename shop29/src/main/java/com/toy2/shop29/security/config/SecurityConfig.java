@@ -31,7 +31,7 @@ public class SecurityConfig {
                                         "/user/checkUserId", "/user/checkUserEmail", "/user/checkUserPhoneNumber",
                                         "/product/**", "/cart/**", "/faq/**", "/email/**", "/login", "/logout",
                                         "/board/**", "/css/**", "/error", "/mainPage/**", "/images/**",
-                                        "/attachment/**", "/js/**", "/chatbot/**", "http://0.0.0.0:8082/chat").permitAll()
+                                        "/attachment/**", "/js/**", "/chatbot/**", "/qna/qna-list/**", "http://0.0.0.0:8082/chat").permitAll()
                                 .requestMatchers("/admin").hasAuthority("관리자")
                                 .anyRequest().authenticated()
                 )
