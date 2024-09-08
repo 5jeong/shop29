@@ -35,12 +35,12 @@ def chat():
             rendered_html = template.render()
             return Response(rendered_html, content_type="text/plain; charset=utf-8")
         return Response(get_order(user_info), content_type="text/plain; charset=utf-8")
-    elif "문의" in message:
+    elif "문의내역" in message or "문의이력" in message:
         if not is_user(user_info):
             html_template = """
             <div class="message assistant">
             <strong>Assistant:</strong>
-            <p>로그인 후 1:1문의 관련 조회가 가능합니다.</p>
+            <p>로그인 후 문의내역 조회가 가능합니다.</p>
             </div>"""
             template = Template(html_template)
             rendered_html = template.render()
