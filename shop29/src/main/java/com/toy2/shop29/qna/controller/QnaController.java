@@ -83,6 +83,16 @@ public class QnaController {
         return "qna/qnaList";
     }
 
+    /**
+     * 이 메서드는 챗봇을 위한 것이며, 오직 localhost에서만 접근 가능하도록 제한해야합니다.
+     */
+    @ResponseBody
+    @GetMapping("/qna-list/{userId}")
+    List<QnaResponse> getQnaListRest(
+            @PathVariable(name = "userId") String userId){
+        return qnaService.findQnaListAll(userId);
+    }
+
     @GetMapping("/admin/qna-list")
     String getQnaListForAdmin(
             @AuthenticationPrincipal UserDto userDto,
@@ -113,6 +123,8 @@ public class QnaController {
 
         return "qna/qnaAdminList";
     }
+
+
 
     @GetMapping("/answer")
     String getAnswerForm(

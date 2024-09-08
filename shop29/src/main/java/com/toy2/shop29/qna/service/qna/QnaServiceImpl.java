@@ -40,6 +40,12 @@ public class QnaServiceImpl implements QnaService{
         this.productService = productService;
     }
 
+    // [READ] 1:1 문의 전체조회
+    @Override
+    public List<QnaResponse> findQnaListAll(String userId) throws RuntimeException {
+        return findQnaList(userId, 0, 0);
+    }
+
     // [READ] 1:1 문의 전체조회(유저) <- 유저 페이지 정보제공 목적
     @Override
     public List<QnaResponse> findQnaList(String userId, int limit, int offset) throws RuntimeException {

@@ -108,6 +108,10 @@ public class ProductDaoImpl implements ProductDao {
         return session.selectOne(namespace+"count");
     }
 
+    @Override
+    public int insert(ProductDto product){
+        return session.insert(namespace + "insert",product); //map 사용하던가 아니면 product 사용하던가
+    }
 }
 
 

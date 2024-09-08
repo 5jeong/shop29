@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 문의 목록 스타일 */
+        .qna_question_qna_list {
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        /* 문의 항목 스타일 */
+        .qna_item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .qna_item:hover {
+            background-color: #f0f8ff;
+        }
+
+        /* 문의 항목 타입 스타일 */
+        .qna_item_type {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* 제목 스타일 */
+        .qna_item_title {
+            margin-bottom: 5px;
+        }
+
+        /* 내용 스타일 */
+        .qna_item_content {
+            margin-bottom: 5px;
+        }
+
+        /* 작성일 스타일 */
+        .qna_item_created {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* 답변 여부 스타일 */
+        .qna_item_answered {
+            color: #666;
+        }
+
+        .qna_item_answered::before {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message assistant">
+        <strong>Assistant:</strong>
+        <div class="qna_question_answer">
+            {{answer}}
+        </div>
+        <div class="qna_question_qna_list">
+            {% for qna in qna_list %}
+            <div class="qna_item">
+                <div class="qna_item_type">
+                    문의유형 : {{qna['qnaTypeName']}}
+                </div>
+                <div class="qna_item_title">
+                    제목 : {{qna['title']}}
+                </div>
+                <div class="qna_item_content">
+                    내용 : {{qna['content']}}
+                </div>
+                <div class="qna_item_created">
+                    작성일 : {{qna['createdTime']}}
+                </div>
+                <div class="qna_item_answered">
+                    답변여부 : {{qna['isAnswerd']}}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

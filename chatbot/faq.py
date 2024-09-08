@@ -2,6 +2,11 @@ import json
 from jinja2 import Template
 from langchain_openai import ChatOpenAI
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 
 # OpenAI API 키 설정
 api_key = os.getenv("OPENAI_API_KEY")

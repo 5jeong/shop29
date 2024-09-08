@@ -93,7 +93,7 @@ document.querySelector('.menu-btn').addEventListener('click', function () {
                     <div class="option-container">
                         <button onclick="requestProduct(this)" class="option-btn">상품 검색
                         </button>
-                        <button onclick="" class="option-btn">1:1 문의
+                        <button onclick="requestQnaList(this)" class="option-btn">문의 내역
                         </button>
                         <button onclick="requestUserAllHistory(this)" class="option-btn">주문 내역
                         </button>
@@ -119,6 +119,36 @@ function requestUserAllHistory(event) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({message: "주문내역"}),
+    })
+        .then(response => response.json())
+        .then(data => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data.message.trim();
+            messagesContainer.appendChild(tempDiv);
+
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
+function requestQnaList(event) {
+    const messagesContainer = document.querySelector(".chatbot-messages");
+
+    const tempDiv = document.createElement('div', {class: 'chatbot-message'});
+    tempDiv.innerText = "1:1문의내역을 조회합니다."
+    messagesContainer.appendChild(tempDiv);
+
+    fetch("/chatbot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({message: "최근 1:1문의내역 3건 조회"}),
     })
         .then(response => response.json())
         .then(data => {
