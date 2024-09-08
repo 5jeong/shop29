@@ -15,7 +15,7 @@ public interface QnaDao {
     /**
      * 개인 조회목적, 조인 : 문의유형, 1:1문의, 문의답변, 첨부파일
      */
-    List<QnaDto> selectAllWith(String userId, Integer limit, Integer offset, Boolean isActive) throws DataAccessException;
+    List<QnaDto> selectAllWith(String userId, int limit, int offset, Boolean isActive) throws DataAccessException;
     //
 
     /**

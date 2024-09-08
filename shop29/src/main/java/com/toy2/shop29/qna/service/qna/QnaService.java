@@ -11,8 +11,11 @@ public interface QnaService {
 
     List<QnaResponse> findQnaListAll(String userId) throws RuntimeException;
 
-    // [READ] 1:1 문의 전체조회
-    List<QnaResponse> findQnaList(String userId, Integer limit, Integer offset) throws RuntimeException;
+    /**
+     * [READ] 1:1 문의 전체조회
+     * @param limit 0이면 개수제한 X & offset 미적용
+     */
+    List<QnaResponse> findQnaList(String userId, int limit, int offset) throws RuntimeException;
 
     // [READ] 1:1 문의 전체조회 <- 관리자 페이지 정보제공 목적
     List<QnaAdminResponse> findQnaListWithFilter(int limit, int offset, String qnaTypeId, Boolean isAnswered) throws RuntimeException;

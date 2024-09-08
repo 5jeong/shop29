@@ -32,7 +32,7 @@ public class QnaDaoImpl implements QnaDao{
         READ
     */
     @Override
-    public List<QnaDto> selectAllWith(String userId, Integer limit, Integer offset, Boolean isActive) throws DataAccessException {
+    public List<QnaDto> selectAllWith(String userId, int limit, int offset, Boolean isActive) throws DataAccessException {
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
         map.put("limit", limit);

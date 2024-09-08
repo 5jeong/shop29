@@ -176,7 +176,7 @@
             AND pqt.is_active = #{isActive}
         </if>
         ORDER BY q.created_time DESC
-        <if test="offset != null and limit != null">
+        <if test="limit != 0">
             LIMIT #{offset} , #{limit}
         </if>
         )  AS qqt

@@ -48,7 +48,7 @@ def chat():
         # 만약 주어진 질문이 1:1문의와 관련있지 않은 답변이라면, 답변을 넘김
         qna_search_rst = get_qna_search(user_info, message)
         chat_answer, can_answer = qna_search_rst['chat_answer'], qna_search_rst['can_answer']
-        if can_answer == True:
+        if can_answer:
             return Response(chat_answer, content_type="text/plain; charset=utf-8")
         
     response_message = process_question(user_info, message)
