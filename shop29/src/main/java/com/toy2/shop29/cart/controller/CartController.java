@@ -5,8 +5,11 @@ import com.toy2.shop29.cart.domain.response.CartDto;
 import com.toy2.shop29.cart.service.CartItemService;
 import com.toy2.shop29.cart.service.CartManagementService;
 import com.toy2.shop29.common.ProductItem;
-import com.toy2.shop29.users.domain.UserDto;
+import com.toy2.shop29.users.domain.UserContext;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +17,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/cart")
@@ -35,14 +41,14 @@ public class CartController {
     /**
      * 장바구니 페이지 요청
      *
-     * @param user  유저 uid(로그인, 비로그인 포함)
+     * @param user    유저 uid(로그인, 비로그인 포함)
      * @param guestId 게스트 id
      * @return 장바구니 페이지
      * @throws Exception .
      */
     @GetMapping("")
     public ModelAndView getCartList(
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId,
             Model model) {
         ModelAndView mav = new ModelAndView("cart/cart");
@@ -68,14 +74,14 @@ public class CartController {
     /**
      * 장바구니 담기
      *
-     * @param user  유저 uid(로그인, 비로그인 포함)
+     * @param user    유저 uid(로그인, 비로그인 포함)
      * @param guestId 게스트 id
      * @return 장바구니 페이지
      * @throws Exception .
      */
     @PostMapping("/cart-item")
     public ResponseEntity<Map<String, String>> addCartItem(
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId,
             @Valid @RequestBody ProductItem addCartProductDto) {
 
@@ -114,7 +120,7 @@ public class CartController {
     public ResponseEntity<Map<String, String>> orderCount(
             @RequestBody ProductItem productItem,
             @SessionAttribute(name = "loginUser", required = false) String userId,
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId) {
         String userInfo = getUserInfo(user, guestId);
         Map<String, String> response = new HashMap<>();
@@ -135,7 +141,7 @@ public class CartController {
      * 장바구니 상품 삭제
      *
      * @param deleteRequest 상품 id 리스트
-     * @param user        로그인 유저 uid
+     * @param user          로그인 유저 uid
      * @param guestId       비로그인 유저 id
      * @return 성공 실패
      * @throws Exception .
@@ -144,7 +150,7 @@ public class CartController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteCartItems(
             @RequestBody List<DeleteCartItemsRequestDto> deleteRequest,
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId
     ) {
 
@@ -161,7 +167,7 @@ public class CartController {
     }
 
     // 로그인 비로그인 검증
-    public String getUserInfo(UserDto user, String guestId) {
-        return (user != null) ? user.getUserId() : guestId;
+    public String getUserInfo(UserContext userContext, String guestId) {
+        return (userContext != null) ? userContext.getUserDto().getUserId() : guestId;
     }
 }
