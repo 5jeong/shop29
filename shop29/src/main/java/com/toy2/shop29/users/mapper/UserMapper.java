@@ -56,5 +56,7 @@ public interface UserMapper {
 
     // provider와 providerId로 소셜 로그인 사용자 조회
     UserDto findByProviderId( String providerId);
+
+    int updateUserImage(@Param("userId") String userId,@Param("userImage") String userImage);
 }
 

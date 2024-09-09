@@ -37,4 +37,7 @@ public interface UserService {
 
     //소셜 로그인 회원 저장
     int saveSocialUser(UserDto userDto);
+
+    //회원프로필 저장
+    int updateUserImage(String userId,String userImage);
 }

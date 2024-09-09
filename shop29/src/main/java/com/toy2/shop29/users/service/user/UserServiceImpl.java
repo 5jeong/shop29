@@ -51,6 +51,12 @@ public class UserServiceImpl implements UserService {
         int result = userMapper.updateUser(userId, userUpdateDto);
 
         // 사용자 정보 수정 후 SecurityContext의 Authentication 객체 갱신
+        updateAuthentication(userId);
+
+        return result;
+    }
+
+    private void updateAuthentication(String userId) {
         UserDto updatedUser = userMapper.findById(userId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -63,8 +69,6 @@ public class UserServiceImpl implements UserService {
                 authentication.getCredentials(), updatedUserContext.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-        return result;
     }
 
     @Override
@@ -112,6 +116,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public int saveSocialUser(UserDto userDto) {
         return userMapper.insertSocialUser(userDto);
+    }
+
+    @Override
+    public int updateUserImage(String userId, String userImage) {
+        updateAuthentication(userId);
+        return userMapper.updateUserImage(userId,userImage);
     }
 
 }

@@ -113,5 +113,10 @@
         #{userId}, #{password}, #{userName}, #{email}, #{joinType}, #{providerId}, #{userImage})
     </insert>
 
+    <insert id="updateUserImage" parameterType="map">
+        update user
+        set user_image = #{userImage}
+        Where user_id = #{userId}
+    </insert>
 
 </mapper>

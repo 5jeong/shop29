@@ -42,7 +42,7 @@
             margin-right: 30px;
         }
         .user-info {
-            flex-grow: 1; /* 사용자 정보가 프로필 사진 오른쪽 공간을 채움 */
+            flex-grow: 1;
             font-size: 16px;
             line-height: 2.0;
         }
@@ -104,12 +104,14 @@
 
 <div class="container">
     <h2>마이페이지</h2>
-
     <!-- 프로필 사진 및 사용자 정보 섹션 -->
     <div class="profile-section">
-        <div class="profile-picture" style="background-image: url('/path/to/profile-image.jpg');">
-            <!-- 프로필 사진이 없을 경우 기본 회색 배경이 표시됩니다. 추후 이미지를 여기에 추가하세요. -->
+
+        <div class="profile-picture">
+            <!-- 프로필 사진을 <img> 태그로 표시 -->
+            <img id="profileImage" th:src="${user.userImage}" alt="프로필 이미지" style="width: 200px; height: 200px; border-radius: 50%;">
         </div>
+
         <div class="user-info" th:object="${user}">
             <div>
                 <label>이름</label>
@@ -141,6 +143,11 @@
                 <label>가입유형</label>
                 <span th:text="*{joinType}"></span>
             </div>
+            <!-- 프로필 사진 업로드 폼 -->
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit">프로필 사진 업로드</button>
+            </form>
         </div>
     </div>
 
@@ -149,4 +156,40 @@
         <a th:href="@{/user/update}">회원 수정</a>
         <a th:href="@{/user/delete}">회원 탈퇴</a>
         <a th:href="@{/order/history}">주문 내역</a>
-        <a th:href="@{/qna/qna-list}">1:1 문의
+        <a th:href="@{/qna/qna-list}">1:1 문의</a>
+    </div>
+</div>
+<script>
+    document.querySelector("#uploadForm").addEventListener("submit", function(event) {
+        event.preventDefault();  // 기본 동작 막기
+
+        let formData = new FormData(this);
+        let fileInput = document.querySelector('input[type="file"]');
+        if (fileInput.files.length === 0) {
+            alert("파일을 선택하세요.");
+            return;
+        }
+
+        fetch('/attachment/userImage', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); // 서버에서 URL을 문자열로 받음
+        }).then(imageUrl => {
+            if (imageUrl) {
+                // 이미지 URL이 성공적으로 반환되면 해당 URL로 프로필 이미지를 변경
+                document.getElementById("profileImage").src = imageUrl;
+            } else {
+                console.error('Error: No data received');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert("업로드 중 오류가 발생했습니다.");
+        });
+    });
+</script>
+</body>
+</html>
