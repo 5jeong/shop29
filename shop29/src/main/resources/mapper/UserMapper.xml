@@ -107,4 +107,11 @@
         WHERE `user_id` = #{userId}
     </update>
 
+    <insert id="insertSocialUser" parameterType="com.toy2.shop29.users.domain.UserDto">
+        INSERT INTO user (
+        user_id,password,user_name,email,join_type,provider_id, user_image ) VALUES (
+        #{userId}, #{password}, #{userName}, #{email}, #{joinType}, #{providerId}, #{userImage})
+    </insert>
+
+
 </mapper>
