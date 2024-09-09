@@ -1,15 +1,16 @@
 package com.toy2.shop29.users.controller;
 
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.domain.UserRegisterDto;
 import com.toy2.shop29.users.domain.UserUpdateDto;
 import com.toy2.shop29.users.domain.UserWithdrawalDto;
-import com.toy2.shop29.users.service.email.EmailVerificationService;
 import com.toy2.shop29.users.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,6 @@ public class UserController {
                           BindingResult bindingResult) {
 
         userService.validateDuplicatedInfo(userRegisterDto, bindingResult);
-
         if (bindingResult.hasErrors()) {
             log.info("회원가입 에러 : {}", bindingResult);
             return "user/addUserForm";
@@ -56,23 +56,24 @@ public class UserController {
 
 
     @GetMapping("/update")
-    public String updateUser(Model model, @AuthenticationPrincipal UserDto userDto) {
+    public String updateUser(Model model, @AuthenticationPrincipal UserContext userContext) {
+        UserDto userDto = userContext.getUserDto();
         UserDto user = userService.findById(userDto.getUserId());
-        model.addAttribute("loginUser", user);
+        model.addAttribute("userUpdateDto", user);
         return "user/editUserForm"; // 수정 폼 페이지로 이동
     }
 
     @PostMapping("/update")
     public String updateUser(@Validated() @ModelAttribute(name = "userUpdateDto") UserUpdateDto userUpdateDto,
                              BindingResult bindingResult,
-                             @AuthenticationPrincipal UserDto user) {
+                             @AuthenticationPrincipal UserContext userContext) {
         if (bindingResult.hasErrors()) {
             log.info("회원 수정에러 : {}", bindingResult);
             return "user/editUserForm";
         }
 
         // 로그인된 사용자 정보
-        String userId = user.getUserId();
+        String userId = userContext.getUserDto().getUserId();
         userService.updateUser(userId, userUpdateDto);
         return "redirect:/";
     }
@@ -130,8 +131,9 @@ public class UserController {
 
     @PostMapping("/delete")
     public String delete(@ModelAttribute(name = "userWithdrawalDto") UserWithdrawalDto userWithdrawalDto,
-                         @AuthenticationPrincipal UserDto user, HttpServletRequest request) {
-        userService.insertWithdrawalUser(user.getUserId(),userWithdrawalDto);
+                         @AuthenticationPrincipal UserContext userContext, HttpServletRequest request) {
+        UserDto user = userContext.getUserDto();
+        userService.insertWithdrawalUser(user.getUserId(), userWithdrawalDto);
         HttpSession session = request.getSession();
         session.invalidate();
         SecurityContextHolder.clearContext();
@@ -139,8 +141,8 @@ public class UserController {
     }
 
     @GetMapping("/mypage")
-    public String mypage(@AuthenticationPrincipal UserDto user,Model model){
-        model.addAttribute("user",user);
+    public String mypage(@AuthenticationPrincipal UserContext userContext, Model model) {
+        model.addAttribute("user", userContext.getUserDto());
         return "user/mypage";
     }
 }
