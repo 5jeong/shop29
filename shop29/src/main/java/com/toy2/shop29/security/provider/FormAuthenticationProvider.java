@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-@Component("authenticationProvider")
+@Component
 @RequiredArgsConstructor
 public class FormAuthenticationProvider implements AuthenticationProvider {
 
@@ -66,7 +66,7 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
         userMapper.resetLoginFailureCount(userId);
 
         // principal 타입으로 UserDto을 받을 수 있게 토큰 설정
-        return new UsernamePasswordAuthenticationToken(userContext.getUserDto(), null, userContext.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userContext, null, userContext.getAuthorities());
 
     }
 
