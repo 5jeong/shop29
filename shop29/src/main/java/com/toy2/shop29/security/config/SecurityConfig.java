@@ -1,6 +1,8 @@
 package com.toy2.shop29.security.config;
 
+import com.toy2.shop29.oauth2.service.CustomOauth2UserService;
 import com.toy2.shop29.security.handler.UserLogoutSuccessHandler;
+import com.toy2.shop29.security.provider.FormAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +19,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+
+    private final CustomOauth2UserService customOauth2UserService;
     private final AuthenticationProvider authenticationProvider;
     private final AuthenticationSuccessHandler successHandler;
     private final AuthenticationFailureHandler failureHandler;
@@ -29,11 +33,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) ->
                         auth.requestMatchers("/", "/user/signup", "/user/findId", "/user/findPassword",
                                         "/user/checkUserId", "/user/checkUserEmail", "/user/checkUserPhoneNumber",
-                                        "/product/**", "/cart/**", "/faq/**", "/email/**", "/login", "/logout",
+                                        "/product/**", "/cart/**", "/faq/**", "/email/**", "/login*", "/logout",
                                         "/board/**", "/css/**", "/error", "/mainPage/**", "/images/**",
-                                        "/attachment/**", "/js/**", "/chatbot/**", "/qna/qna-list/**", "http://0.0.0.0:8082/chat").permitAll()
-                                .requestMatchers("/admin").hasAuthority("관리자")
+                                        "/attachment/**", "/js/**", "/chatbot/**", "/qna/qna-list/**", "http://0.0.0.0:8082/chat", "/oauth2/**")
+                                .permitAll()
+                                .requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
                                 .anyRequest().authenticated()
+
+                )
+
+                .oauth2Login((oauth2) -> oauth2
+                        .loginPage("/login")
+                        .userInfoEndpoint((userInfoEndpointConfig ->
+                                userInfoEndpointConfig.userService(customOauth2UserService)))
+                        .successHandler(successHandler)
+                        .failureHandler(failureHandler)
                 )
 
                 .formLogin((form) ->
