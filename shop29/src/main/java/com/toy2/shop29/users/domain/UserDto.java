@@ -25,8 +25,10 @@ public class UserDto {
     private String birthDate;  // 생년월일
     private Integer gender;  // 성별 (1: 남성, 0: 여성)
     private LocalDate registrationDate;  // 가입일자
-    private LocalDate withdrawalDate;  // 탈퇴일자
     private Integer loginFailureCount;  // 로그인 실패 횟수
     private LocalDateTime lockExpiryTime;  // 계정 잠금 만료시간
     private LocalDateTime lastLoginFailureTime;  // 마지막 로그인 실패 시간
+    private String joinType; // 제공자 : 네이버, 카카오 등
+    private String providerId;  // 소셜로그인에서 제공하는 id
+    private String userImage; // 회원 이미지
 }
