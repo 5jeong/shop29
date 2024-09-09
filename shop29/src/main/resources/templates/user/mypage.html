@@ -8,8 +8,8 @@
     <title>마이페이지</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f2f4f6;
             margin: 0;
             padding: 0;
         }
@@ -17,18 +17,34 @@
             max-width: 900px;
             margin: 50px auto;
             background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
         h2 {
             text-align: center;
-            margin-bottom: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .profile-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .profile-picture {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            background-size: cover;
+            background-position: center;
+            margin-right: 30px;
         }
         .user-info {
-            margin-bottom: 30px;
+            flex-grow: 1; /* 사용자 정보가 프로필 사진 오른쪽 공간을 채움 */
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 2.0;
         }
         .user-info div {
             margin-bottom: 10px;
@@ -37,6 +53,7 @@
             font-weight: bold;
             display: inline-block;
             width: 120px;
+            color: #495057;
         }
         .button-container {
             display: flex;
@@ -56,6 +73,31 @@
         .button-container a:hover {
             background-color: #495057;
         }
+
+        /* 모바일에서 버튼이 너무 작게 나오는 경우를 대비한 반응형 처리 */
+        @media (max-width: 768px) {
+            .button-container a {
+                width: 48%; /* 버튼 너비를 늘려 두 개씩 나란히 나오도록 조정 */
+            }
+            .profile-section {
+                flex-direction: column; /* 프로필과 정보를 세로로 배치 */
+                align-items: center;
+            }
+            .profile-picture {
+                margin-right: 0; /* 세로 배치일 때 사진과 정보의 간격을 제거 */
+                margin-bottom: 20px;
+            }
+            .user-info {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .button-container a {
+                width: 100%; /* 작은 화면에서는 버튼이 한 줄씩 나옴 */
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -63,39 +105,48 @@
 <div class="container">
     <h2>마이페이지</h2>
 
-    <div class="user-info">
-        <div>
-            <label>회원 이름:</label>
-            <span th:text="${user.userName}"></span>
+    <!-- 프로필 사진 및 사용자 정보 섹션 -->
+    <div class="profile-section">
+        <div class="profile-picture" style="background-image: url('/path/to/profile-image.jpg');">
+            <!-- 프로필 사진이 없을 경우 기본 회색 배경이 표시됩니다. 추후 이미지를 여기에 추가하세요. -->
         </div>
-        <div>
-            <label>전화번호:</label>
-            <span th:text="${user.phoneNumber}"></span>
-        </div>
-        <div>
-            <label>생년월일:</label>
-            <span th:text="${user.birthDate}"></span>
-        </div>
-        <div>
-            <label>주소:</label>
-            <span th:text="${user.postalCode}"></span>
-            <span th:text="${user.addressLine1}"></span>,
-            <span th:text="${user.addressLine2}"></span>
-            (<span th:text="${user.addressReference}"></span>)
-        </div>
-        <div>
-            <label>이메일:</label>
-            <span th:text="${user.email}"></span>
+        <div class="user-info" th:object="${user}">
+            <div>
+                <label>이름</label>
+                <span th:text="*{userName}"></span>
+            </div>
+            <div>
+                <label>전화번호</label>
+                <span th:text="*{phoneNumber}"></span>
+            </div>
+            <div>
+                <label>생년월일</label>
+                <span th:text="*{birthDate}"></span>
+            </div>
+            <div>
+                <label>우편번호</label>
+                <span th:text="*{postalCode}"></span>
+            </div>
+            <div>
+                <label>주소</label>
+                <span th:text="*{addressLine1}"></span>
+                <span th:text="*{addressLine2}"></span>
+                <span th:text="*{addressReference}"></span>
+            </div>
+            <div>
+                <label>이메일</label>
+                <span th:text="*{email}"></span>
+            </div>
+            <div>
+                <label>가입유형</label>
+                <span th:text="*{joinType}"></span>
+            </div>
         </div>
     </div>
 
+    <!-- 버튼 섹션 -->
     <div class="button-container">
         <a th:href="@{/user/update}">회원 수정</a>
         <a th:href="@{/user/delete}">회원 탈퇴</a>
         <a th:href="@{/order/history}">주문 내역</a>
-        <a th:href="@{/qna/qna-list}">1:1 문의</a>
-    </div>
-</div>
-
-</body>
-</html>
+        <a th:href="@{/qna/qna-list}">1:1 문의
