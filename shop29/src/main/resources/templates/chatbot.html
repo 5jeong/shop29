@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" th:href="@{/css/chatbot/style.css}">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            width: 400px;
+            max-height: 600px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+        .chat-message.user {
+            justify-content: flex-start;
+        }
+        .chat-message.bot {
+            justify-content: flex-end;
+        }
+        .chat-message.user .message-content {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-start;
+            border-radius: 15px 15px 15px 0;
+        }
+        .chat-message.bot .message-content {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-end;
+            border-radius: 15px 15px 0 15px;
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 10px 15px;
+            font-size: 14px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .chat-footer {
+            display: flex;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+        }
+        .chat-footer input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            outline: none;
+            margin-right: 10px;
+            padding-left: 15px;
+        }
+        .chat-footer button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .chat-footer button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">쇼핑몰 AI 에이전트</div>
+
+    <div class="chat-body" id="chat-body">
+        <!-- 메시지 내용이 여기에 표시됩니다 -->
+    </div>
+
+    <div class="chat-footer">
+        <input type="text" id="user-input" placeholder="AI 에이전트에게 질문해 주세요..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">전송</button>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('user-input');
+        const message = input.value.trim();
+
+        if (message === "") return;
+
+        appendMessage(message, 'user');
+
+        fetch('/api/chat/question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        })
+            .then(response => response.text())
+            .then(data => {
+                appendMessage(data, 'bot');
+            })
+            .catch(error => {
+                appendMessage('Error: 서버에 연결할 수 없습니다.', 'bot');
+            });
+
+        input.value = '';
+    }
+
+    function appendMessage(message, sender) {
+        const chatBody = document.getElementById('chat-body');
+
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', sender); // 'user' 또는 'bot' 클래스 추가
+
+        const bubbleElement = document.createElement('div');
+        bubbleElement.classList.add('message-content');
+        bubbleElement.textContent = message;
+
+        messageElement.appendChild(bubbleElement);
+        chatBody.appendChild(messageElement);
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.toy2.shop29.chatBot.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.toy2.shop29.chatBot.domain.ChatBotRequestDto;
 import com.toy2.shop29.chatBot.service.ChatBotService;
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,11 +17,11 @@ public class ChatBotController {
 
     @PostMapping("")
     public ChatBotRequestDto chatBot(
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestBody ChatBotRequestDto messageRequest
     ) throws JsonProcessingException {
-        String userInfo = getUserInfo(user, guestId);
+        String userInfo = getUserInfo(user.getUserDto(), guestId);
         String userMessage = messageRequest.getMessage();
 
         String responseMessage = chatBotService.sendMessage(userInfo, userMessage);
@@ -29,26 +30,26 @@ public class ChatBotController {
 
     @GetMapping("/order-history")
     public ChatBotRequestDto requestOrderHistory(
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = true, name = "id") String orderId
     ) throws JsonProcessingException {
-        String responseMessage = chatBotService.getOrderHistory(user.getUserId(), orderId);
+        String responseMessage = chatBotService.getOrderHistory(user.getUserDto().getUserId(), orderId);
         return new ChatBotRequestDto(responseMessage);
         // return new ChatBotRequestDto(responseMessage);
     }
 
     @GetMapping("/refund")
     public ChatBotRequestDto getRefundableOrder(
-            @AuthenticationPrincipal UserDto user,
+            @AuthenticationPrincipal UserContext user,
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = false, name = "orderId") String orderId
     ) throws JsonProcessingException {
         if (orderId == null) {
-            String responseMessage = chatBotService.getRefundableOrderList(user.getUserId());
+            String responseMessage = chatBotService.getRefundableOrderList(user.getUserDto().getUserId());
             return new ChatBotRequestDto(responseMessage);
         }
-        String responseMessage = chatBotService.getRefundableOrder(user.getUserId(), orderId);
+        String responseMessage = chatBotService.getRefundableOrder(user.getUserDto().getUserId(), orderId);
         return new ChatBotRequestDto(responseMessage);
     }
 

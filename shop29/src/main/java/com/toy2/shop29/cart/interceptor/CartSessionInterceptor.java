@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.interceptor;
 
 import com.toy2.shop29.cart.service.CartMergeService;
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
@@ -48,7 +49,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
             Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext()
                     .getAuthentication();
 
-            UserDto userDto = checkAuthentication(authentication);
+            UserDto userDto  = checkAuthentication(authentication);
             String guestId = null;
 
             // 비로그인 연장
@@ -105,7 +106,8 @@ public class CartSessionInterceptor implements HandlerInterceptor {
         if (authentication != null && authentication.isAuthenticated()) {
             // 인증된 사용자가 anonymousUser가 아닌지 확인
             if (!authentication.getPrincipal().equals("anonymousUser")) {
-                return (UserDto) authentication.getPrincipal();
+                UserContext userContext = (UserContext) authentication.getPrincipal();
+                return userContext.getUserDto();
             }
         }
         return null;

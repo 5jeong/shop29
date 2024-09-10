@@ -9,6 +9,7 @@ import com.toy2.shop29.qna.service.qna.QnaService;
 import com.toy2.shop29.qna.service.qnaanswer.QnaAnswerService;
 import com.toy2.shop29.qna.service.qnatype.QnaTypeService;
 import com.toy2.shop29.qna.util.QnaPagingHandler;
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.service.user.UserService;
 import jakarta.validation.Valid;
@@ -31,7 +32,7 @@ public class QnaController {
     private QnaTypeService qnaTypeService;
     private UserService userService;
     private QnaAnswerService qnaAnswerService;
-    private final String ROLE_ADMIN = "관리자";
+    private final String ROLE_ADMIN = "ROLE_ADMIN";
 
     public QnaController(QnaService qnaService, QnaTypeService qnaTypeService, UserService userService, QnaAnswerService qnaAnswerService) {
         this.qnaService = qnaService;
@@ -42,7 +43,7 @@ public class QnaController {
 
     @GetMapping("/form")
     String getQnaForm(
-            @AuthenticationPrincipal UserDto userDto, Model model){
+            @AuthenticationPrincipal UserContext userContext, Model model){
         // key : 부모 문의유형 이름, value : 자식 문의유형 리스트
         Map<String,List<QnaTypeDto>> qnaTypeMap = qnaTypeService.findAllWithParentForUser();
         model.addAttribute("qnaTypeMap", qnaTypeMap);
@@ -53,18 +54,18 @@ public class QnaController {
 
         // 사용자 정보
 //        UserDto userDto = userService.findById(loginUser);
-        model.addAttribute("userDto", userDto);
+        model.addAttribute("userDto", userContext.getUserDto());
 
         return "qna/qnaForm";
     }
 
     @GetMapping("/qna-list")
     String getQnaList(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "pageNo",defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize",defaultValue = "10") int pageSize,
             Model model){
-//        UserDto userDto = userService.findById(loginUser);
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(userRole.equals(ROLE_ADMIN)){
@@ -95,13 +96,13 @@ public class QnaController {
 
     @GetMapping("/admin/qna-list")
     String getQnaListForAdmin(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "pageNo",defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize",defaultValue = "10") int pageSize,
             @RequestParam(name = "qnaTypeId",required = false) String qnaTypeId,
             @RequestParam(name = "isAnswered",required = false) Boolean isAnswered,
             Model model){
-//        UserDto userDto = userService.findById(userDto.getUserId());
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(!userRole.equals(ROLE_ADMIN)){
@@ -128,10 +129,10 @@ public class QnaController {
 
     @GetMapping("/answer")
     String getAnswerForm(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaId", required = true) int qnaId,
             Model model){
-//        UserDto userDto = userService.findById(loginUser);
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(!userRole.equals(ROLE_ADMIN)){
@@ -146,9 +147,10 @@ public class QnaController {
 
     @PostMapping
     ResponseEntity<String> postQna(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @ModelAttribute @Valid QnaCreateRequest qnaCreateRequest){
         try{
+            UserDto userDto = userContext.getUserDto();
             qnaService.createQna(qnaCreateRequest, userDto.getUserId());
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -167,10 +169,11 @@ public class QnaController {
     @DeleteMapping
     @ResponseBody
     ResponseEntity<String> deleteQna(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name= "qnaId",required = true) int qnaId
     ){
         try{
+            UserDto userDto = userContext.getUserDto();
             qnaService.deleteQna(qnaId, userDto.getUserId());
         }catch (RuntimeException e){
             e.printStackTrace();
@@ -183,10 +186,11 @@ public class QnaController {
     @PostMapping("/answer")
     @ResponseBody
     ResponseEntity<String> postAnswer(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaId", required = true) int qnaId,
             @RequestParam(name = "answerContent", required = true) String answerContent){
         try{
+            UserDto userDto = userContext.getUserDto();
             qnaAnswerService.createQnaAnswer(qnaId, userDto.getUserId(), answerContent);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -198,10 +202,11 @@ public class QnaController {
     @PutMapping("/answer")
     @ResponseBody
     ResponseEntity<String> putAnswer(
-            @AuthenticationPrincipal UserDto userDto,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaAnswerId", required = true) int qnaAnswerId,
             @RequestParam(name = "answerContent", required = true) String answerContent){
         try{
+            UserDto userDto = userContext.getUserDto();
             qnaAnswerService.updateQnaAnswer(qnaAnswerId, userDto.getUserId(), answerContent);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

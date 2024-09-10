@@ -49,5 +49,14 @@ public interface UserMapper {
 
     // 테스트용 메서드 - 작성자 : 김정민(24.08.16)
     int updateUserRoleForTest(Map<String,Object> map);
+
+
+    // 소셜 로그인 사용자 저장
+    int insertSocialUser(UserDto userDto);
+
+    // provider와 providerId로 소셜 로그인 사용자 조회
+    UserDto findByProviderId( String providerId);
+
+    int updateUserImage(@Param("userId") String userId,@Param("userImage") String userImage);
 }
 

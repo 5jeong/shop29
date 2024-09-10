@@ -1,6 +1,7 @@
 package com.toy2.shop29.order.interceptor;
 
 import com.toy2.shop29.order.service.OrderService;
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,8 @@ public class OrderSessionInterceptor implements HandlerInterceptor {
         Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext()
                 .getAuthentication();
 
-        UserDto userDto = (UserDto) authentication.getPrincipal();
+        UserContext userContext = (UserContext) authentication.getPrincipal();
+        UserDto userDto = userContext.getUserDto();
         String userId = userDto.getUserId();
         String tid = (String) session.getAttribute("tid");
 
