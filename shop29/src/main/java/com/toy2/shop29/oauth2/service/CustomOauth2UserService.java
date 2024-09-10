@@ -65,6 +65,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             newUser.setUserId(oAuth2Response.getProviderId());  // 소셜 로그인 제공자의 고유 ID 사용
             newUser.setUserName(oAuth2Response.getName());      // 소셜 로그인에서 제공된 이름
             newUser.setEmail(oAuth2Response.getEmail());        // 소셜 로그인에서 제공된 이메일
+            newUser.setUserRole("ROLE_USER");
             newUser.setJoinType(oAuth2Response.getProvider());  // 소셜 로그인 제공자 정보 (google, naver, kakao 등)
             newUser.setProviderId(oAuth2Response.getProviderId());
             newUser.setPassword(UUID.randomUUID().toString().substring(0, 10));  // 비밀번호는 더미 값(소셜로그인에서는 필요없음)
