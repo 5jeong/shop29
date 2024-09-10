@@ -56,6 +56,7 @@
 <body>
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="header">
+    <div th:include="~{fragments/bot :: bot}"></div>
     <div class="container-fluid">
         <a class="navbar-brand" href="/" th:text="'29CM'">29CM</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
