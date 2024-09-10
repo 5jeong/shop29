@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.toy2.shop29.chatBot.domain.ChatBotRequestDto;
 import com.toy2.shop29.chatBot.service.ChatBotService;
 import com.toy2.shop29.users.domain.UserContext;
-import com.toy2.shop29.users.domain.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,7 @@ public class ChatBotController {
             @CookieValue(name = "guestId", required = false) String guestId,
             @RequestBody ChatBotRequestDto messageRequest
     ) throws JsonProcessingException {
-        String userInfo = getUserInfo(user.getUserDto(), guestId);
+        String userInfo = getUserInfo(user, guestId);
         String userMessage = messageRequest.getMessage();
 
         String responseMessage = chatBotService.sendMessage(userInfo, userMessage);
@@ -68,7 +67,7 @@ public class ChatBotController {
     }
 
     // 로그인 비로그인 검증
-    public String getUserInfo(UserDto user, String guestId) {
-        return (user != null) ? user.getUserId() : guestId;
+    public String getUserInfo(UserContext user, String guestId) {
+        return (user != null) ? user.getUserDto().getUserId() : guestId;
     }
 }
