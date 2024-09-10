@@ -30,10 +30,10 @@ public class ChatBotController {
     @GetMapping("/order-history")
     public ChatBotRequestDto requestOrderHistory(
             @AuthenticationPrincipal UserContext user,
-            @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = true, name = "id") String orderId
     ) throws JsonProcessingException {
-        String responseMessage = chatBotService.getOrderHistory(user.getUserDto().getUserId(), orderId);
+        String userInfo = getUserInfo(user, "");
+        String responseMessage = chatBotService.getOrderHistory(userInfo, orderId);
         return new ChatBotRequestDto(responseMessage);
         // return new ChatBotRequestDto(responseMessage);
     }
@@ -41,21 +41,19 @@ public class ChatBotController {
     @GetMapping("/refund")
     public ChatBotRequestDto getRefundableOrder(
             @AuthenticationPrincipal UserContext user,
-            @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = false, name = "orderId") String orderId
     ) throws JsonProcessingException {
+        String userInfo = getUserInfo(user, "");
         if (orderId == null) {
-            String responseMessage = chatBotService.getRefundableOrderList(user.getUserDto().getUserId());
+            String responseMessage = chatBotService.getRefundableOrderList(userInfo);
             return new ChatBotRequestDto(responseMessage);
         }
-        String responseMessage = chatBotService.getRefundableOrder(user.getUserDto().getUserId(), orderId);
+        String responseMessage = chatBotService.getRefundableOrder(userInfo, orderId);
         return new ChatBotRequestDto(responseMessage);
     }
 
     @GetMapping("/product")
     public ChatBotRequestDto getProduct(
-            @SessionAttribute(name = "loginUser", required = false) String userId,
-            @CookieValue(name = "guestId", required = false) String guestId,
             @RequestParam(required = false, name = "productId") String productId
     ) throws JsonProcessingException {
         if (productId == null) {
