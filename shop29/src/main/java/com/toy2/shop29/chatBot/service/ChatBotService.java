@@ -13,6 +13,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class ChatBotService {
@@ -39,7 +42,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-        
+
         return response.getBody();
     }
 
@@ -57,7 +60,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        
+
         return response.getBody();
     }
 
@@ -74,7 +77,7 @@ public class ChatBotService {
 
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        
+
         return response.getBody();
     }
 
@@ -91,7 +94,7 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        
+
         return response.getBody();
     }
 
@@ -107,7 +110,7 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        
+
         return response.getBody();
     }
 
@@ -124,7 +127,22 @@ public class ChatBotService {
                 .toUriString();
         // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        
+
+        return response.getBody();
+    }
+
+    public String createAutoQnaAnswer(String qnaContent) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 실제 Flask 서버와 연결하기 위한 URL
+        String url = "http://0.0.0.0:8082/create-qna-answer";
+
+        Map<String,String> map = new HashMap<>();
+        map.put("user_qna", qnaContent);
+
+        // Flask 서버로 데이터를 전송하고 받은 응답 값을 반환
+        ResponseEntity<String> response = restTemplate.postForEntity(url, map, String.class);
+
         return response.getBody();
     }
 }

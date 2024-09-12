@@ -15,7 +15,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: auto;
             background: white;
             padding: 20px;
@@ -28,10 +28,18 @@
             margin-bottom: 20px;
         }
 
+        .title{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 230px
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            white-space: nowrap;
         }
 
         th, td {
@@ -39,6 +47,7 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
             font-size: 14px;
+            width: 100px;
         }
 
         th {
@@ -165,7 +174,7 @@
         <thead>
         <tr>
             <th>상담구분</th>
-            <th>상담제목</th>
+            <th class="title">상담제목</th>
             <th>회원ID</th>
             <th>작성일</th>
             <th>답변자ID</th>
@@ -176,7 +185,7 @@
         <tbody>
         <tr th:each="qna : ${qnaResponses}" th:data-qna-id="${qna.getQnaId()}" th:onclick="'window.location.href=\'/qna/answer?qnaId=' + ${qna.getQnaId()} + '\''">
             <td th:text="${qna.getQnaTypeName()}">상담구분</td>
-            <td th:text="${qna.getTitle()}">상담제목</td>
+            <td class="title" th:text="${qna.getTitle()}">상담제목</td>
             <td th:text="${qna.getUserId()}">회원ID</td>
             <td th:text="${qna.getCreatedTime()}">작성일</td>
             <td th:text="${qna.getAdminId()}">답변자ID</td>
