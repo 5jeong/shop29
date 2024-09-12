@@ -279,6 +279,7 @@
 }
 
 .order-product-btn {
+    display:block;
     animation: 2000ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
     padding: 10px 20px;
     text-align: center;
