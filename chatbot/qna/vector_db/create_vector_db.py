@@ -7,6 +7,8 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from dotenv import load_dotenv
 
+load_dotenv()
+
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_DATA_PATH = os.path.join(os.path.dirname(CUR_DIR), ".." , "faq_data.json")
 
