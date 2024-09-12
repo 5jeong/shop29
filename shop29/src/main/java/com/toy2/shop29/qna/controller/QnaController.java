@@ -1,5 +1,6 @@
 package com.toy2.shop29.qna.controller;
 
+import com.toy2.shop29.chatBot.service.ChatBotService;
 import com.toy2.shop29.qna.domain.QnaTypeDto;
 import com.toy2.shop29.qna.domain.request.QnaCreateRequest;
 import com.toy2.shop29.qna.domain.response.QnaAdminResponse;
@@ -30,14 +31,14 @@ public class QnaController {
 
     private QnaService qnaService;
     private QnaTypeService qnaTypeService;
-    private UserService userService;
     private QnaAnswerService qnaAnswerService;
+    private ChatBotService chatBotService;
     private final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    public QnaController(QnaService qnaService, QnaTypeService qnaTypeService, UserService userService, QnaAnswerService qnaAnswerService) {
+    public QnaController(QnaService qnaService, QnaTypeService qnaTypeService, ChatBotService chatBotService, QnaAnswerService qnaAnswerService) {
         this.qnaService = qnaService;
+        this.chatBotService = chatBotService;
         this.qnaTypeService = qnaTypeService;
-        this.userService = userService;
         this.qnaAnswerService = qnaAnswerService;
     }
 
@@ -123,6 +124,28 @@ public class QnaController {
         model.addAttribute("ph", pagingHandler);
 
         return "qna/qnaAdminList";
+    }
+
+    @ResponseBody
+    @PostMapping("/admin/create-auto-answer")
+    String createAutoAnswer(
+            @AuthenticationPrincipal UserContext userContext,
+            @RequestParam(name = "qnaId", required = true) int qnaId
+    ){
+        UserDto userDto = userContext.getUserDto();
+        String userRole = userDto.getUserRole();
+
+        // 관리자 권한이 없을 경우 리다이렉트
+        if(!userRole.equals(ROLE_ADMIN)){
+            return "redirect:/qna/qna-list";
+        }
+
+        // 문의글 내용 조회
+        QnaDetailResponse qnaDetailResponse = qnaService.findQnaDetail(qnaId);
+        String qnaContent = qnaDetailResponse.getContent();
+
+        // Flask 서버에 답변생성 요청
+        return chatBotService.createAutoQnaAnswer(qnaContent);
     }
 
 

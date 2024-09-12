@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template,Response
+from flask import Flask, request,Response, jsonify
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ from sqlalchemy import text
 from database import get_db
 from refund import get_refundable_orders, get_refundable_order_history
 from product import get_product_search, search_product
-from qna.qna import get_qna_search
+from qna.qna import get_qna_search, create_qna_answer
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ def chat():
         chat_answer, can_answer = qna_search_rst['chat_answer'], qna_search_rst['can_answer']
         if can_answer:
             return Response(chat_answer, content_type="text/plain; charset=utf-8")
-        
+
     response_message = process_question(user_info, message)
     return Response(response_message, content_type="text/plain; charset=utf-8")
 
@@ -86,14 +86,22 @@ def refund():
         return Response(get_refundable_orders(user_id), content_type="text/plain; charset=utf-8")
     else:
         return Response(get_refundable_order_history(user_id, order_id), content_type="text/plain; charset=utf-8")
-    
+
 @app.route('/product', methods=['GET'])
 def product():
     product_id = request.args.get('productId')
     if not product_id:
-        return Response(get_product_search(), content_type="text/plain; charset=utf-8")    
-    return Response(search_product(product_id), content_type="text/plain; charset=utf-8")    
-    
+        return Response(get_product_search(), content_type="text/plain; charset=utf-8")
+    return Response(search_product(product_id), content_type="text/plain; charset=utf-8")
+
+@app.route('/create-qna-answer', methods=['POST'])
+def create_auto_qna_answer():
+    user_qna = request.get_json()["user_qna"]
+    ans = create_qna_answer(user_qna)
+
+    return Response(ans, content_type='text/html; charset=utf-8')
+
+
 def is_user(user_info):
     db = next(get_db())
     query = text("SELECT count(*) FROM User WHERE user_id = :user_id")
