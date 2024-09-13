@@ -1,9 +1,8 @@
 package com.toy2.shop29.order.dao;
 
-import com.toy2.shop29.order.domain.CurrentOrderDTO;
-import com.toy2.shop29.order.domain.OrderItemDTO;
-import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.common.ProductItem;
+import com.toy2.shop29.order.domain.*;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -113,13 +112,14 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception {
+    public int insertUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId, Long productPrice) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("orderId", orderId);
         params.put("userId", userId);
         params.put("productId", productId);
         params.put("quantity", quantity);
         params.put("productOptionId", productOptionId);
+        params.put("productPrice", productPrice);
         return session.insert(namespace + "insertUserOrderHistoryItem", params);
     }
 
@@ -152,7 +152,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<OrderHistoryDTO> getOrderHistoryInfoById(String orderId) throws Exception {
+    public List<OrderHistoryResponseDTO> getOrderHistoryInfoById(String orderId) throws Exception {
         return session.selectList(namespace + "getOrderHistoryInfoById", orderId);
     }
 
@@ -246,7 +246,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<OrderItemDTO> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
+    public List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("tid", tid);
@@ -266,5 +266,52 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public int deleteAllOrderHistoryItem() throws Exception {
         return session.delete(namespace + "deleteAllOrderHistoryItem");
+    }
+
+    @Override
+    public int updateUserOrderHistory(String orderStatus, Long totalPrice, String orderId, String userId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderStatus", orderStatus);
+        params.put("totalPrice", totalPrice);
+        params.put("orderId", orderId);
+        params.put("userId", userId);
+        return session.update(namespace + "updateUserOrderHistory", params);
+    }
+
+    @Override
+    public OrderHistoryItemDto getOrderHistoryProduct(String userId, String orderId, Long productId, Long productOptionId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("orderId", orderId);
+        params.put("productId", productId);
+        params.put("productOptionId", productOptionId);
+        return session.selectOne(namespace + "getOrderHistoryProduct", params);
+    }
+
+    @Override
+    public int updateOrderHistoryItemStatus(String userId, String orderId, Long productId, Long productOptionId, String productOrderStatus) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("orderId", orderId);
+        params.put("productId", productId);
+        params.put("productOptionId", productOptionId);
+        params.put("productOrderStatus", productOrderStatus);
+        return session.update(namespace + "updateOrderHistoryItemStatus", params);
+    }
+
+    @Override
+    public OrderHistoryDTO getOrderHistoryByUserIdAndOrderId(String userId, String orderId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("orderId", orderId);
+        return session.selectOne(namespace + "getOrderHistoryByUserIdAndOrderId", params);
+    }
+
+    @Override
+    public int countUserOrderHistoryItemPaid(String userId, String tid) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", userId);
+        params.put("tid", tid);
+        return session.selectOne(namespace + "countUserOrderHistoryItemPaid", params);
     }
 }

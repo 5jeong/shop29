@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accordian UI</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .answer-box {
+            border: 2px solid #c1c0bf;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .accordian {
+            margin-top: 20px;
+        }
+
+        .accordian-toggle {
+            background-color: #909090;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .accordian-toggle:hover {
+            background-color: #555555;
+        }
+
+        .accordian-content {
+            display: none;
+            background-color: #dad1d1;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #b4b4b4;
+            margin-bottom: 10px;
+        }
+
+        .accordian-content p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="answer-box">
+        <p>
+            {{answer}}
+        </p>
+    </div>
+
+    <div class="accordian">
+        {% for doc in related_documents %}
+        <button class="accordian-toggle">{{doc['title']}}<span>&#9660;</span></button>
+        <div class="accordian-content">
+            <p>
+                {{doc['contents']}}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

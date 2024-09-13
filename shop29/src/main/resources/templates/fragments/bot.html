@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Chatbot</title>
+</head>
+<body>
+<div class="chatbot-container" th:fragment="bot">
+    <div class="chatbot-button-container">
+        <button type="button" class="chatbot-toggle-btn">
+            <img src="/images/openai.svg" alt="OpenAI logo" class="chatbot-logo">
+        </button>
+        <div class="chatbot-chatbox resize-drag">
+            <div class="chatbot-messages">
+                <div class="select-option-container">
+                    <div class="message assistant">
+                        <strong>Assistant:</strong>
+                        <p>안녕하세요! 29CM 쇼핑몰입니다.</p>
+                        <p>무엇을 도와드릴까요?</p>
+                    </div>
+                    <div class="option-container">
+                        <button onclick="requestProduct(this)" class="option-btn">상품 검색
+                        </button>
+                        <button onclick="requestQnaList(this)" class="option-btn">문의 내역
+                        </button>
+                        <button onclick="requestUserAllHistory(this)" class="option-btn">주문 내역
+                        </button>
+                        <button onclick="requestUserRefundableList(this)" class="option-btn">환불 신청
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input-container">
+                <button class="menu-btn">메뉴</button>
+                <div class="chatbot-input-form">
+                    <label class="chatbot-input-label">
+                        <input type="text" name="message" class="chatbot-input" placeholder="채팅을 입력하세요" required/>
+                    </label>
+                    <button type="submit" class="chatbot-submit-btn">보내기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" th:href="@{/css/chatbot.css}"/>
+    <script type="text/javascript" th:src="@{/js/bot.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script type="module">
+        interact('.resize-drag')
+            .resizable({
+                edges: {top: true, left: true, bottom: true, right: true},
+                listeners: {
+                    move: function (event) {
+                        let {x, y} = event.target.dataset
+
+                        x = (parseFloat(x) || 0) + event.deltaRect.left
+                        y = (parseFloat(y) || 0) + event.deltaRect.top
+
+                        Object.assign(event.target.style, {
+                            width: `${event.rect.width}px`,
+                            height: `${event.rect.height}px`,
+                            transform: `translate(${x}px, ${y}px)`
+                        })
+
+                        Object.assign(event.target.dataset, {x, y})
+                    }
+                }, modifiers: [
+                    // minimum size
+                    interact.modifiers.restrictSize({
+                        min: {width: 350, height: 500},
+                        // max: {width: 700, height: 700}
+                    }),
+                ],
+
+                inertia: true
+            })
+
+    </script>
+</div>
+</body>
+</html>

@@ -6,6 +6,59 @@
     <meta charset="utf-8">
     <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <style>
+
+        /* 소셜 로그인 버튼 스타일 */
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .social-login a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s ease-in-out;
+            width: 100%; /* 버튼의 너비를 부모 요소에 맞게 설정 */
+        }
+
+        .social-login a img {
+            height: 40px; /* 이미지 높이를 더 크게 조정 */
+            margin-right: 10px;
+            width: auto; /* 이미지 비율 유지 */
+        }
+
+        .kakao-login {
+            background-color: #FEE500;
+            color: #381E1F;
+        }
+
+        .kakao-login:hover {
+            background-color: #E0C200;
+        }
+
+        .naver-login {
+            background-color: #1EC800;
+        }
+
+        .naver-login:hover {
+            background-color: #17A300;
+        }
+
+        .google-login {
+            background-color: #4285F4;
+        }
+
+        .google-login:hover {
+            background-color: #357AE8;
+        }
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #f2f2f2;
@@ -41,6 +94,26 @@
         .form-control:focus {
             box-shadow: none;
             border-color: #555;
+        }
+
+        /* 링크 배치 및 스타일 */
+        .link-group {
+            display: flex;
+            justify-content: center; /* 중앙 정렬 */
+            gap: 15px; /* 링크 간의 간격 설정 */
+            margin-top: 20px; /* 위쪽 여백 추가 */
+        }
+
+        .link-group a {
+            font-size: 14px;
+            color: #3e4144;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .link-group a:hover {
+            color: #0056b3;
         }
 
         .btn-primary {
@@ -111,31 +184,52 @@
     <div class="text-center">
         <h2>로그인</h2>
     </div>
-    <form th:action th:object="${loginForm}" method="post">
+    <form th:action = "@{/login}" th:object="${loginForm}" method="post">
 
-        <div th:if="${loginError != null}">
-            <p class="field-error" th:text="${loginError}"></p>
+<!--        &lt;!&ndash; 인증 실패 시 에러 메시지 표시 &ndash;&gt;-->
+<!--        <div th:if="${error != null}">-->
+<!--            <p class="field-error" th:text="${error}"></p>-->
+<!--        </div>-->
+
+        <!-- 로그인 예외 발생 시 상세한 에러 메시지 표시 -->
+        <div th:if="${param.error}">
+            <p class="field-error" th:text="${exception}"></p>
         </div>
 
         <div class="mb-3">
             <input type="text" id="userId" th:field="*{userId}" class="form-control" placeholder="아이디를 입력해주세요."
-                   th:errorclass="field-error">
+                   th:errorclass="field-error" >
             <div class="field-error" th:errors="*{userId}"></div>
         </div>
         <div class="mb-3">
             <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력해주세요."
-                   th:errorclass="field-error">
+                   th:errorclass="field-error" >
             <span class="toggle-password">👁</span>
             <div class="field-error" th:errors="*{password}"></div>
         </div>
 
         <button class="w-100 btn btn-primary btn-lg mt-3" type="submit">로그인</button>
 
-        <div>
-            <a th:href="@{/user/signup}" class="link">회원가입</a>
-            <a th:href="@{/user/findId}" class="link">아이디 찾기</a>
-            <a th:href="@{/user/findPassword}" class="link">비밀번호 찾기</a>
+        <!-- 소셜 로그인 버튼 섹션 -->
+        <div class="social-login">
+            <a th:href="@{/oauth2/authorization/kakao}" class="kakao-login">
+                <img src="/images/kakao-login.png" alt="카카오 로고">
+            </a>
+            <a th:href="@{/oauth2/authorization/naver}" class="naver-login">
+                <img src="/images/naver-login.png" alt="네이버 로고">
+            </a>
+            <a th:href="@{/oauth2/authorization/google}" class="google-login">
+                <img src="/images/google-login.png" alt="구글 로고">
+            </a>
         </div>
+
+        <!-- 회원가입, 아이디 찾기, 비밀번호 찾기 링크 -->
+        <div class="link-group">
+            <a th:href="@{/user/signup}">회원가입</a>
+            <a th:href="@{/user/findId}">아이디 찾기</a>
+            <a th:href="@{/user/findPassword}">비밀번호 찾기</a>
+        </div>
+
 
     </form>
 

@@ -40,3 +40,5 @@ out/
 application.properties
 /src/main/resources/application.properties
 /src/main/resources/firebase-admin-key.json
+
+chroma-persist/

@@ -9,7 +9,12 @@ import java.util.List;
 
 public interface QnaService {
 
-    // [READ] 1:1 문의 전체조회
+    List<QnaResponse> findQnaListAll(String userId) throws RuntimeException;
+
+    /**
+     * [READ] 1:1 문의 전체조회
+     * @param limit 0이면 개수제한 X & offset 미적용
+     */
     List<QnaResponse> findQnaList(String userId, int limit, int offset) throws RuntimeException;
 
     // [READ] 1:1 문의 전체조회 <- 관리자 페이지 정보제공 목적

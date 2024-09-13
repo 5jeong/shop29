@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.dao;
 
 import com.toy2.shop29.cart.domain.response.CartDto;
+import com.toy2.shop29.common.ProductItem;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -108,4 +109,8 @@ public class CartDaoImpl implements CartDao {
         return session.selectOne(namespace + "countCartItem");
     }
 
+    @Override
+    public List<ProductItem> selectUserCartItem(String userId) throws Exception {
+        return session.selectList(namespace + "selectUserCartItem", userId);
+    }
 }

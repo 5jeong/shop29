@@ -9,7 +9,6 @@ import java.util.Map;
 
 public interface ProductDao {
 
-
     //제품ID로 상품의 분류 정보까지 조회
     ProductWithCategoriesDto selectProductWithCategories(int productId);
 
@@ -40,9 +39,14 @@ public interface ProductDao {
 
     int updateProductStock(Long productId, Long optionValueId, Long quantity);
 
+    Long getProductPriceByProductId(Long productId);
+
+
     //2-1.id로 product 1개만 read
     ProductDto select(int product_id);
 
     int count();
 
+    // write
+    int insert(ProductDto product);
 }

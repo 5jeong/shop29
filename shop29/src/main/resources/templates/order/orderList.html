@@ -1,12 +1,12 @@
-<div th:insert="fragments/header :: header"></div>
+<div th:insert="~{fragments/header :: header}"></div>
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Order History</title>
+    <title>주문 내역</title>
     <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
-    <!--    <link rel="stylesheet" th:href="@{/styles.css}"/>-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* 기본 스타일 초기화 */
         * {
@@ -71,14 +71,17 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
         }
 
         .order-items ul li p {
             margin: 5px 0;
+            flex: 1;
         }
 
-        .order-items ul li:nth-child(odd) {
-            background-color: #f1f1f1;
+        .order-items ul li input[type="checkbox"] {
+            margin-right: 10px;
         }
 
         .shipping-info, .payment-info {
@@ -114,9 +117,86 @@
             }
         }
 
+        .list-item {
+            list-style: none;
+            padding: 20px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+        }
+
+        .list-item__label {
+            margin: 0 20px 0 10px;
+            width: 20px;
+        }
+
+        .list-item__checkbox {
+            transform: scale(1.5);
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .list-item__details p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .list-item__details p span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .list-item__details p.item-name {
+            font-size: 18px;
+        }
+
+        .list-item__details p.item-name span {
+            color: #555;
+        }
+
+        .list-item__details p.total-price {
+            font-size: 18px;
+            color: #007bff;
+
+            span {
+                font-size: 18px;
+                color: #007bff !important;
+            }
+        }
+
+
+        .refund-btn {
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-image: linear-gradient(to right, #FF8008 0%, #FFC837  51%, #FF8008  100%);
+            margin: 10px;
+            padding: 10px 30px;
+            text-align: center;
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .refund-btn:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+        }
+
+
+
     </style>
 </head>
-<body>
+<body><!-- HTML 헤더 부분은 이전과 동일합니다 -->
 <div class="container">
     <h1>주문 내역</h1>
 
@@ -129,19 +209,29 @@
             <div class="order-items">
                 <h3>주문 상품</h3>
                 <ul>
-                    <li th:each="item : ${order.orderItems}">
-                        <p>상품명: <span th:text="${item.productName}">[상품명]</span></p>
-                        <p>상품 옵션: <span th:text="${item.optionValueName}">[상품 설명]</span></p>
-                        <p>수량: <span th:text="${item.quantity}">1</span></p>
-                        <p>가격: <span th:text="${item.price}">39,900</span> 원</p>
-                        <p>총액: <span th:text="${item.price * item.quantity}">39,900</span> 원</p>
+                    <li th:each="item : ${order.orderItems}" class="list-item">
+                        <!-- 체크박스 추가 -->
+                        <label class="list-item__label">
+                            <input class="list-item__checkbox" th:if=" ${item.productOrderStatus== null}"
+                                   type="checkbox"
+                                   name="selectedItems" th:value="${item.productId + '|' + item.productOptionId + '|' +
+                            item.quantity}">
+                        </label>
+                        <div class="list-item__details">
+                            <p class="item-name">상품명: <span th:text="${item.productName}">[상품명]</span></p>
+                            <p>상품 옵션: <span th:text="${item.optionValueName}">[상품 설명]</span></p>
+                            <p>수량: <span th:text="${item.quantity}">1</span></p>
+                            <p>가격: <span th:text="${item.price}">39,900</span> 원</p>
+                            <p>총액: <span th:text="${item.price * item.quantity}">39,900</span> 원</p>
+                            <p class="total-price" th:if="${item.productOrderStatus == '취소 완료'}"><span
+                                    th:text="${item.productOrderStatus}"></span></p>
+                        </div>
                     </li>
                 </ul>
             </div>
 
             <div class="shipping-info">
                 <h3>배송 정보</h3>
-                <!--                <p>배송 상태: <span th:text="${order.deliveryStatus}">배송 중</span></p>-->
                 <p>배송지: <span th:text="${order.shippingAddress.recipientName}">서울시 강남구</span></p>
                 <p>주소: <span th:text="${order.shippingAddress.address + ' ' + order.shippingAddress.addressDetail}">서울시 강남구</span>
                 </p>
@@ -152,9 +242,14 @@
             <div class="payment-info">
                 <h3>결제 정보</h3>
                 <p>결제 방법: <span th:text="${order.payMethod}">카카오페이</span></p>
-                <p>총 상품 금액: <span th:text="${order.totalPrice}">39,900</span> 원</p>
+                <p>총 결제 금액: <span th:text="${order.totalPrice}">39,900</span> 원</p>
                 <p>주문 상태: <span th:text="${order.orderStatus}">[주문 상태]</span></p>
             </div>
+
+            <!-- 데이터 속성에 orderId를 저장하고, 버튼 클릭 시 JavaScript에서 가져옴 -->
+            <button class="refund-btn" th:if="${order.orderStatus != '환불 완료'}" type="button" th:data-order-id="${order.orderId}"
+                    onclick="submitRefundRequest(this)">환불 신청
+            </button>
 
             <hr/>
         </div>
@@ -164,7 +259,50 @@
     <div th:if="${orderHistory == null || #lists.size(orderHistory) == 0}">
         <p>주문 내역이 없습니다.</p>
     </div>
-
 </div>
-</body>
-</html>
+
+<script>
+    function submitRefundRequest(button) {
+        var orderId = button.getAttribute('data-order-id');
+        var selectedItems = [];
+        var checkboxes = document.querySelectorAll('input[name="selectedItems"]:checked');
+
+        checkboxes.forEach(function (checkbox) {
+            var itemData = checkbox.value.split('|');
+            selectedItems.push({
+                productId: itemData[0],
+                productOptionId: itemData[1],
+                quantity: itemData[2]
+            });
+        });
+
+        if (selectedItems.length === 0) {
+            alert("환불 신청할 상품을 선택해 주세요.");
+            return;
+        }
+
+        var refundData = {
+            orderId: orderId,
+            productItems: selectedItems
+        };
+        $.ajax({
+            url: '/order/refund',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(refundData),
+            success: function (response) {
+                // 응답이 JSON 형식일 경우 그대로 사용하고, 문자열일 경우 파싱
+                const res = typeof response === 'string' ? JSON.parse(response) : response;
+
+                // 응답의 status 값이 success일 경우
+                if (res.status === 'success') {
+                    alert(res.message);
+                    location.reload();
+                } else {
+                    // status가 success가 아닌 경우 (옵션 처리)
+                    alert(res.message);
+                }
+            },
+        });
+    }
+</script>

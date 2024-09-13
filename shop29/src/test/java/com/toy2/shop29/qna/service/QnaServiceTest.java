@@ -114,7 +114,7 @@ public class QnaServiceTest {
         assertTrue(userMapper.insertUser(userRegisterDto1) == 1);
         Map<String,Object> map = new HashMap<>();
         map.put("userId", ADMIN_ID);
-        map.put("userRole", "관리자");
+        map.put("userRole", "ROLE_ADMIN");
         assertTrue(userMapper.updateUserRoleForTest(map) == 1);
 
         UserRegisterDto userRegisterDto2 = new UserRegisterDto();

@@ -17,6 +17,13 @@
         WHERE email = #{email};
     </select>
 
+    <insert id="insertWithdrawalUser" parameterType="map">
+        INSERT INTO UserWithdrawal (user_id, reason_primary, reason_secondary)
+        VALUES (#{userId},
+                #{withdrawalDto.reasonPrimary},
+                #{withdrawalDto.reasonSecondary})
+    </insert>
+
 
     <!-- 핸드폰번호 조회-->
     <select id="findByPhoneNumber" resultType="String">
@@ -99,5 +106,17 @@
         SET `user_role` = #{userRole}
         WHERE `user_id` = #{userId}
     </update>
+
+    <insert id="insertSocialUser" parameterType="com.toy2.shop29.users.domain.UserDto">
+        INSERT INTO user (
+        user_id,password,user_name,email,join_type,provider_id, user_image ) VALUES (
+        #{userId}, #{password}, #{userName}, #{email}, #{joinType}, #{providerId}, #{userImage})
+    </insert>
+
+    <insert id="updateUserImage" parameterType="map">
+        update user
+        set user_image = #{userImage}
+        Where user_id = #{userId}
+    </insert>
 
 </mapper>

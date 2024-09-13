@@ -126,4 +126,10 @@
         DELETE FROM CARTITEM
     </delete>
 
+    <select id="selectUserCartItem" parameterType="String" resultType="com.toy2.shop29.common.ProductItem">
+        SELECT product_id,quantity,product_option_id
+        FROM CartItem
+        WHERE cart_id = (SELECT cart_id FROM Cart WHERE user_id = #{userId})
+    </select>
+
 </mapper>

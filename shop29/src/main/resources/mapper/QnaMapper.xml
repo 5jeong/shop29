@@ -176,7 +176,9 @@
             AND pqt.is_active = #{isActive}
         </if>
         ORDER BY q.created_time DESC
-        LIMIT #{offset} , #{limit}
+        <if test="limit != 0">
+            LIMIT #{offset} , #{limit}
+        </if>
         )  AS qqt
         LEFT JOIN `QnaAnswer` AS qa ON qqt.qna_id = qa.qna_id
         -- 1:1문의의 첨부파일인 경우의 레코드만 가져오기 위해, 서브쿼리 사용

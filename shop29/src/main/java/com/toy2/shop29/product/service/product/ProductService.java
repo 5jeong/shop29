@@ -41,4 +41,6 @@ public interface ProductService {
     //총 상품 개수
     int count();
 
+    Long getProductPriceByProductId(Long productId);
+
 }

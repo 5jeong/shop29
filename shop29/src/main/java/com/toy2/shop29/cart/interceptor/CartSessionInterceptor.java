@@ -1,11 +1,16 @@
 package com.toy2.shop29.cart.interceptor;
 
-import com.toy2.shop29.cart.service.CartService;
+import com.toy2.shop29.cart.service.CartMergeService;
+import com.toy2.shop29.users.domain.UserContext;
+import com.toy2.shop29.users.domain.UserDto;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -14,13 +19,9 @@ import java.util.Date;
 import java.util.Random;
 
 @Component
+@RequiredArgsConstructor
 public class CartSessionInterceptor implements HandlerInterceptor {
-
-    private final CartService cartService;
-
-    public CartSessionInterceptor(CartService cartService) {
-        this.cartService = cartService;
-    }
+    private final CartMergeService cartMergeService;
 
     public static String generateId() {
         // 현재 날짜와 시간을 YYMMDDhhmmss 형식으로 포맷팅
@@ -45,7 +46,10 @@ public class CartSessionInterceptor implements HandlerInterceptor {
             // TODO : 임시아이디
             // session.setAttribute("loginUser", "user001");
 
-            String userId = (String) session.getAttribute("loginUser");
+            Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext()
+                    .getAuthentication();
+
+            UserDto userDto  = checkAuthentication(authentication);
             String guestId = null;
 
             // 비로그인 연장
@@ -66,7 +70,7 @@ public class CartSessionInterceptor implements HandlerInterceptor {
                 }
             }
 
-            if (userId == null && guestId == null) {
+            if (userDto == null && guestId == null) {
                 String uniqueId = generateId();
                 Cookie cookie = new Cookie("guestId", uniqueId);
                 cookie.setMaxAge(60 * 60 * 24 * 7); // 쿠키 유효 기간: 7일
@@ -77,11 +81,16 @@ public class CartSessionInterceptor implements HandlerInterceptor {
 
             // 로그인한 유저uid와 비로그인 guestid가 둘다 존재한다면
             // 비로그인 장바구니를 유저 장바구니로 옮김
-            if (userId != null && guestId != null) {
-                cartService.updateGuestCartToUser(userId, guestId, 1);
+            if (userDto != null && guestId != null) {
+                cartMergeService.updateGuestCartToUser(userDto.getUserId(), guestId);
+                Cookie myCookie = new Cookie("guestId", null);
+                myCookie.setMaxAge(0); // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+                myCookie.setPath("/"); // 모든 경로에서 삭제 됬음을 알린다.
+                response.addCookie(myCookie);
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             HttpSession session = request.getSession(true);
             session.invalidate();
             Cookie myCookie = new Cookie("guestId", null);
@@ -90,5 +99,17 @@ public class CartSessionInterceptor implements HandlerInterceptor {
             response.addCookie(myCookie);
         }
         return true;
+    }
+
+    private static UserDto checkAuthentication(Authentication authentication) {
+        // 인증된 사용자인지 확인
+        if (authentication != null && authentication.isAuthenticated()) {
+            // 인증된 사용자가 anonymousUser가 아닌지 확인
+            if (!authentication.getPrincipal().equals("anonymousUser")) {
+                UserContext userContext = (UserContext) authentication.getPrincipal();
+                return userContext.getUserDto();
+            }
+        }
+        return null;
     }
 }

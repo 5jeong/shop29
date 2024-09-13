@@ -39,14 +39,10 @@ public class EmailController {
     @PostMapping("/verifyCode")
     public ResponseEntity<String> verifyCode(@RequestParam(name = "email") String email,
                                              @RequestParam("code") String code) {
-//        System.out.println("이메일 : " + email);
-//        System.out.println("코드 : " + code);
         boolean isVerified = emailVerificationService.verifyCode(email, code);
         if (isVerified) {
-//            System.out.println("Verification 성공.");
             return ResponseEntity.ok("이메일 인증 성공.");
         } else {
-//            System.out.println("Verification 실패.");
             return ResponseEntity.badRequest().body("이메일 인증 실패. 다시 시도해주세요.");
         }
     }

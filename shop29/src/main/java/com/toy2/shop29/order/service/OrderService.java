@@ -1,10 +1,12 @@
 package com.toy2.shop29.order.service;
 
+import com.toy2.shop29.common.ProductItem;
+import com.toy2.shop29.order.domain.OrderHistoryDTO;
 import com.toy2.shop29.order.domain.OrderItemDTO;
 import com.toy2.shop29.order.domain.ShippingAddressInfoDTO;
-import com.toy2.shop29.order.domain.request.OrderProductDto;
 import com.toy2.shop29.order.domain.request.OrderCompletedRequestDTO;
-import com.toy2.shop29.order.domain.response.OrderHistoryDTO;
+import com.toy2.shop29.order.domain.request.OrderProductDto;
+import com.toy2.shop29.order.domain.response.OrderHistoryResponseDTO;
 import com.toy2.shop29.order.domain.response.OrderPageResponseDTO;
 
 import java.util.List;
@@ -34,7 +36,7 @@ public interface OrderService {
 
     Long getProductPrice(Long productId);
 
-    int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId) throws Exception;
+    int addUserOrderHistoryItem(String orderId, String userId, Long productId, Long quantity, Long productOptionId, Long productPrice) throws Exception;
 
     int insertOrderAddress(String orderId, String userId, ShippingAddressInfoDTO orderAddress) throws Exception;
 
@@ -42,7 +44,7 @@ public interface OrderService {
 
     int updateUserOrderStatus(String userId, String tid, String orderStatus) throws Exception;
 
-    List<OrderHistoryDTO> getOrderHistory(String userId) throws Exception;
+    List<OrderHistoryResponseDTO> getOrderHistory(String userId) throws Exception;
 
     void deleteOrderHistory(String userId, String tid) throws Exception;
 
@@ -58,7 +60,7 @@ public interface OrderService {
 
     int countUserOrderHistoryItem(String userId, String tid) throws Exception;
 
-    List<OrderItemDTO> selectUserOrderHistoryItem (String userId, String tid) throws Exception;
+    List<ProductItem> selectUserOrderHistoryItem(String userId, String tid) throws Exception;
 
     int deleteAllCurrentOrder() throws Exception;
 
@@ -75,4 +77,12 @@ public interface OrderService {
     int countCurrentOrder() throws Exception;
 
     int countCurrentOrderItem() throws Exception;
+
+    Long cancelOrder(String userId, String orderId, List<ProductItem> productItems) throws Exception;
+
+    OrderHistoryDTO getOrderHistoryByUserIdAndOrderId(String userId, String orderId) throws Exception;
+
+    int countUserOrderHistoryItemPaid(String userId, String tid) throws Exception;
+
+    int updateUserOrderHistory(String orderStatus, Long totalPrice, String orderId, String userId) throws Exception;
 }

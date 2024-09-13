@@ -15,4 +15,5 @@ public class OrderItemDTO {
     private int saleRatio;
     private Long productOptionId;
     private String optionValueName;
+    private String productOrderStatus;
 }

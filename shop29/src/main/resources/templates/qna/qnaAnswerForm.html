@@ -8,12 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <title>문의 정보</title>
     <style>
+        /* 모달 배경 및 모달 창 스타일 */
+        .modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f9f9f9;
         }
         .table-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 5px;
@@ -24,6 +57,22 @@
             width: 100%;
             border-collapse: collapse;
         }
+
+        .table-key{
+            min-width: 200px;
+        }
+
+        .table-value{
+            min-width: 200px;
+        }
+
+        pre {
+            white-space: pre-wrap;  /* 자동 줄바꿈 적용 */
+            word-wrap: break-word;  /* 긴 단어도 줄바꿈 */
+            word-break: break-all;  /* 너무 긴 단어는 강제 줄바꿈 */
+        }
+
+
         th, td {
             padding: 12px;
             border: 1px solid #ccc;
@@ -58,6 +107,28 @@
             background-color: #cccccc; /* 비활성화된 버튼 색상 */
             cursor: not-allowed;
         }
+
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loading-overlay div {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
     </style>
     <script>
         function enableAnswerInputForEdit(qnaAnswerId, currentContent) {
@@ -126,7 +197,6 @@
 
         function postAnswer(qnaId) {
             const answerContent = document.getElementById('answer-input').value;
-            console.log(`답변 제출: QnA ID=${qnaId}, 내용=${answerContent}`);
 
             const formData = new FormData();
             formData.append('qnaId', qnaId);           // qnaId 추가
@@ -142,6 +212,46 @@
                     alert('답변 제출에 실패했습니다.');
                 }
             });
+        }
+
+        function createAutoQnaAnswer(qnaId) {
+            const formData = new FormData();
+            formData.append('qnaId', qnaId);  // qnaId 추가
+
+            // 로딩 화면 표시
+            const loadingOverlay = document.getElementById('loading-overlay');
+            loadingOverlay.style.display = 'flex';
+
+            fetch(`/qna/admin/create-auto-answer`, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    alert('자동 답변생성에 실패하였습니다.');
+                }
+                return response.text();  // response가 텍스트일 경우 처리
+            }).then(htmlText => {
+                openModal(htmlText);  // 모달 열기
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다.');
+            }).finally(() => {
+                // 로딩 화면 숨기기
+                loadingOverlay.style.display = 'none';
+            });
+        }
+
+
+        function openModal(htmlString){
+            // 1. 모달 관련 요소 가져오기
+            const modal = document.getElementById("myModal");
+            modal.style.display = "block"
+            document.getElementById("modal-body").innerHTML = htmlString
+        }
+
+        function closeModal(){
+            const modal = document.getElementById("myModal");
+            modal.style.display = "none"
         }
 
         function cancelEdit() {
@@ -161,70 +271,70 @@
     <table>
         <thead>
         <tr>
-            <th>항목</th>
+            <th class="table-key">항목</th>
             <th>값</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td>문의 유형 ID</td>
-            <td th:text="${response.getQnaTypeId()}"></td>
+            <td class="table-key">문의 유형 ID</td>
+            <td class="table-value" th:text="${response.getQnaTypeId()}"></td>
         </tr>
         <tr>
-            <td>문의 유형 이름</td>
-            <td th:text="${response.getQnaTypeName()}"></td>
+            <td class="table-key">문의 유형 이름</td>
+            <td class="table-value" th:text="${response.getQnaTypeName()}"></td>
         </tr>
         <tr>
-            <td>문의 유형 활성화</td>
-            <td th:text="${response.getQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
+            <td class="table-key">문의 유형 활성화</td>
+            <td class="table-value" th:text="${response.getQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
         </tr>
         <tr>
-            <td>부모 문의 유형 ID</td>
-            <td th:text="${response.getParentQnaTypeId()}"></td>
+            <td class="table-key">부모 문의 유형 ID</td>
+            <td class="table-value" th:text="${response.getParentQnaTypeId()}"></td>
         </tr>
         <tr>
-            <td>부모 문의 유형 이름</td>
-            <td th:text="${response.getParentQnaTypeName()}"></td>
+            <td class="table-key">부모 문의 유형 이름</td>
+            <td class="table-value" th:text="${response.getParentQnaTypeName()}"></td>
         </tr>
         <tr>
-            <td>부모 문의 유형 활성화</td>
-            <td th:text="${response.getParentQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
+            <td class="table-key">부모 문의 유형 활성화</td>
+            <td class="table-value" th:text="${response.getParentQnaTypeIsActive() ? '활성화' : '비활성화'}"></td>
         </tr>
         <tr>
-            <td>주문 ID</td>
-            <td th:text="${response.getOrderId()}"></td>
+            <td class="table-key">주문 ID</td>
+            <td class="table-value" th:text="${response.getOrderId()}"></td>
         </tr>
         <tr>
-            <td>상품 ID</td>
-            <td th:text="${response.getProductId()}"></td>
+            <td class="table-key">상품 ID</td>
+            <td class="table-value" th:text="${response.getProductId()}"></td>
         </tr>
         <tr>
-            <td>1:1 문의 ID</td>
-            <td th:text="${response.getQnaId()}"></td>
+            <td class="table-key">1:1 문의 ID</td>
+            <td class="table-value" th:text="${response.getQnaId()}"></td>
         </tr>
         <tr>
-            <td>문의자 ID</td>
-            <td th:text="${response.getUserId()}"></td>
+            <td class="table-key">문의자 ID</td>
+            <td class="table-value" th:text="${response.getUserId()}"></td>
         </tr>
         <tr>
-            <td>문의자 이름</td>
-            <td th:text="${response.getUserName()}"></td>
+            <td class="table-key">문의자 이름</td>
+            <td class="table-value" th:text="${response.getUserName()}"></td>
         </tr>
         <tr>
-            <td>1:1문의글 생성일시</td>
-            <td th:text="${response.getCreatedTime()}"></td>
+            <td class="table-key">1:1문의글 생성일시</td>
+            <td class="table-value" th:text="${response.getCreatedTime()}"></td>
         </tr>
         <tr>
-            <td>제목</td>
-            <td th:text="${response.getTitle()}"></td>
+            <td class="table-key">제목</td>
+            <td class="table-value" th:text="${response.getTitle()}"></td>
         </tr>
         <tr>
-            <td>문의내용</td>
-            <td><pre th:text="${response.getContent()}"></pre></td>
+            <td class="table-key">문의내용</td>
+            <td class="table-value"><pre th:text="${response.getContent()}"></pre></td>
         </tr>
         <tr>
-            <td>첨부파일</td>
-            <td>
+            <td class="table-key">첨부파일</td>
+            <td class="table-value">
                 <ul>
                     <li th:each="path, stat : ${response.getAttachmentPaths()}">
                         <a th:href="${path}" target="_blank" th:text="'이미지 링크 ' + ${stat.count}"></a>
@@ -233,27 +343,64 @@
             </td>
         </tr>
         <tr>
-            <td>답변자 ID</td>
-            <td th:text="${response.getAdminId()}"></td>
+            <td class="table-key">답변자 ID</td>
+            <td class="table-value" th:text="${response.getAdminId()}"></td>
         </tr>
         <tr>
-            <td>답변일시</td>
-            <td th:text="${response.getAnswerCreatedTime()}"></td>
+            <td class="table-key">답변일시</td>
+            <td class="table-value" th:text="${response.getAnswerCreatedTime()}"></td>
         </tr>
         <tr>
-            <td>답변내용</td>
-            <td id="answer-row" ><pre th:text="${response.getAnswerContent()}"></pre></td>
+            <td class="table-key">답변내용</td>
+            <td class="table-value" id="answer-row" ><pre th:text="${response.getAnswerContent()}"></pre></td>
         </tr>
         </tbody>
     </table>
     <div class="button-container">
+        <button class="btn" th:onclick="createAutoQnaAnswer([[${response.getQnaId()}]])">답변자동생성</button>
         <a class="btn" href="/qna/admin/qna-list">목록</a>
         <button class="btn" th:if="${response.getAdminId() != null}"
                 th:onclick="enableAnswerInputForEdit([[${response.getAnswerId()}]], [[${response.getAnswerContent()}]])">수정하기</button>
         <button class="btn" th:if="${response.getAdminId() == null}"
                 th:onclick="enableAnswerInput([[${response.getQnaId()}]],'')">답변하기</button>
     </div>
-</div>
 
+    <!-- 모달 구조 -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div id="modal-body">
+                <!-- 문자열로 전달된 HTML이 여기에 렌더링됩니다. -->
+            </div>
+            <button onclick="closeModal()" class="close">닫기</button>
+        </div>
+    </div>
+
+    <!-- 로딩 오버레이 추가 -->
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background-color: white; padding: 20px; border-radius: 5px; text-align: center;">
+            <p>로딩 중...</p>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('click', function(event) {
+        // 클릭한 요소가 'accordian-toggle' 클래스인지 확인
+        if (event.target.classList.contains('accordian-toggle')) {
+            const toggle = event.target;
+            const content = toggle.nextElementSibling;
+            const isOpen = content.style.display === 'block';
+
+            // 모든 아코디언 콘텐츠를 닫음
+            document.querySelectorAll('.accordian-content').forEach(content => content.style.display = 'none');
+            document.querySelectorAll('.accordian-toggle span').forEach(span => span.innerHTML = '&#9660;');
+
+            // 클릭된 아코디언만 열기
+            if (!isOpen) {
+                content.style.display = 'block';
+                toggle.querySelector('span').innerHTML = '&#9650;';
+            }
+        }
+    });
+</script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package com.toy2.shop29.cart.dao;
 
 import com.toy2.shop29.cart.domain.response.CartDto;
+import com.toy2.shop29.common.ProductItem;
 
 import java.util.List;
 
@@ -42,4 +43,6 @@ public interface CartDao {
     int deleteCartItem() throws Exception;
 
     int countCartItem() throws Exception;
+
+    List<ProductItem> selectUserCartItem(String userId) throws Exception;
 }

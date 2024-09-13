@@ -91,6 +91,11 @@ public class ProductDaoImpl implements ProductDao {
         return session.update(namespace + "updateProductStock", params);
     }
 
+    @Override
+    public Long getProductPriceByProductId(Long productId) {
+        return session.selectOne(namespace + "getProductPriceByProductId", productId);
+    }
+
     //2-1.id로 product 1개만 read
     @Override
     public ProductDto select(int product_id){
@@ -103,6 +108,10 @@ public class ProductDaoImpl implements ProductDao {
         return session.selectOne(namespace+"count");
     }
 
+    @Override
+    public int insert(ProductDto product){
+        return session.insert(namespace + "insert",product); //map 사용하던가 아니면 product 사용하던가
+    }
 }
 
 

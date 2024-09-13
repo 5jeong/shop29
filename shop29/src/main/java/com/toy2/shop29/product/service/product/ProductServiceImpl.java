@@ -94,4 +94,9 @@ public class ProductServiceImpl implements ProductService {
         return productDao.count();
     }
 
+
+    @Override
+    public Long getProductPriceByProductId(Long productId) {
+        return productDao.getProductPriceByProductId(productId);
+    }
 }

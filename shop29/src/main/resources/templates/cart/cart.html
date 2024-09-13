@@ -1,4 +1,4 @@
-<div th:insert="fragments/header :: header"></div>
+<div th:insert="~{fragments/header :: header}"></div>
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,6 +8,8 @@
     <link th:href="@{/css/bootstrap.min.css}" href="../css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" th:href="@{/css/cart/styles.css}"/>
     <script>
         let msg = "[[${msg}]]";
@@ -18,7 +20,19 @@
         };
 
         if (messages[msg]) {
-            alert(messages[msg]);
+            Toastify({
+                text: messages[msg],
+                duration: 3000,
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "center", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                },
+                onClick: function(){} // Callback after click
+            }).showToast();
         }
     </script>
 </head>
@@ -124,7 +138,7 @@
     </div>
     <div class="checkout-actions">
         <button class="continue-shopping">CONTINUE SHOPPING</button>
-        <button class="checkout" th:data-login="${isLogin}">CHECK OUT</button>
+        <button class="checkout"  th:data-login="${isLogin}">CHECK OUT</button>
     </div>
     <form id="hidden-order-form" action="/order/update-order" method="POST" style="display:none;">
         <input type="hidden" name="orderItems" id="orderItems">
@@ -208,7 +222,7 @@
         $('.checkout').on('click', function () {
             if ($('.checkout').data('login') === 0) {
                 alert('로그인 후 주문 가능합니다.');
-                window.location.href = '/login?redirectURI=/cart';
+                window.location.href = '/login';
                 return
             }
             const orderItems = [];
@@ -246,12 +260,36 @@
                         const response = JSON.parse(xhr.responseText);
                         if (response?.message) {
                             const reason = response.message; // 첫 번째 오류의 reason 값
-                            alert(reason); // 알림창으로 reason 표시
+                            Toastify({
+                                text: reason,
+                                duration: 3000,
+                                newWindow: true,
+                                close: true,
+                                gravity: "top", // `top` or `bottom`
+                                position: "center", // `left`, `center` or `right`
+                                stopOnFocus: true, // Prevents dismissing of toast on hover
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                                },
+                                onClick: function(){} // Callback after click
+                            }).showToast();// 알림창으로 reason 표시
                         }
                     }
                 });
             } else {
-                alert("주문할 상품을 선택해주세요.");
+                Toastify({
+                    text: "주문할 상품을 선택해주세요.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
             }
         });
 
@@ -311,7 +349,20 @@
                     }
                 });
             } else {
-                alert("삭제할 상품을 선택해주세요.");
+
+                Toastify({
+                    text: "삭제할 상품을 선택해주세요.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
             }
         });
 
@@ -324,7 +375,20 @@
             const sizeOption = row.data('size-option');
             if (orderCount > 100) {
                 quantityInput.val(100);
-                alert("수량 최대 100개까지 가능합니다.");
+
+                Toastify({
+                    text: "수량 최대 100개까지 가능합니다.",
+                    duration: 3000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top", // `top` or `bottom`
+                    position: "center", // `left`, `center` or `right`
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                    onClick: function(){} // Callback after click
+                }).showToast();
             }
 
             $.ajax({
@@ -332,7 +396,7 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    product_id: id,
+                    productId: id,
                     quantity: Number(orderCount),
                     productOptionId: Number(sizeOption)
                 }),
@@ -388,7 +452,20 @@
                     const response = JSON.parse(xhr.responseText);
                     if (response?.message) {
                         const reason = response.message; // 첫 번째 오류의 reason 값
-                        alert(reason); // 알림창으로 reason 표시
+
+                        Toastify({
+                            text: reason,
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "center", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            },
+                            onClick: function(){} // Callback after click
+                        }).showToast();
                     }
                 }
             });
@@ -408,7 +485,20 @@
                 success: function (response) {
                     // 요청이 성공하면 페이지 새로고침
                     if (response.data?.message) {
-                        alert(response.data.message);
+
+                        Toastify({
+                            text: response.data.message,
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "center", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            },
+                            onClick: function(){} // Callback after click
+                        }).showToast();
                     }
                     location.reload();
                 },
@@ -416,7 +506,19 @@
                     const response = JSON.parse(xhr.responseText);
                     if (response.errors && response.errors.length > 0) {
                         const reason = response.errors[0].reason; // 첫 번째 오류의 reason 값
-                        alert(reason); // 알림창으로 reason 표시
+                        Toastify({
+                            text: reason,
+                            duration: 3000,
+                            newWindow: true,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "center", // `left`, `center` or `right`
+                            stopOnFocus: true, // Prevents dismissing of toast on hover
+                            style: {
+                                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                            },
+                            onClick: function(){} // Callback after click
+                        }).showToast();
                     }
                 }
             });

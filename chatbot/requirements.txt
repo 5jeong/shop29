@@ -1,0 +1,11 @@
+langchain-openai==0.1.23
+langchain-community==0.2.16
+langchain==0.2.16
+SQLAlchemy==2.0.32
+Jinja2==3.1.4
+Flask==3.0.3
+python-dotenv==1.0.1
+PyMySQL==1.1.1
+jq==1.8.0
+chromadb==0.5.3
+langchain-chroma==0.1.3

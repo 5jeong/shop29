@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -54,6 +56,7 @@
 <body>
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="header">
+    <div th:include="~{fragments/bot :: bot}"></div>
     <div class="container-fluid">
         <a class="navbar-brand" href="/" th:text="'29CM'">29CM</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -85,10 +88,10 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/cart" th:text="'장바구니'"></a>
                 </li>
-                <li class="nav-item" th:if="${session.loginUser != null}">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
                     <a class="nav-link active" href="/order/history" th:text="'주문내역'"></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="isAuthenticated()">
                     <a class="nav-link active" href="/qna/qna-list" th:text="'1:1 문의'">1:1 문의</a>
                 </li>
                 <li class="nav-item">
@@ -97,16 +100,14 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/faq/list" th:text="'FAQ'">FAQ</a>
                 </li>
-                <li class="nav-item" th:if="${session.loginUser == null}">
+                <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link active" href="/user/signup" th:text="'회원가입'">회원가입</a>
                 </li>
-                <li class="nav-item" th:if="${session.loginUser == null}">
+                <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link active" href="/login" th:text="'로그인'">로그인</a>
                 </li>
-                <li class="nav-item" th:if="${session.loginUser != null}">
-                    <form class="mb-0" th:action="@{/logout}" method="post">
-                        <button type="submit" class="nav-link active btn btn-link" th:text="'로그아웃'"></button>
-                    </form>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link active" href="/logout" th:text="'로그아웃'">로그아웃</a>
                 </li>
             </ul>
             <form class="d-flex">

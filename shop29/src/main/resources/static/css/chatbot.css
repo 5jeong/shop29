@@ -1,0 +1,407 @@
+.chatbot-container {
+    z-index: 10000000 !important;
+    position: relative !important;
+}
+
+.chatbot-button-container {
+    transition: visibility 400ms cubic-bezier(0.36, 0, 0, 1);
+    animation: 400ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
+    z-index: 10;
+    bottom: 24px;
+    right: 24px;
+    display: flex !important;
+    position: fixed !important;
+    flex-wrap: nowrap !important;
+}
+
+.chatbot-toggle-btn {
+    box-shadow: rgba(255, 255, 255, 0.12) 0 0 2px 0 inset, rgba(0, 0, 0, 0.05) 0 0 2px 1px, rgba(0, 0, 0, 0.3) 0 3px 6px 2px;
+    width: 56px;
+    height: 56px;
+    cursor: pointer;
+    background-color: #0dcaf0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    border-radius: 25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.chatbot-logo {
+    vertical-align: middle;
+    border-style: none;
+    width: 20px;
+    height: 20px;
+}
+
+.chatbot-chatbox {
+    max-height: calc(100vh - 160px);
+    max-width: calc(100vw - 48px);;
+    transition: visibility 400ms cubic-bezier(0.36, 0, 0, 1);
+    animation: 400ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeInUp;
+    align-content: flex-end;
+    width: 350px;
+    height: 500px;
+    box-shadow: rgba(255, 255, 255, 0.12) 0px 0px 2px 0px inset, rgba(0, 0, 0, 0.05) 0px 0px 2px 1px, rgba(0, 0, 0, 0.3) 0px 12px 60px;
+    position: fixed;
+    background-image: linear-gradient(to top, rgb(152, 144, 227) 0%, rgb(177, 244, 207) 100%);
+    border-radius: 10px;
+    bottom: 90px !important;
+    right: 24px !important;
+    min-height: calc(100% - 310px) !important;
+    overflow-y: auto;
+    display: none;
+    user-select: none;
+}
+
+.chatbot-messages {
+    max-height: calc(100% - 80px);
+    min-height: min-content;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.chatbot-input-container {
+    height: 80px;
+    position: sticky;
+    bottom: 0;
+}
+
+.chatbot-input-form {
+    height: 50px;
+    width: 100%;
+    display: flex;
+}
+
+.chatbot-input-label {
+    width: 100%;
+    height: 100%;
+}
+
+.chatbot-input {
+    width: 100%;
+    height: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    outline: none;
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 10px;
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 1.15;
+    margin: 0;
+}
+
+.chatbot-submit-btn {
+    width: 100px;
+    padding: 12px 20px;
+    background-color: #0d6efd;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-bottom-right-radius: 10px;
+    height: 100%;
+}
+
+
+.message {
+    transition: visibility 800ms cubic-bezier(0.36, 0, 0, 1);
+    animation: 800ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeInUp;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    position: relative;
+    max-width: 75%;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background-color: #0d6efd;
+    color: white;
+    align-self: flex-end;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.assistant {
+    background-color: #f8f9fa;
+    color: #212529;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.message strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.message p {
+    margin: 0;
+    white-space: pre-line;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translate3d(0px, 20px, 0px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0px, 0px, 0px);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.select-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: auto;
+    margin-bottom: 15px;
+}
+
+.select-option-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: auto;
+    margin-bottom: 15px;
+}
+
+.btn-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 10px;
+}
+
+.select-btn {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+}
+
+.select-btn {
+    animation: 2000ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: uppercase;
+    background-size: 200% auto;
+    transition: 0.5s;
+    color: white;
+    box-shadow: 0 0 5px #eee;
+    border-radius: 10px;
+    max-width: fit-content;
+    letter-spacing: -0.1px;
+    color: rgba(0, 0, 0, 0.85);
+    word-break: break-word;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.select-btn:hover {
+    box-shadow: rgba(255, 255, 255, 0.12) 0px 0px 2px 0px inset, rgba(0, 0, 0, 0.05) 0px 0px 2px 1px, rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    background-color: rgb(35, 34, 35);
+    color: rgb(255, 255, 255);
+}
+
+.option-btn {
+    animation: 2000ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: uppercase;
+    background-size: 200% auto;
+    transition: 0.5s;
+    border-radius: 10px;
+    max-width: fit-content;
+    letter-spacing: -0.1px;
+    word-break: break-word;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: rgba(255, 255, 255, 0.12) 0px 0px 2px 0px inset, rgba(0, 0, 0, 0.05) 0px 0px 2px 1px, rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    background-color: rgb(35, 34, 35);
+    color: rgb(255, 255, 255);
+}
+
+.option-btn:hover {
+    box-shadow: 0 0 5px #eee;
+    background-color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.option-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 15px;
+}
+
+
+.menu-btn {
+    /*background: #b9dcdd;*/
+    height: 30px;
+    border: none;
+    width: 100%;
+    background-image: linear-gradient(to right, #50C9C3 0%, #96DEDA 51%, #50C9C3 100%);
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 5px #eee;
+    display: block;
+}
+
+.menu-btn:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+}
+
+.order-product-btn {
+    display:block;
+    animation: 2000ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: uppercase;
+    background-size: 200% auto;
+    transition: 0.5s;
+    border-radius: 10px;
+    max-width: fit-content;
+    letter-spacing: -0.1px;
+    word-break: break-word;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: rgba(255, 255, 255, 0.12) 0px 0px 2px 0px inset, rgba(0, 0, 0, 0.05) 0px 0px 2px 1px, rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    background-color: rgb(35, 34, 35);
+    color: rgb(255, 255, 255);
+    margin: 10px 0;
+}
+
+.order-product-btn.active {
+    box-shadow: 0 0 5px #eee;
+    background-color: rgb(218 215 255);
+    color: rgba(0, 0, 0, 0.85);
+}
+
+.order-product-container {
+    animation: 2000ms cubic-bezier(0.36, 0, 0, 1) 0s 1 normal both running fadeIn;
+    padding: 10px 20px;
+    text-align: center;
+    text-transform: uppercase;
+    background-size: 200% auto;
+    transition: 0.5s;
+    border-radius: 10px;
+    max-width: fit-content;
+    letter-spacing: -0.1px;
+    word-break: break-word;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: black;
+    margin: 10px 0;
+}
+
+
+.refund-btn {
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-image: linear-gradient(to right, #FF8008 0%, #FFC837 51%, #FF8008 100%);
+    margin: 10px;
+    padding: 10px 30px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+}
+
+.refund-btn:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+}
+
+.search-product-container {
+    position: relative;
+    width: 100%;
+    margin: 50px 0 20px;
+
+    & > span {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        background-color: #666;
+        width: 0;
+        height: 2px;
+        border-radius: 2px;
+        transition: 0.5s;
+    }
+
+    & > input:focus ~ label, & > input:valid ~ label {
+        font-size: 16px;
+        bottom: 40px;
+        color: white;
+        font-weight: bold;
+    }
+
+    & > input:focus ~ span, & > input:valid ~ span {
+        width: 100%;
+    }
+}
+
+.search-product-input {
+    font-size: 15px;
+    color: white;
+    width: 100%;
+    border: none;
+    border-bottom: solid white 1px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    position: relative;
+    background: none;
+    z-index: 5;
+}
+
+.search-product-input::placeholder {
+    color: #aaaaaa;
+}
+
+.search-product-input:focus {
+    outline: none;
+}
+
+
+.search-product-label {
+    position: absolute;
+    color: white;
+    left: 10px;
+    font-size: 20px;
+    bottom: 8px;
+    transition: all .2s;
+}
+

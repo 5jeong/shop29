@@ -1,5 +1,6 @@
 package com.toy2.shop29.qna.controller;
 
+import com.toy2.shop29.chatBot.service.ChatBotService;
 import com.toy2.shop29.qna.domain.QnaTypeDto;
 import com.toy2.shop29.qna.domain.request.QnaCreateRequest;
 import com.toy2.shop29.qna.domain.response.QnaAdminResponse;
@@ -9,12 +10,14 @@ import com.toy2.shop29.qna.service.qna.QnaService;
 import com.toy2.shop29.qna.service.qnaanswer.QnaAnswerService;
 import com.toy2.shop29.qna.service.qnatype.QnaTypeService;
 import com.toy2.shop29.qna.util.QnaPagingHandler;
+import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,20 +31,20 @@ public class QnaController {
 
     private QnaService qnaService;
     private QnaTypeService qnaTypeService;
-    private UserService userService;
     private QnaAnswerService qnaAnswerService;
-    private final String ROLE_ADMIN = "관리자";
+    private ChatBotService chatBotService;
+    private final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    public QnaController(QnaService qnaService, QnaTypeService qnaTypeService, UserService userService, QnaAnswerService qnaAnswerService) {
+    public QnaController(QnaService qnaService, QnaTypeService qnaTypeService, ChatBotService chatBotService, QnaAnswerService qnaAnswerService) {
         this.qnaService = qnaService;
+        this.chatBotService = chatBotService;
         this.qnaTypeService = qnaTypeService;
-        this.userService = userService;
         this.qnaAnswerService = qnaAnswerService;
     }
 
     @GetMapping("/form")
     String getQnaForm(
-            @SessionAttribute(name = "loginUser", required = false) String loginUser, Model model){
+            @AuthenticationPrincipal UserContext userContext, Model model){
         // key : 부모 문의유형 이름, value : 자식 문의유형 리스트
         Map<String,List<QnaTypeDto>> qnaTypeMap = qnaTypeService.findAllWithParentForUser();
         model.addAttribute("qnaTypeMap", qnaTypeMap);
@@ -51,46 +54,56 @@ public class QnaController {
         model.addAttribute("qnaTypeList", qnaTypeDtos);
 
         // 사용자 정보
-        UserDto userDto = userService.findById(loginUser);
-        model.addAttribute("userDto", userDto);
+//        UserDto userDto = userService.findById(loginUser);
+        model.addAttribute("userDto", userContext.getUserDto());
 
         return "qna/qnaForm";
     }
 
     @GetMapping("/qna-list")
     String getQnaList(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "pageNo",defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize",defaultValue = "10") int pageSize,
             Model model){
-        UserDto userDto = userService.findById(loginUser);
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(userRole.equals(ROLE_ADMIN)){
             return "redirect:/qna/admin/qna-list";
         }
 
-        int totalCnt = qnaService.countByUserId(loginUser);
+        int totalCnt = qnaService.countByUserId(userDto.getUserId());
         QnaPagingHandler pagingHandler = new QnaPagingHandler(totalCnt, pageSize, 10,pageNo);
         int limit = pagingHandler.getLimit();
         int offset = pagingHandler.getOffset();
 
-        List<QnaResponse> qnaResponses = qnaService.findQnaList(loginUser, limit, offset);
+        List<QnaResponse> qnaResponses = qnaService.findQnaList(userDto.getUserId(), limit, offset);
         model.addAttribute("qnaResponses", qnaResponses);
         model.addAttribute("ph", pagingHandler);
 
         return "qna/qnaList";
     }
 
+    /**
+     * 이 메서드는 챗봇을 위한 것이며, 오직 localhost에서만 접근 가능하도록 제한해야합니다.
+     */
+    @ResponseBody
+    @GetMapping("/qna-list/{userId}")
+    List<QnaResponse> getQnaListRest(
+            @PathVariable(name = "userId") String userId){
+        return qnaService.findQnaListAll(userId);
+    }
+
     @GetMapping("/admin/qna-list")
     String getQnaListForAdmin(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "pageNo",defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize",defaultValue = "10") int pageSize,
             @RequestParam(name = "qnaTypeId",required = false) String qnaTypeId,
             @RequestParam(name = "isAnswered",required = false) Boolean isAnswered,
             Model model){
-        UserDto userDto = userService.findById(loginUser);
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(!userRole.equals(ROLE_ADMIN)){
@@ -113,12 +126,36 @@ public class QnaController {
         return "qna/qnaAdminList";
     }
 
+    @ResponseBody
+    @PostMapping("/admin/create-auto-answer")
+    String createAutoAnswer(
+            @AuthenticationPrincipal UserContext userContext,
+            @RequestParam(name = "qnaId", required = true) int qnaId
+    ){
+        UserDto userDto = userContext.getUserDto();
+        String userRole = userDto.getUserRole();
+
+        // 관리자 권한이 없을 경우 리다이렉트
+        if(!userRole.equals(ROLE_ADMIN)){
+            return "redirect:/qna/qna-list";
+        }
+
+        // 문의글 내용 조회
+        QnaDetailResponse qnaDetailResponse = qnaService.findQnaDetail(qnaId);
+        String qnaContent = qnaDetailResponse.getContent();
+
+        // Flask 서버에 답변생성 요청
+        return chatBotService.createAutoQnaAnswer(qnaContent);
+    }
+
+
+
     @GetMapping("/answer")
     String getAnswerForm(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaId", required = true) int qnaId,
             Model model){
-        UserDto userDto = userService.findById(loginUser);
+        UserDto userDto = userContext.getUserDto();
         String userRole = userDto.getUserRole();
 
         if(!userRole.equals(ROLE_ADMIN)){
@@ -133,10 +170,11 @@ public class QnaController {
 
     @PostMapping
     ResponseEntity<String> postQna(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @ModelAttribute @Valid QnaCreateRequest qnaCreateRequest){
         try{
-            qnaService.createQna(qnaCreateRequest, loginUser);
+            UserDto userDto = userContext.getUserDto();
+            qnaService.createQna(qnaCreateRequest, userDto.getUserId());
         }catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -154,11 +192,12 @@ public class QnaController {
     @DeleteMapping
     @ResponseBody
     ResponseEntity<String> deleteQna(
-            @SessionAttribute(name = "loginUser", required = true) String userId,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name= "qnaId",required = true) int qnaId
     ){
         try{
-            qnaService.deleteQna(qnaId, userId);
+            UserDto userDto = userContext.getUserDto();
+            qnaService.deleteQna(qnaId, userDto.getUserId());
         }catch (RuntimeException e){
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -170,11 +209,12 @@ public class QnaController {
     @PostMapping("/answer")
     @ResponseBody
     ResponseEntity<String> postAnswer(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaId", required = true) int qnaId,
             @RequestParam(name = "answerContent", required = true) String answerContent){
         try{
-            qnaAnswerService.createQnaAnswer(qnaId, loginUser, answerContent);
+            UserDto userDto = userContext.getUserDto();
+            qnaAnswerService.createQnaAnswer(qnaId, userDto.getUserId(), answerContent);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -185,11 +225,12 @@ public class QnaController {
     @PutMapping("/answer")
     @ResponseBody
     ResponseEntity<String> putAnswer(
-            @SessionAttribute(name = "loginUser", required = true) String loginUser,
+            @AuthenticationPrincipal UserContext userContext,
             @RequestParam(name = "qnaAnswerId", required = true) int qnaAnswerId,
             @RequestParam(name = "answerContent", required = true) String answerContent){
         try{
-            qnaAnswerService.updateQnaAnswer(qnaAnswerId, loginUser, answerContent);
+            UserDto userDto = userContext.getUserDto();
+            qnaAnswerService.updateQnaAnswer(qnaAnswerId, userDto.getUserId(), answerContent);
         }catch (RuntimeException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

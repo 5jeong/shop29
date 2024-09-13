@@ -67,7 +67,7 @@
         <h2>회원정보 수정</h2>
         <p class="text-muted">수정할 회원정보를 입력해주세요.</p>
     </div>
-    <form th:action="@{/user/update}" th:object="${loginUser}" method="post" onsubmit="return validateForm();">
+    <form th:action="@{/user/update}" th:object="${userUpdateDto}" method="post" onsubmit="return validateForm();">
 
         <div>
             <label for="userId">아이디</label>
@@ -78,8 +78,8 @@
 
         <div>
             <label for="password">비밀번호</label>
-            <input type="text" id="password" th:field="*{password}"
-                   class="form-control" th:errorclass="field-error" placeholder="8-20자 이내의 영문, 숫자의 조합으로 입력">
+            <input type="password" id="password" th:field="*{password}"
+                   class="form-control" th:errorclass="field-error" placeholder="비밀번호를 변경하려면 입력하세요.">
             <div class="field-error" th:errors="*{password}"></div>
         </div>
         <div>
@@ -96,8 +96,8 @@
         </div>
         <div>
             <label for="birthDate">생년월일</label>
-            <input type="text" id="birthDate" th:field="*{birthDate}"
-                   class="form-control" th:errorclass="field-error" placeholder="생년월일 입력 ex) 1990-03-21" readonly>
+            <input type="date" id="birthDate" th:field="*{birthDate}"
+                   class="form-control" th:errorclass="field-error" placeholder="생년월일 입력 ex) 1990-03-21" >
             <div class="field-error" th:errors="*{birthDate}"></div>
         </div>
 
@@ -272,9 +272,11 @@
         }
 
         // 비밀번호 유효성 검사
-        if (!/^(?=.*[a-zA-Z])(?=.*\d).{8,20}$/.test(password)) {
-            alert("비밀번호는 8~20자 이내의 대소문자 및 숫자로 이루어져야 합니다.");
-            return false;
+        if(passwordField.length > 0){
+            if (!/^(?=.*[a-zA-Z])(?=.*\d).{8,20}$/.test(password)) {
+                alert("비밀번호는 8~20자 이내의 대소문자 및 숫자로 이루어져야 합니다.");
+                return false;
+            }
         }
 
         // 이름 유효성 검사
