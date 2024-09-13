@@ -22,6 +22,10 @@ DATABASE_PASSWORD = "DB비밀번호"
 
 `pip install -r requirements.txt`
 
+벡터BD 생성
+
+`python /chatbot/qna/vector_db/create_vector_db.py`
+
 ## 실행방법
 - DB 테이블 생성문 실행 (상품관련 테이블은 컬럼 추가 필요)
 - `application.properties` 세팅
