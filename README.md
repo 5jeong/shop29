@@ -1,15 +1,26 @@
-# 29CM 쇼핑몰 벤치마킹
-## 멤버구성 및 역할
-- 김병훈 : 장바구니, 결제, 주문
-- 김정민 : 1:1문의, 첨부파일
-- 류은기 : 상품 분류, 상품 옵션
-- 오정훈 : 회원가입, 회원수정, 로그인, 계정찾기
-- 임정훈 : 공지사항, FAQ
+# [2조] 토이프로젝트3 챗봇 기능 구현
+
+# _[챗봇 PPT](https://docs.google.com/presentation/d/1ySOBfHEXxCUV4AeJFUnlCxB7Egob18_8LCzPv0B33kI/edit?usp=sharing)_
 
 ## 개발환경
 - Web BackEnd : Java 17, Spring Boot 3.3.2, Mybatis, MySql 8.0이상, Gradle
 - Web FrontEnd : thymeleaf , HTML/CSS/JS
 - Versioning : Git, GitHub, Notion
+
+**[챗봇 관련 설정]**
+
+/chatbot 폴더에 .env파일 생성하여 아래 값 수정
+```
+OPENAI_API_KEY = "OPENAI API 키"
+OPENAI_MODEL_NAME = "OPENAI 모델명"
+DATABASE_URL = "localhost:3306/DB명?charset=utf8"
+DATABASE_USERNAME = "DB아이디"
+DATABASE_PASSWORD = "DB비밀번호"
+```
+
+터미널 아래 코드 실행
+
+`pip install -r requirements.txt`
 
 ## 실행방법
 - DB 테이블 생성문 실행 (상품관련 테이블은 컬럼 추가 필요)
