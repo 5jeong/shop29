@@ -2,6 +2,10 @@
 
 # _[챗봇 PPT](https://docs.google.com/presentation/d/1ySOBfHEXxCUV4AeJFUnlCxB7Egob18_8LCzPv0B33kI/edit?usp=sharing)_
 
+## 시연영상 링크
+- 영상1 링크 : https://www.youtube.com/watch?v=drDO_L3ZQfo&t=1s
+- 영상2 링크 : https://www.youtube.com/watch?v=5ZW4JTOFNbI
+
 ## 개발환경
 - Web BackEnd : Java 17, Spring Boot 3.3.2, Mybatis, MySql 8.0이상, Gradle
 - Web FrontEnd : thymeleaf , HTML/CSS/JS
