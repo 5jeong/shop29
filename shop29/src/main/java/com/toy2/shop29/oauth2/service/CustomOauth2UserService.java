@@ -4,6 +4,7 @@ import com.toy2.shop29.oauth2.dto.GoogleResponse;
 import com.toy2.shop29.oauth2.dto.KakaoResponse;
 import com.toy2.shop29.oauth2.dto.NaverResponse;
 import com.toy2.shop29.oauth2.dto.OAuth2Response;
+import com.toy2.shop29.oauth2.dto.OAuth2ResponseFactory;
 import com.toy2.shop29.users.domain.UserContext;
 import com.toy2.shop29.users.domain.UserDto;
 import com.toy2.shop29.users.service.user.UserService;
@@ -34,28 +35,14 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         System.out.println("attributes = " + attributes);
 
-        // 구글인지 네이버인지 카카오인지
-        String registration = userRequest.getClientRegistration().getRegistrationId();
-
-        OAuth2Response oAuth2Response = null;
-        if (registration.equals("naver")) {
-            log.info("naver 로그인");
-            oAuth2Response = new NaverResponse(attributes);
-        } else if (registration.equals("google")) {
-            log.info("google 로그인");
-            oAuth2Response = new GoogleResponse(attributes);
-        } else if (registration.equals("kakao")) {
-            log.info("kakao 로그인");
-            oAuth2Response = new KakaoResponse(attributes);
-        } else {
-            throw new IllegalArgumentException("지원하지 않는 로그인 제공자");
-        }
+        // 로그인 제공자 (google, naver, kakao)
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        OAuth2Response oAuth2Response = OAuth2ResponseFactory.getOAuth2Response(registrationId, attributes);
 
         UserDto user = getUserInfo(oAuth2Response);
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getUserRole()));
         return new UserContext(user, authorities, attributes);
     }
-
     private UserDto getUserInfo(OAuth2Response oAuth2Response) {
         UserDto user = userService.findById(oAuth2Response.getProviderId());
 
