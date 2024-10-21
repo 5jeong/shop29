@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,7 @@ public class EmailService {
     private String emailSender;
 
     // 이메일 인증번호 전송
+    @Async
     public void sendEmail(EmailDto emailDto) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(emailSender); // 발신자 이메일 설정
